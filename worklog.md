@@ -108,5 +108,10 @@
 - Why: The prior blanket disables were too broad and would have suppressed real bugs outside the R3F scenes.
 - Next: Wait for owner review. Do not start Phase 1.
 
+## 2026-05-17 — phase 0.6 workflow scaffolding
+- Did: **Piece 1** — commitlint.config.cjs with the prompt's type/scope/subject rules; husky 9 installed via `prepare`; `.husky/commit-msg` runs commitlint, `.husky/pre-commit` runs `typecheck && lint && lint:colors`. **Piece 2** — `.husky/commit-msg` greps for `^Co-Authored-by:` before commitlint and exits 1 with the prescribed error; `ci.yml` added a `guard against Co-Authored-by trailers` step over the PR range (`origin/<base>..HEAD`) with `fetch-depth: 0`. **Piece 3** — `scripts/check-commit-size.mjs` warns on >500 lines OR >15 files per commit and hard-blocks on >2000; wired to `.husky/pre-push` with safe defaults (`origin/main..HEAD`, silent exit on missing remote). **Piece 4** — `scripts/sync-worklog.mjs` reads/writes the hidden `<!-- worklog-sync: lastCommitSha=… -->` marker, walks `git log marker..HEAD`, filters `docs(worklog):` subjects, groups by date, appends `## YYYY-MM-DD — auto-synced from git log` bullet entries; `.github/workflows/worklog-sync.yml` runs it on push to main with `contents: write`, commits as `github-actions[bot]` with `[skip ci]`. **Piece 5** — `CONTRIBUTING.md` covers the non-negotiable Co-Authored-by rule, branch model, commit format, hook list, branch-protection settings the owner must configure; `scripts/update-phase-status.mjs` reads `docs/04-roadmap.md`, finds the first phase with unchecked boxes, writes `phase-status.json`; `.github/workflows/phase-status.yml` runs on push + daily cron; `README.md` includes the shields.io dynamic-JSON badge.
+- Why: Phase 0.6 — workflow infrastructure before Phase 1 starts dropping desk-object commits.
+- Next: Wait for owner approval, then Phase 1 Checkpoint A.
+
 ## 2026-05-17 — auto-synced from git log
 - chore(infra): gitignore claude local settings (`ce3533c`)
