@@ -40,6 +40,21 @@ The three layers, shipped together as the v1 MVP:
 - 3D assets in `public/models/`, audio in `public/audio/`. Both git-LFS if >1MB.
 - Every PR-sized change appends an entry to `worklog.md`
 
+## Tool-use discipline
+
+The full rules are in `docs/tooling-rules.md`. The cliff notes:
+
+- **File reads**: use Read with `offset`+`limit` for anything over 200 lines; never `cat` markdown/json/lock/log files.
+- **Search**: Grep with `output_mode: "files_with_matches"` first; cap with `head_limit`; never `grep -r`/`rg` unbounded.
+- **Build/test**: always pipe `pnpm build|test|dev|install` through `tail -n N`; full output only when investigating a known failure.
+- **Git**: `git log` requires `--oneline`/`--stat`/`-n`; diffs go through `--stat` first.
+- **Subagent dispatch (hard)**: dispatch when reading >10 files, investigating >2K-line logs, touching >15 files, or any task verb of "investigate / audit / survey / map / trace."
+- **Hygiene**: `/compact` after each checkpoint, `/clear` between unrelated tasks.
+
+The mechanical enforcement lives in `.claude/settings.json` PreToolUse hooks; they will deny non-conforming commands with a reason. To bypass for a single call, append `# bypass:hooks` to the command.
+
+Reference: `docs/tooling-rules.md`.
+
 ## Definition of done — v1 MVP
 
 - All three layers navigable on desktop (≥1024px) and mobile (≥375px, with reduced fidelity)

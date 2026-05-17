@@ -13,6 +13,7 @@
     "lint:colors": "node scripts/lint-colors.mjs",
     "bundle:check": "node scripts/bundle-budget.mjs",
     "a11y:check": "node scripts/a11y-smoke.mjs",
+    "test:hooks": "node scripts/test-hooks.mjs",
     "lh:check": "lhci autorun",
     "prepare": "husky"
   },
