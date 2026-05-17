@@ -10,3 +10,4 @@ Thumbs.db
 coverage
 .lighthouseci
 .husky/_
+.claude/settings.local.json
