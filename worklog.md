@@ -1,3 +1,4 @@
+<!-- worklog-sync: lastCommitSha=ce3533c98ed08120d3d0ff0f8fad2798938c0468 -->
 # worklog.md
 
 > One-line-per-line decision log. Append after every meaningful change.
@@ -106,3 +107,6 @@
 - Did: Re-enabled `react/jsx-no-comment-textnodes` and `react/no-unescaped-entities` globally; scoped `react/no-unknown-property` disable to a `files: ['src/scenes/**/*.tsx']` override so DOM components stay guarded. Fixed the source the re-enabled rules flagged: removed `//` prefixes from the CityRoute/NnRoute stub text nodes; changed `quant's` → `quant&rsquo;s` in TextRoute (also reads better — curly apostrophe).
 - Why: The prior blanket disables were too broad and would have suppressed real bugs outside the R3F scenes.
 - Next: Wait for owner review. Do not start Phase 1.
+
+## 2026-05-17 — auto-synced from git log
+- chore(infra): gitignore claude local settings (`ce3533c`)
