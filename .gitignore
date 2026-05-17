@@ -12,3 +12,4 @@ coverage
 .husky/_
 .claude/settings.local.json
 .claude/hook-log.jsonl
+phase-*-prompt.md
