@@ -1,0 +1,9 @@
+{
+  "$comment": "Symbol -> district mapping. Phase 3 wires this into the city renderer.",
+  "indices": ["SPY", "QQQ", "VIX"],
+  "districts": {
+    "research": ["NVDA", "GOOGL", "MSFT", "META", "PLTR"],
+    "trading": ["JPM", "GS", "MS", "BLK", "COIN"],
+    "infrastructure": ["AMZN", "AAPL", "AMD", "AVGO", "ORCL"]
+  }
+}

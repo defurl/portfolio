@@ -1,0 +1,60 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+          fetch-depth: 0
+
+      - name: guard against Co-Authored-by trailers
+        run: |
+          base="origin/${{ github.base_ref || 'main' }}"
+          if ! git rev-parse --verify "$base" >/dev/null 2>&1; then
+            range="HEAD"
+          else
+            range="$base..HEAD"
+          fi
+          if git log --format='%B' $range | grep -iE '^Co-Authored-by:'; then
+            echo "::error::Co-Authored-by trailer is not allowed in this repo. See CONTRIBUTING.md."
+            exit 1
+          fi
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm lint:colors
+      - run: pnpm build
+
+      - name: bundle budget
+        run: pnpm bundle:check
+
+      - name: install playwright deps
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: serve dist for axe smoke
+        run: npx --yes serve dist -p 4173 -L &
+      - name: wait for static server
+        run: npx --yes wait-on http://localhost:4173
+
+      - name: a11y smoke
+        run: pnpm a11y:check
+
+      - name: lighthouse (serves dist itself via lhci staticDistDir)
+        run: pnpm lh:check

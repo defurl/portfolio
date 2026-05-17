@@ -1,0 +1,40 @@
+.toggle {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.85rem;
+  background: rgba(10, 15, 26, 0.7);
+  border: 1px solid var(--ink-ghost);
+  color: var(--ink-muted);
+  font-family: var(--font-mono);
+  font-size: var(--step-1);
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: color var(--dur-ui) var(--ease-ui), border-color var(--dur-ui) var(--ease-ui);
+  z-index: 20;
+}
+
+.toggle:hover {
+  color: var(--ink-paper);
+  border-color: var(--signal-amber-dim);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ink-faint);
+  transition: background var(--dur-ui) var(--ease-ui), box-shadow var(--dur-ui) var(--ease-ui);
+}
+
+.dot[data-on='true'] {
+  background: var(--signal-amber);
+  box-shadow: 0 0 8px var(--signal-amber);
+}
+
+.label {
+  text-transform: lowercase;
+}

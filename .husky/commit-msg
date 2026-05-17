@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+# 1) Reject Co-Authored-by trailers BEFORE commitlint runs.
+if grep -iE '^Co-Authored-by:' "$1" >/dev/null; then
+  echo "commit rejected: Co-Authored-by trailer not allowed in this repo. See CONTRIBUTING.md." >&2
+  exit 1
+fi
+
+# 2) Conventional Commits format.
+pnpm exec commitlint --edit "$1"

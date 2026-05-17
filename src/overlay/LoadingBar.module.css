@@ -1,0 +1,32 @@
+.wrap {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: end center;
+  padding-bottom: 4rem;
+  background: var(--bg-void);
+  z-index: 50;
+}
+
+.bar {
+  width: 12rem;
+  height: 1px;
+  background: var(--ink-ghost);
+  position: relative;
+  overflow: hidden;
+}
+
+.bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -40%;
+  width: 40%;
+  height: 100%;
+  background: var(--signal-amber);
+  animation: slide 1800ms var(--ease-ui) infinite;
+}
+
+@keyframes slide {
+  to { left: 100%; }
+}

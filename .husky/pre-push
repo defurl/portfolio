@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+# Commit-size discipline. Warns >500 lines or >15 files per commit.
+# Hard-blocks >2000 lines per commit. See CONTRIBUTING.md.
+node scripts/check-commit-size.mjs

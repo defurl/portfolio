@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+# Fast local checks. Target <10s on the current scaffold.
+# If this exceeds 10s, drop `typecheck` and rely on CI for it.
+pnpm typecheck && pnpm lint && pnpm lint:colors

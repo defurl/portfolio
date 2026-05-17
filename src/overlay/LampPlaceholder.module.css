@@ -1,0 +1,26 @@
+.room {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-void);
+  display: grid;
+  place-items: center;
+}
+
+.room::before {
+  content: '';
+  width: 18rem;
+  height: 18rem;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    var(--lamp-warm) 0%,
+    rgba(255, 182, 97, 0.25) 30%,
+    transparent 70%
+  );
+  opacity: 0;
+  animation: lamp-on 1400ms var(--ease-ui) forwards;
+}
+
+@keyframes lamp-on {
+  to { opacity: 0.55; }
+}
