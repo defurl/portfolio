@@ -55,7 +55,8 @@ a:hover { color: var(--signal-amber-hot); }
 }
 
 /* Film-grain overlay — atmosphere only, never a "design flourish".
-   Static (no animation); reduced-motion fades it out per AR-2. */
+   Drifts gently at ~24fps-coded speed (6s loop, stepped) when motion is allowed.
+   Reduced-motion freezes the position and fades the layer entirely. */
 .grain::after {
   content: '';
   position: fixed;
@@ -65,10 +66,21 @@ a:hover { color: var(--signal-amber-hot); }
   opacity: 0.03;
   mix-blend-mode: overlay;
   z-index: 1000;
+  animation: grain-drift 6s steps(6, end) infinite;
 }
 
 .grain[data-reduced-motion='true']::after {
   opacity: 0;
+  animation: none;
+}
+
+@keyframes grain-drift {
+  0%   { background-position: 0 0; }
+  20%  { background-position: -8px 4px; }
+  40%  { background-position: 5px -7px; }
+  60%  { background-position: -3px -3px; }
+  80%  { background-position: 6px 5px; }
+  100% { background-position: 0 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
