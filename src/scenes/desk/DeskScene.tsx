@@ -26,6 +26,7 @@ import { Notebook } from './objects/Notebook';
 import { Phone } from './objects/Phone';
 import { Lamp } from './objects/Lamp';
 import { Window } from './objects/Window';
+import { BloomLayer } from './postfx/BloomLayer';
 
 // The Night Desk scene root. Camera is positioned in DeskRoute.
 //
@@ -100,6 +101,8 @@ export function DeskScene() {
       <Phone position={[0.7, 0.012, -0.05]} />
       <Lamp position={[0.9, 0, -0.2]} />
       <Window position={[1.2, 1.0, -0.6]} />
+
+      <BloomLayer />
     </>
   );
 }
