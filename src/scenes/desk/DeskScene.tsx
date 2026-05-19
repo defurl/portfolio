@@ -21,6 +21,7 @@ import {
 } from './lighting';
 import { DeskSurface } from './objects/DeskSurface';
 import { Lamp } from './objects/Lamp';
+import { Monitor } from './objects/Monitor';
 import { BloomLayer } from './postfx/BloomLayer';
 
 // PHASE 1 REVISION — Lighting-only scene per `phase-1-revision-prompt.md`
@@ -112,6 +113,11 @@ export function DeskScene() {
         position={[LAMP_POSITION[0], 0, LAMP_POSITION[2]]}
         bulbPosition={LAMP_POSITION as unknown as [number, number, number]}
       />
+
+      {/* Monitors (step 3 of order-of-operations) — emissive screens that
+          bloom. Positions per the lighting-plan plan view. */}
+      <Monitor variant="primary" position={[-0.3, 0.55, -0.4]} />
+      <Monitor variant="terminal" position={[0.5, 0.55, -0.4]} width={0.5} height={0.3} />
 
       <BloomLayer />
     </>
