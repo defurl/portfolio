@@ -22,6 +22,7 @@ import {
 import { DeskSurface } from './objects/DeskSurface';
 import { Lamp } from './objects/Lamp';
 import { Monitor } from './objects/Monitor';
+import { Window } from './objects/Window';
 import { BloomLayer } from './postfx/BloomLayer';
 
 // PHASE 1 REVISION — Lighting-only scene per `phase-1-revision-prompt.md`
@@ -118,6 +119,10 @@ export function DeskScene() {
           bloom. Positions per the lighting-plan plan view. */}
       <Monitor variant="primary" position={[-0.3, 0.55, -0.4]} />
       <Monitor variant="terminal" position={[0.5, 0.55, -0.4]} width={0.5} height={0.3} />
+
+      {/* Window (step 4) — `MeshPhysicalMaterial` glass + placeholder city.
+          Rim DirectionalLight carries the cool cast through to the room. */}
+      <Window position={[1.4, 1.0, -0.6]} />
 
       <BloomLayer />
     </>
