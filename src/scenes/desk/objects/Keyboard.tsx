@@ -45,7 +45,7 @@ export function Keyboard({ position }: KeyboardProps) {
   return (
     <group position={position}>
       {/* Plate */}
-      <mesh receiveShadow>
+      <mesh castShadow receiveShadow>
         <boxGeometry args={[totalW + PLATE_PAD, 0.012, totalD + PLATE_PAD]} />
         <meshStandardMaterial color={INK_GHOST} roughness={0.6} metalness={0.25} />
       </mesh>

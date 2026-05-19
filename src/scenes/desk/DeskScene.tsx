@@ -23,6 +23,12 @@ import { DeskSurface } from './objects/DeskSurface';
 import { Lamp } from './objects/Lamp';
 import { Monitor } from './objects/Monitor';
 import { Window } from './objects/Window';
+import { Keyboard } from './objects/Keyboard';
+import { Mug } from './objects/Mug';
+import { Plant } from './objects/Plant';
+import { Headphones } from './objects/Headphones';
+import { Notebook } from './objects/Notebook';
+import { Phone } from './objects/Phone';
 import { BloomLayer } from './postfx/BloomLayer';
 
 // PHASE 1 REVISION — Lighting-only scene per `phase-1-revision-prompt.md`
@@ -123,6 +129,15 @@ export function DeskScene() {
       {/* Window (step 4) — `MeshPhysicalMaterial` glass + placeholder city.
           Rim DirectionalLight carries the cool cast through to the room. */}
       <Window position={[1.4, 1.0, -0.6]} />
+
+      {/* Step 6 — rest of the desk objects. All castShadow per no-contact-shadow.
+          Positions per the lighting-plan + revision-prompt table. */}
+      <Keyboard position={[0, 0.04, 0.2]} />
+      <Mug position={[-0.55, 0.06, 0.35]} />
+      <Notebook position={[-0.05, 0.025, 0.4]} />
+      <Plant position={[-0.8, 0.12, 0.1]} />
+      <Headphones position={[0.85, 0.04, 0.15]} />
+      <Phone position={[1.0, 0.012, -0.05]} />
 
       <BloomLayer />
     </>
