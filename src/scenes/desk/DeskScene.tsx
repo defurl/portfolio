@@ -90,27 +90,26 @@ export function DeskScene() {
         decay={DOOR_SPILL_DECAY}
       />
 
-      {/* Floor — 10m × 10m, BG_PANEL, receiveShadow. Closes the void-edge.
-          Sits at y=-0.05 (5cm below desk-bottom) so the desk reads as a
-          surface sitting above the floor rather than coplanar with it
-          (which would z-fight where the desk-top and floor overlap). */}
-      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.05, 0]}>
+      {/* Floor — 10m × 10m, BG_PANEL, receiveShadow. Sits 74cm below the
+          desk top (standard desk height) so the desk surface reads as
+          elevated above the floor with visible leg gap. */}
+      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.74, 0]}>
         <planeGeometry args={[10, 10]} />
         <meshStandardMaterial color={BG_PANEL} roughness={0.85} metalness={0.05} />
       </mesh>
 
-      {/* Back wall — 3m × 2.5m at z=-1.2. Catches the rim light and stops
-          the scene "ending" abruptly. */}
-      <mesh receiveShadow position={[0, 1.25, -1.2]}>
+      {/* Back wall — 3m × 2.5m at z=-1.2. Centered y at 1.25 so it spans
+          from floor (y=-0.74) up to y≈1.76 (~half-meter above eye-line). */}
+      <mesh receiveShadow position={[0, 0.51, -1.2]}>
         <planeGeometry args={[3, 2.5]} />
         <meshStandardMaterial color={BG_PANEL} roughness={0.85} metalness={0.05} />
       </mesh>
 
       <DeskSurface />
-      {/* Lamp base sits on the FLOOR at y=-0.05 (the lamp is at x=-0.95,
-          just past the desk's left edge — see lighting-plan.svg plan view). */}
+      {/* Lamp base sits ON the desk top (y=0). The desk was widened to 2.0m
+          (x range -1.0..+1.0) so x=-0.95 is on the desk surface. */}
       <Lamp
-        position={[LAMP_POSITION[0], -0.05, LAMP_POSITION[2]]}
+        position={[LAMP_POSITION[0], 0, LAMP_POSITION[2]]}
         bulbPosition={LAMP_POSITION as unknown as [number, number, number]}
       />
 
