@@ -20,19 +20,18 @@ export function BloomLayer() {
 
   if (reduced || lowFps) return null;
 
+  // Threshold tuning notes:
+  //   - Lamp bulb (MeshBasicMaterial LAMP_WARM, toneMapped:false): luminance ~0.55.
+  //   - Monitor 1 emissive (SIGNAL_AMBER_DIM × intensity 1.2): luminance ~0.12.
+  //   - Monitor 2 emissive (VOXEL_GLOW_SOFT × intensity 1.0): luminance ~0.13.
+  // To catch both the lamp bulb AND the monitor screens (all flagged "bloom
+  // target" in the lighting plan), thresholds need to sit below ~0.12.
   return (
     <EffectComposer>
-      {/* Warm bloom — catches the lamp bulb. Wider kernel for the soft halo. */}
+      {/* Single broad bloom — soft warm/cool halos around everything emissive. */}
       <Bloom
-        intensity={1.1}
-        luminanceThreshold={0.6}
-        luminanceSmoothing={0.25}
-        mipmapBlur
-      />
-      {/* Cool/tight bloom — will catch monitor emissives once they're added. */}
-      <Bloom
-        intensity={0.45}
-        luminanceThreshold={0.3}
+        intensity={0.9}
+        luminanceThreshold={0.1}
         luminanceSmoothing={0.4}
         mipmapBlur
       />
