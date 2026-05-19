@@ -31,17 +31,9 @@ export const WINDOW_RIM_INTENSITY = 1.2;
 
 // ── DOOR SPILL: off-frame warm ───────────────────────────────────────────────
 // #FFB661 = LAMP_WARM (same as the lamp; both warm sources).
-//
-// DEVIATION FROM LIGHTING-PLAN: the plan specifies `[-1.8, 0.4, 1.0]`, but at
-// camera (0, 1.15, 1.8) looking at (0, 0.8, 0) with FOV 50° vertical, the
-// bottom-of-screen ray hits the floor at z≈0.22 — z=+1.0 is geometrically
-// below the visible frustum. The pool would land off-screen. Per the
-// revision prompt's criterion 3 ("check the light's position relative to
-// the camera frustum"), we pull the light position back to z=-0.4 so its
-// falloff cone reaches the visible floor camera-left (behind the desk's
-// back-left corner). The light source itself stays well outside the
-// horizontal FOV (x=-1.6), so the "off-frame" metaphor is intact.
-export const DOOR_SPILL_POSITION = [-1.6, 0.4, -0.4] as const;
+// EXACT from lighting-plan. Visibility requires the camera to reach z=+1.0
+// floor in its FOV — see camera config in `routes/DeskRoute.tsx`.
+export const DOOR_SPILL_POSITION = [-1.8, 0.4, 1.0] as const;
 export const DOOR_SPILL_INTENSITY = 2.4;
 export const DOOR_SPILL_DISTANCE = 2.5;
 export const DOOR_SPILL_DECAY = 2;
