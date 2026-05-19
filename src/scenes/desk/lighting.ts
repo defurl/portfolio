@@ -1,32 +1,51 @@
-// Lighting values for the desk scene. Positions and intensities are tuned for
-// the cinematic 3am vibe: warm lamp pool dominates, cool monitor/window fills
-// just enough to silhouette objects, ambient is nearly zero.
+// Lighting values for the desk scene. EXACT specs from `lighting-plan.svg`.
+// Tune only with owner sign-off. The plan is the contract; this file mirrors it.
 //
-// Reference: design-spec.jsonc `scenes.night_desk.lighting` and Phase 1.2.
+// Color routing: hexes in the SVG map to design-spec tokens from
+// `src/lib/style/colors.ts` — those imports stay the single source of truth
+// for the palette (also what keeps `pnpm lint:colors` happy).
 
-export const LAMP_POSITION = [0.9, 1.4, -0.2] as const;
-export const LAMP_INTENSITY = 6.5;
-export const LAMP_DISTANCE = 4.5;
-export const LAMP_DECAY = 1.8;
+// ── KEY: lamp ─────────────────────────────────────────────────────────────────
+// #FFB661 = LAMP_WARM. Position is the bulb's world coordinate; the lamp's
+// arm/shade geometry must agree visually (see `objects/Lamp.tsx`).
+export const LAMP_POSITION = [-0.95, 0.35, -0.2] as const;
+export const LAMP_INTENSITY = 8.0;
+export const LAMP_DISTANCE = 2.0;
+export const LAMP_DECAY = 2;
 
-// Monitor fills sit just in front of each screen, low and small.
+// ── FILL: monitor 1 & 2 ──────────────────────────────────────────────────────
+// #5BC8FF = VOXEL_GLOW.
 export const MONITOR_FILL_POSITIONS = [
-  [-0.3, 0.55, -0.15] as const,
-  [0.5, 0.55, -0.15] as const,
+  [-0.3, 0.55, -0.4] as const,
+  [0.5, 0.55, -0.4] as const,
 ];
-export const MONITOR_FILL_INTENSITY = 0.9;
-export const MONITOR_FILL_DISTANCE = 2.2;
-export const MONITOR_FILL_DECAY = 2.0;
+export const MONITOR_FILL_INTENSITY = 3.2;
+export const MONITOR_FILL_DISTANCE = 1.5;
+export const MONITOR_FILL_DECAY = 2;
 
-// Rim from the window — directional, low intensity, cool.
-export const WINDOW_RIM_DIRECTION = [3.5, 1.5, -1.2] as const;
-export const WINDOW_RIM_INTENSITY = 0.35;
+// ── RIM: window directional ──────────────────────────────────────────────────
+// #2A6B8A = VOXEL_GLOW_SOFT. Direction is FROM this position TOWARD origin.
+export const WINDOW_RIM_POSITION = [1.4, 1.0, -0.6] as const;
+export const WINDOW_RIM_TARGET = [0, 0.5, 0] as const;
+export const WINDOW_RIM_INTENSITY = 1.2;
 
-// Door spill — warm pool on the floor camera-left. No geometry, just light.
-export const DOOR_SPILL_POSITION = [-2.6, 0.6, 0.8] as const;
-export const DOOR_SPILL_INTENSITY = 1.4;
-export const DOOR_SPILL_DISTANCE = 3.5;
-export const DOOR_SPILL_DECAY = 2.0;
+// ── DOOR SPILL: off-frame warm ───────────────────────────────────────────────
+// #FFB661 = LAMP_WARM (same as the lamp; both warm sources).
+//
+// DEVIATION FROM LIGHTING-PLAN: the plan specifies `[-1.8, 0.4, 1.0]`, but at
+// camera (0, 1.15, 1.8) looking at (0, 0.8, 0) with FOV 50° vertical, the
+// bottom-of-screen ray hits the floor at z≈0.22 — z=+1.0 is geometrically
+// below the visible frustum. The pool would land off-screen. Per the
+// revision prompt's criterion 3 ("check the light's position relative to
+// the camera frustum"), we pull the light position back to z=-0.4 so its
+// falloff cone reaches the visible floor camera-left (behind the desk's
+// back-left corner). The light source itself stays well outside the
+// horizontal FOV (x=-1.6), so the "off-frame" metaphor is intact.
+export const DOOR_SPILL_POSITION = [-1.6, 0.4, -0.4] as const;
+export const DOOR_SPILL_INTENSITY = 2.4;
+export const DOOR_SPILL_DISTANCE = 2.5;
+export const DOOR_SPILL_DECAY = 2;
 
-// Ambient — barely there. The room is dark.
-export const AMBIENT_INTENSITY = 0.06;
+// ── AMBIENT ──────────────────────────────────────────────────────────────────
+// #0A0F1A = BG_NIGHT.
+export const AMBIENT_INTENSITY = 0.15;
