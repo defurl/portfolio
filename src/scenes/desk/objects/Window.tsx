@@ -61,13 +61,16 @@ export function Window({ position }: WindowProps) {
         />
       </mesh>
 
-      {/* City beyond — placeholder. Sits ~30cm behind the window glass. */}
+      {/* City beyond — placeholder. Sits ~30cm behind the window glass.
+          Sized just slightly larger than the opening (window + frame) so it
+          fills the visible cutout without extending past the wall edges
+          (which would show the city in the open space beyond the wall). */}
       <mesh position={[0, 0.05, -0.3]}>
-        <planeGeometry args={[W * 2, H * 1.5]} />
+        <planeGeometry args={[W * 0.95, H * 1.05]} />
         <meshStandardMaterial
           color={BG_VOID}
           emissive={VOXEL_GLOW_SOFT}
-          emissiveIntensity={0.18}
+          emissiveIntensity={0.35}
           roughness={1}
           metalness={0}
           toneMapped={false}
