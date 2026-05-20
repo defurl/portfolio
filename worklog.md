@@ -108,6 +108,19 @@
 - Why: The prior blanket disables were too broad and would have suppressed real bugs outside the R3F scenes.
 - Next: Wait for owner review. Do not start Phase 1.
 
+## 2026-05-18 — phase 1A fix floating objects + shadow projection
+- Did: Owner's fresh screenshot revealed every object on the desk was floating by half its own height. Root cause: the DeskScene positions were written as if `position.y` meant "object base sits at this y," but each component's geometry centers itself on the group origin (so e.g. a mug at `y=0.06` puts its center at 0.06m, base 0.0425m below center, base actually at y=0.018 — 1.8cm above desk). Shadows then projected from where the LIGHT saw the floating mesh, landing on the desk a hand's-width away from where the eye expected the contact — that's what reads as "shadows off."
+- Concrete offsets corrected, all units meters:
+  - Monitor 1 (0.36m bezel): y `0.55 → 0.306` (foot at local -0.306 from group, now at desk surface)
+  - Monitor 2 (0.30m bezel): y `0.55 → 0.27`
+  - Keyboard: y `0.04 → 0.011` (lower body extends 0.011 below group origin)
+  - Mug, Phone, Plant, Notebook: y `→ 0` (their components already place geometry above the group origin, so group origin = base)
+  - Headphones: y `0.04 → 0.045` (cup radius extends below group origin in world Y after the π/2-X rotation)
+  - Lamp was already correct
+- Why: All objects now sit ON the desk top; contact shadows from the lamp PointLight will land directly under each object instead of offset by a half-height gap.
+- Gates: typecheck ✅, lint ✅, lint:colors ✅. No bundle change.
+- Next: Owner verifies the new render. Open whether monitors at the corrected height (foot on desk, bezel center now at y=0.306 vs prior 0.55) look right proportionally for the scene, or want adjustment.
+
 ## 2026-05-18 — phase 1A review feedback applied
 - Did: Product manager reviewed the prior checkpoint A render. Four real issues + one stale-perception item:
   - **Criterion 1 (lamp pool brightest)** failed because the two monitor FILL PointLights were creating saturated circular cyan pools on the desk surface that competed with the lamp pool for visual primacy. Fix: switched both fills to `SpotLight` aimed at the keyboard zone (target positions `[-0.3, 0.04, 0.2]` and `[0.5, 0.04, 0.2]`), with cone angle 0.6 rad (~34°) and penumbra 0.7 for soft edges. The cyan now lands on the keyboard / fronts of objects rather than puddling on the desk behind them. Source: `lighting.ts` adds `MONITOR_FILL_TARGETS`, `MONITOR_FILL_ANGLE`, `MONITOR_FILL_PENUMBRA`; `DeskScene.tsx` mounts `<spotLight>` instead of `<pointLight>` for the two fills.
