@@ -11,6 +11,7 @@ import { BG_NIGHT, BG_PANEL, BG_VOID, VOXEL_GLOW_SOFT } from '../../../lib/style
 
 interface WindowProps {
   position: [number, number, number];
+  rotation?: [number, number, number];
 }
 
 const W = 0.7;
@@ -19,9 +20,9 @@ const FRAME_T = 0.04;
 const FRAME_DEPTH = 0.06;
 const GLASS_THICKNESS = 0.02;
 
-export function Window({ position }: WindowProps) {
+export function Window({ position, rotation = [0, 0, 0] }: WindowProps) {
   return (
-    <group position={position}>
+    <group position={position} rotation={rotation}>
       {/* Top frame */}
       <mesh castShadow position={[0, H / 2 - FRAME_T / 2, 0]}>
         <boxGeometry args={[W, FRAME_T, FRAME_DEPTH]} />

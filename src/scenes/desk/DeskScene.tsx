@@ -122,29 +122,36 @@ export function DeskScene() {
         <meshStandardMaterial color={BG_PANEL} roughness={0.85} metalness={0.05} />
       </mesh>
 
-      {/* Back wall — built as four segments around the window opening so the
-          window reads as a real cutout. Wall widened to 6m × 2.5m so it fills
-          the camera's horizontal FOV at z=-1.2 (no more black void past the
-          wall's right edge). Centered y=0.51, spans x=-3..+3, y=-0.74..+1.76.
-          Window opening: 0.7m × 1m centered at (1.0, 1.0), opening spans
-          x=0.65..1.35, y=0.5..1.5. */}
-      {/* Left section — from x=-3 to x=0.65 (width 3.65) */}
-      <mesh receiveShadow position={[-1.175, 0.51, -1.2]}>
-        <planeGeometry args={[3.65, 2.5]} />
+      {/* Back wall — single solid panel, 6m × 2.5m at z=-1.2, no cutout. */}
+      <mesh receiveShadow position={[0, 0.51, -1.2]}>
+        <planeGeometry args={[6, 2.5]} />
         <meshStandardMaterial color={BG_PANEL} roughness={0.85} metalness={0.05} />
       </mesh>
-      {/* Right section — from x=1.35 to x=3 (width 1.65) */}
-      <mesh receiveShadow position={[2.175, 0.51, -1.2]}>
-        <planeGeometry args={[1.65, 2.5]} />
+
+      {/* Right side wall — built as four segments around the window opening.
+          Wall plane at x=+2.0 facing -X (normal toward camera at x=0). Y range
+          mirrors back wall (-0.74..+1.76). Z range -1.2..+2.5 covers from the
+          back-wall corner forward past the camera, so the right edge of the
+          frame reads as a real room edge instead of empty void. Window opening:
+          0.7m wide × 1m tall, centered at (2.0, 1.0, -0.3) — z=-0.3 places it
+          roughly behind the monitors so it's visible past their right edge. */}
+      {/* Behind window — from z=-1.2 to z=-0.65 (depth 0.55), full height */}
+      <mesh receiveShadow position={[2.0, 0.51, -0.925]} rotation={[0, -Math.PI / 2, 0]}>
+        <planeGeometry args={[0.55, 2.5]} />
         <meshStandardMaterial color={BG_PANEL} roughness={0.85} metalness={0.05} />
       </mesh>
-      {/* Above window — from y=1.5 to y=1.76 across the window's x range */}
-      <mesh receiveShadow position={[1.0, 1.63, -1.2]}>
+      {/* In front of window — from z=+0.05 to z=+2.5 (depth 2.45), full height */}
+      <mesh receiveShadow position={[2.0, 0.51, 1.275]} rotation={[0, -Math.PI / 2, 0]}>
+        <planeGeometry args={[2.45, 2.5]} />
+        <meshStandardMaterial color={BG_PANEL} roughness={0.85} metalness={0.05} />
+      </mesh>
+      {/* Above window — z range matches opening (0.7m), y=1.5..1.76 (0.26m) */}
+      <mesh receiveShadow position={[2.0, 1.63, -0.3]} rotation={[0, -Math.PI / 2, 0]}>
         <planeGeometry args={[0.7, 0.26]} />
         <meshStandardMaterial color={BG_PANEL} roughness={0.85} metalness={0.05} />
       </mesh>
-      {/* Below window — from y=-0.74 to y=0.5 across the window's x range */}
-      <mesh receiveShadow position={[1.0, -0.12, -1.2]}>
+      {/* Below window — z range matches opening, y=-0.74..0.5 (1.24m) */}
+      <mesh receiveShadow position={[2.0, -0.12, -0.3]} rotation={[0, -Math.PI / 2, 0]}>
         <planeGeometry args={[0.7, 1.24]} />
         <meshStandardMaterial color={BG_PANEL} roughness={0.85} metalness={0.05} />
       </mesh>
@@ -166,11 +173,12 @@ export function DeskScene() {
           have group origin = base, so y=0. */}
       <Monitor variant="primary" position={[-0.3, 0.306, -0.4]} />
       <Monitor variant="terminal" position={[0.5, 0.27, -0.4]} width={0.5} height={0.3} />
-      {/* Window mounted on the BACK wall (z=-1.18, 2cm in front of the wall
-          at z=-1.2 to avoid z-fighting). x=1.0 keeps the 0.7m-wide window
-          fully on the 3m-wide back wall (which spans x=-1.5..+1.5).
-          No rotation — the window faces the camera. */}
-      <Window position={[1.0, 1.0, -1.18]} />
+      {/* Window mounted on the RIGHT side wall — the wall plane is at x=2.0,
+          window frame 2cm inside (x=1.98) so it sits in the opening without
+          z-fighting. Rotated -π/2 around Y so the frame normal faces -X
+          (back toward camera). The city-beyond plane inside the Window
+          component then lands behind the wall (world x ≈ 2.28). */}
+      <Window position={[1.98, 1.0, -0.3]} rotation={[0, -Math.PI / 2, 0]} />
 
       <Keyboard position={[0, 0.011, 0.2]} />
       {/* Mug pulled from z=0.35 (5cm past desk front edge z=+0.3, hanging
