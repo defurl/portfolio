@@ -134,19 +134,31 @@ export function DeskScene() {
         bulbPosition={LAMP_POSITION as unknown as [number, number, number]}
       />
 
-      <Monitor variant="primary" position={[-0.3, 0.55, -0.4]} />
-      <Monitor variant="terminal" position={[0.5, 0.55, -0.4]} width={0.5} height={0.3} />
+      {/* Object Y positions are all foot-on-desk — i.e., position.y equals
+          the offset from the group origin down to the object's lowest point
+          so each base lands on the desk top (y=0). Monitor stand foot sits
+          0.306m below its group origin for a 0.36m-tall bezel (foot offset
+          = height/2 + 0.12), so Monitor 1 sits at y=0.306; Monitor 2 with
+          a 0.3m bezel sits at y=0.27. Keyboard's lower body extends 0.011m
+          below the plate's group origin, so y=0.011 puts the keyboard's
+          lowest face on the desk. All others (Mug/Phone/Plant/Notebook)
+          have group origin = base, so y=0. */}
+      <Monitor variant="primary" position={[-0.3, 0.306, -0.4]} />
+      <Monitor variant="terminal" position={[0.5, 0.27, -0.4]} width={0.5} height={0.3} />
       <Window position={[1.4, 1.0, -0.6]} />
 
-      <Keyboard position={[0, 0.04, 0.2]} />
-      <Mug position={[-0.55, 0.06, 0.35]} />
+      <Keyboard position={[0, 0.011, 0.2]} />
+      <Mug position={[-0.55, 0, 0.35]} />
       {/* Notebook moved from [-0.05, 0.025, 0.4] (off desk front edge at z=0.3,
-          0.245m deep — half hung in space) to [-0.4, 0.025, 0.05] so it sits
+          0.245m deep — half hung in space) to [-0.4, 0, 0.05] so it sits
           fully on the desk to the camera-left of the keyboard, behind the mug. */}
-      <Notebook position={[-0.4, 0.025, 0.05]} />
-      <Plant position={[-0.8, 0.12, 0.1]} />
-      <Headphones position={[0.85, 0.04, 0.15]} />
-      <Phone position={[1.0, 0.012, -0.05]} />
+      <Notebook position={[-0.4, 0, 0.05]} />
+      <Plant position={[-0.8, 0, 0.1]} />
+      {/* Headphones group rotates by PI/2 around X (cups face camera), so the
+          cup radius (0.045) extends downward in world Y after rotation —
+          group origin needs to sit one radius above the desk. */}
+      <Headphones position={[0.85, 0.045, 0.15]} />
+      <Phone position={[1.0, 0, -0.05]} />
 
       <BloomLayer />
     </>
