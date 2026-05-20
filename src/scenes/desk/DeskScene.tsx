@@ -145,10 +145,16 @@ export function DeskScene() {
           have group origin = base, so y=0. */}
       <Monitor variant="primary" position={[-0.3, 0.306, -0.4]} />
       <Monitor variant="terminal" position={[0.5, 0.27, -0.4]} width={0.5} height={0.3} />
-      <Window position={[1.4, 1.0, -0.6]} />
+      {/* Window mounted on the BACK wall (z=-1.18, 2cm in front of the wall
+          at z=-1.2 to avoid z-fighting). x=1.0 keeps the 0.7m-wide window
+          fully on the 3m-wide back wall (which spans x=-1.5..+1.5).
+          No rotation — the window faces the camera. */}
+      <Window position={[1.0, 1.0, -1.18]} />
 
       <Keyboard position={[0, 0.011, 0.2]} />
-      <Mug position={[-0.55, 0, 0.35]} />
+      {/* Mug pulled from z=0.35 (5cm past desk front edge z=+0.3, hanging
+          off the desk) to z=0.15 so it sits fully on the desk top. */}
+      <Mug position={[-0.55, 0, 0.15]} />
       {/* Notebook moved from [-0.05, 0.025, 0.4] (off desk front edge at z=0.3,
           0.245m deep — half hung in space) to [-0.4, 0, 0.05] so it sits
           fully on the desk to the camera-left of the keyboard, behind the mug. */}

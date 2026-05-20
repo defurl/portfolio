@@ -1,14 +1,13 @@
 import { BG_NIGHT, BG_PANEL, BG_VOID, VOXEL_GLOW_SOFT } from '../../../lib/style/colors';
 
-// Phase 1 revision — window per `lighting-plan.svg` window-flat fix.
+// Phase 1 revision — window mounted on the BACK wall, facing the camera.
+// (Previously had rotation `[0, -PI/2, 0]` as if mounted on a right-side wall,
+// but the scene only has a back wall, so the window was floating mid-air.)
+//
 // Glass is NOT a saturated cyan plane. It's a near-transparent
 // `MeshPhysicalMaterial` with `color: BG_NIGHT` — the cool cast we see
 // comes from the rim DirectionalLight passing through, not from the glass
-// being tinted. The "city beyond" is a placeholder plane behind the window
-// (we'll do the real voxel city in Phase 3).
-//
-// Frame is built from four BG_PANEL boxes around the perimeter so each
-// frame edge casts shadow into the room. Glass is a thin slab between them.
+// being tinted. The "city beyond" is a placeholder plane behind the window.
 
 interface WindowProps {
   position: [number, number, number];
@@ -22,7 +21,7 @@ const GLASS_THICKNESS = 0.02;
 
 export function Window({ position }: WindowProps) {
   return (
-    <group position={position} rotation={[0, -Math.PI / 2, 0]}>
+    <group position={position}>
       {/* Top frame */}
       <mesh castShadow position={[0, H / 2 - FRAME_T / 2, 0]}>
         <boxGeometry args={[W, FRAME_T, FRAME_DEPTH]} />
@@ -33,7 +32,7 @@ export function Window({ position }: WindowProps) {
         <boxGeometry args={[W, FRAME_T, FRAME_DEPTH]} />
         <meshStandardMaterial color={BG_PANEL} roughness={0.7} metalness={0.15} />
       </mesh>
-      {/* Left frame (toward room interior on this rotated mesh) */}
+      {/* Left frame */}
       <mesh castShadow position={[-W / 2 + FRAME_T / 2, 0, 0]}>
         <boxGeometry args={[FRAME_T, H - FRAME_T * 2, FRAME_DEPTH]} />
         <meshStandardMaterial color={BG_PANEL} roughness={0.7} metalness={0.15} />
@@ -49,9 +48,7 @@ export function Window({ position }: WindowProps) {
         <meshStandardMaterial color={BG_PANEL} roughness={0.7} metalness={0.15} />
       </mesh>
 
-      {/* Glass — transmissive, near-untinted. The rim light passing through
-          provides the cool cast on the room interior; the glass itself stays
-          neutral so we can see through to the "city beyond." */}
+      {/* Glass — transmissive, near-untinted. */}
       <mesh position={[0, 0, 0]}>
         <boxGeometry args={[W - FRAME_T * 2, H - FRAME_T * 2, GLASS_THICKNESS]} />
         <meshPhysicalMaterial
@@ -64,10 +61,7 @@ export function Window({ position }: WindowProps) {
         />
       </mesh>
 
-      {/* City beyond — placeholder. Sits ~30cm behind the window glass.
-          BG_VOID base with a slight VOXEL_GLOW_SOFT bleed on the upper half
-          to suggest a city skyline lit from below by streetlight glow.
-          Replaced by the real voxel-city render in Phase 3. */}
+      {/* City beyond — placeholder. Sits ~30cm behind the window glass. */}
       <mesh position={[0, 0.05, -0.3]}>
         <planeGeometry args={[W * 2, H * 1.5]} />
         <meshStandardMaterial
