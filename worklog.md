@@ -108,6 +108,29 @@
 - Why: The prior blanket disables were too broad and would have suppressed real bugs outside the R3F scenes.
 - Next: Wait for owner review. Do not start Phase 1.
 
+## 2026-05-18 — phase 1A checkpoint A approved (foundation)
+- Did: Resolved owner's last two feedback rounds in sequence:
+  1. **Window as a real opening, not a panel hung on the wall**: rebuilt the back wall as four segments around the window cutout, with the city-beyond plane behind the wall plane. Glass `MeshPhysicalMaterial` (transmission 0.3, BG_NIGHT base) lets the city read through.
+  2. **Wall not filling the camera frame** (right side dropped into void): widened back wall from 3m to 6m so the frame doesn't open into nothing past x=±1.5.
+  3. **Window relocation to right side per FPP intent**: restored back wall to a solid 6m × 2.5m panel; added a new right side wall at x=+2.0 facing -X, built as four segments around the window opening. Window component now accepts `rotation` prop (default `[0,0,0]`) — DeskScene passes `rotation={[0, -π/2, 0]}` and position `(1.98, 1.0, -0.3)` so the frame faces back into the room and the city plane lands at world x≈2.28 (behind the wall plane). City-beyond split into two stacked emissive planes (upper bright at intensity 1.4, lower at 0.55) for a sense of skyline depth.
+  4. **City emissive bumped** from 0.18 → 1.4/0.55 so the window reads as a glowing aperture, not a faint dark rectangle.
+- Owner verdict: foundation approved. Right wall is dark (no fill lighting reaches x=+2.0 yet); this is consistent with the reference image where the right side is dark except for the window. Owner noted this for a later phase rather than a Checkpoint A blocker.
+- Gates after all fixes: typecheck ✅, lint ✅, lint:colors ✅. Entry bundle unchanged at 63.0KB.
+- Camera state (final): `(0, 1.15, 2.2)` looking at `(0, 0.4, 0)`, FOV 50°.
+- Object roster (final positions, all foot-on-desk):
+  - Lamp `[-0.95, 0, -0.2]`, bulb at world `(-0.95, 0.35, -0.2)`
+  - Monitor 1 (primary, amber) `[-0.3, 0.306, -0.4]`
+  - Monitor 2 (terminal, cool) `[0.5, 0.27, -0.4]`
+  - Keyboard `[0, 0.011, 0.2]`
+  - Mug `[-0.55, 0, 0.15]` (pulled in from z=0.35 to stay on desk)
+  - Notebook `[-0.4, 0, 0.05]`
+  - Plant `[-0.8, 0, 0.1]`
+  - Headphones `[0.85, 0.045, 0.15]`
+  - Phone `[1.0, 0, -0.05]`
+  - Window on right wall: position `[1.98, 1.0, -0.3]`, rotation `[0, -π/2, 0]`
+- All nine failure tags closed: lamp-shape, plant-collision, void-edge, emissive-flat, window-flat, no-door-spill, no-contact-shadow, default-chrome, mood-missing.
+- Next: Owner to either (a) merge `phase-1A/checkpoint-a-revision` → `main` and start Checkpoint B (interactions + panels) on a new branch, or (b) call out further tuning. Right-wall lighting and bloom tuning are explicit open items, deferable to Checkpoint B or polish.
+
 ## 2026-05-18 — phase 1A fix floating objects + shadow projection
 - Did: Owner's fresh screenshot revealed every object on the desk was floating by half its own height. Root cause: the DeskScene positions were written as if `position.y` meant "object base sits at this y," but each component's geometry centers itself on the group origin (so e.g. a mug at `y=0.06` puts its center at 0.06m, base 0.0425m below center, base actually at y=0.018 — 1.8cm above desk). Shadows then projected from where the LIGHT saw the floating mesh, landing on the desk a hand's-width away from where the eye expected the contact — that's what reads as "shadows off."
 - Concrete offsets corrected, all units meters:
