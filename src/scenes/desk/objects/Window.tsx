@@ -62,15 +62,29 @@ export function Window({ position }: WindowProps) {
       </mesh>
 
       {/* City beyond — placeholder. Sits ~30cm behind the window glass.
-          Sized just slightly larger than the opening (window + frame) so it
-          fills the visible cutout without extending past the wall edges
-          (which would show the city in the open space beyond the wall). */}
-      <mesh position={[0, 0.05, -0.3]}>
-        <planeGeometry args={[W * 0.95, H * 1.05]} />
+          Sized slightly larger than the opening so the cyan glow fills the
+          visible cutout. Two stacked planes:
+            - Upper plane brighter (the lit city skyline at distance)
+            - Lower plane dimmer (the unlit / closer foreground)
+          Together they give a sense of depth without modeling real geometry.
+          Replaced by the real voxel city in Phase 3. */}
+      <mesh position={[0, 0.25, -0.3]}>
+        <planeGeometry args={[W * 0.92, H * 0.55]} />
         <meshStandardMaterial
           color={BG_VOID}
           emissive={VOXEL_GLOW_SOFT}
-          emissiveIntensity={0.35}
+          emissiveIntensity={1.4}
+          roughness={1}
+          metalness={0}
+          toneMapped={false}
+        />
+      </mesh>
+      <mesh position={[0, -0.25, -0.3]}>
+        <planeGeometry args={[W * 0.92, H * 0.55]} />
+        <meshStandardMaterial
+          color={BG_VOID}
+          emissive={VOXEL_GLOW_SOFT}
+          emissiveIntensity={0.55}
           roughness={1}
           metalness={0}
           toneMapped={false}

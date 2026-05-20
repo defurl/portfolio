@@ -123,27 +123,27 @@ export function DeskScene() {
       </mesh>
 
       {/* Back wall — built as four segments around the window opening so the
-          window reads as a real cutout. The city-beyond plane (inside the
-          Window component) sits behind the wall plane and is visible only
-          through the gap. Wall: 3m × 2.5m at z=-1.2, centered y=0.51,
-          spanning x=-1.5..+1.5 and y=-0.74..+1.76. Window opening: 0.7m × 1m
-          centered at (1.0, 1.0), so opening spans x=0.65..1.35, y=0.5..1.5. */}
-      {/* Left section — from x=-1.5 to x=0.65 */}
-      <mesh receiveShadow position={[-0.425, 0.51, -1.2]}>
-        <planeGeometry args={[2.15, 2.5]} />
+          window reads as a real cutout. Wall widened to 6m × 2.5m so it fills
+          the camera's horizontal FOV at z=-1.2 (no more black void past the
+          wall's right edge). Centered y=0.51, spans x=-3..+3, y=-0.74..+1.76.
+          Window opening: 0.7m × 1m centered at (1.0, 1.0), opening spans
+          x=0.65..1.35, y=0.5..1.5. */}
+      {/* Left section — from x=-3 to x=0.65 (width 3.65) */}
+      <mesh receiveShadow position={[-1.175, 0.51, -1.2]}>
+        <planeGeometry args={[3.65, 2.5]} />
         <meshStandardMaterial color={BG_PANEL} roughness={0.85} metalness={0.05} />
       </mesh>
-      {/* Right section — from x=1.35 to x=1.5 */}
-      <mesh receiveShadow position={[1.425, 0.51, -1.2]}>
-        <planeGeometry args={[0.15, 2.5]} />
+      {/* Right section — from x=1.35 to x=3 (width 1.65) */}
+      <mesh receiveShadow position={[2.175, 0.51, -1.2]}>
+        <planeGeometry args={[1.65, 2.5]} />
         <meshStandardMaterial color={BG_PANEL} roughness={0.85} metalness={0.05} />
       </mesh>
-      {/* Above window — from y=1.5 to y=1.76, across the window's x range */}
+      {/* Above window — from y=1.5 to y=1.76 across the window's x range */}
       <mesh receiveShadow position={[1.0, 1.63, -1.2]}>
         <planeGeometry args={[0.7, 0.26]} />
         <meshStandardMaterial color={BG_PANEL} roughness={0.85} metalness={0.05} />
       </mesh>
-      {/* Below window — from y=-0.74 to y=0.5, across the window's x range */}
+      {/* Below window — from y=-0.74 to y=0.5 across the window's x range */}
       <mesh receiveShadow position={[1.0, -0.12, -1.2]}>
         <planeGeometry args={[0.7, 1.24]} />
         <meshStandardMaterial color={BG_PANEL} roughness={0.85} metalness={0.05} />
