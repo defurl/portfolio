@@ -3,6 +3,108 @@
 
 > One-line-per-line decision log. Append after every meaningful change.
 
+---
+
+# 📍 Current state — Phase 1 Checkpoint A (for PM review)
+
+**Branch:** `phase-1A/checkpoint-a-revision` · **Head:** `fee1bc7` · **Pushed to origin** · **Awaiting merge to main**
+
+**Status:** Owner approved the foundation. Right-wall lighting is the one acknowledged open item, deferred to Checkpoint B / polish.
+
+## What was delivered
+
+A populated, lit, atmospheric Night Desk scene matching the revision-prompt's lighting plan and the reference image's mood. Eleven hand-built objects on a real elevated desk, lamp-anchored composition, window on the right side wall with city-beyond glow visible through transmissive glass.
+
+## Final scene state
+
+### Camera
+- Position `(0, 1.15, 2.2)`, lookAt `(0, 0.4, 0)`, FOV 50°
+
+### Lighting (mirrors `lighting-plan.svg` exactly)
+| Light | Color | Token | Intensity | Distance | Decay | Notes |
+|---|---|---|---|---|---|---|
+| Ambient | `#0A0F1A` | `BG_NIGHT` | 0.15 | — | — | — |
+| KEY (lamp) | `#FFB661` | `LAMP_WARM` | 8.0 | **2.8** | 2 | castShadow, mapSize 1024², bias -0.0005. Distance bumped from spec 2.0 → 2.8 so the keyboard sits in the falloff. |
+| FILL ×2 (monitors) | `#5BC8FF` | `VOXEL_GLOW` | 3.2 each | 1.5 | 2 | **`SpotLight`** aimed at keyboard targets `[-0.3, 0.04, 0.2]` and `[0.5, 0.04, 0.2]`, angle 0.6 rad, penumbra 0.7 — was `PointLight` which puddled on the desk. |
+| RIM (window) | `#2A6B8A` | `VOXEL_GLOW_SOFT` | 1.2 | — | — | DirectionalLight from `(1.4, 1.0, -0.6)` toward `(0, 0.5, 0)` |
+| DOOR SPILL | `#FFB661` | `LAMP_WARM` | 2.4 | 2.5 | 2 | Position `[-1.8, 0.4, 1.0]` per spec |
+| Bloom | — | — | int 0.9, threshold 0.1 | — | — | Single broad pass, catches lamp bulb + both monitor emissives |
+
+### Geometry — room
+- **Floor:** 10m × 10m at `y=-0.74`, BG_PANEL, receiveShadow
+- **Back wall:** solid 6m × 2.5m at `z=-1.2`, no cutout
+- **Right side wall:** at `x=+2.0` facing -X, built as four segments around the window opening (behind / in-front-of / above / below the window)
+- **Desk:** 2.0m × 0.9m × 4cm top on four cylindrical legs (radius 2.5cm, height 70cm, INK_GHOST metal), centered z=-0.15
+
+### Geometry — objects (all foot-on-desk, group origin = base of object)
+| Object | Position | Notes |
+|---|---|---|
+| Lamp | `[-0.95, 0, -0.2]` | Open-hemisphere shade, bulb at world `(-0.95, 0.35, -0.2)` matches PointLight |
+| Monitor 1 (primary, amber) | `[-0.3, 0.306, -0.4]` | Emissive `SIGNAL_AMBER_DIM` × 1.2, toneMapped:false |
+| Monitor 2 (terminal, cool) | `[0.5, 0.27, -0.4]` | Emissive `VOXEL_GLOW_SOFT` × 1.0 |
+| Keyboard | `[0, 0.011, 0.2]` | TKL with ~60 caps + spacebar slot |
+| Mug | `[-0.55, 0, 0.15]` | Pulled in from spec z=0.35 (past desk edge) |
+| Notebook | `[-0.4, 0, 0.05]` | Moved from spec `[-0.05, 0.025, 0.4]` (hung off desk front) |
+| Plant | `[-0.8, 0, 0.1]` | DATA_GREEN × 0.35 runtime scalar, jittered leaf rotations |
+| Headphones | `[0.85, 0.045, 0.15]` | Cup radius offset after π/2-X rotation |
+| Phone | `[1.0, 0, -0.05]` | Face-down, camera bump on back |
+| Window | `[1.98, 1.0, -0.3]` + rotation `[0, -π/2, 0]` | On right wall, glass `MeshPhysicalMaterial` (transmission 0.3, ior 1.45, BG_NIGHT color), city-beyond plane behind the wall at world x≈2.28 with stacked emissives (upper 1.4 / lower 0.55) |
+
+### AudioToggle
+- Restyled to a faint `· sound off` Departure Mono caption, bottom-right, no border, 0.7 opacity baseline / 1.0 on hover. Disappears into the scene unless looked for.
+
+## Failure tags — all nine closed
+
+| Tag | Resolution |
+|---|---|
+| `lamp-shape` | Open hemisphere shade per spec, weighted base, bulb dangling at rim |
+| `plant-collision` | Verified xz distance 0.335m vs combined radii 0.095m — no overlap |
+| `void-edge` | 10×10 floor + 6m back wall + right side wall extending from back-wall corner past camera |
+| `emissive-flat` | Proper `MeshStandardMaterial` with BG_VOID base + emissive tint at spec intensities |
+| `window-flat` | `MeshPhysicalMaterial` with transmission, color BG_NIGHT (NOT cyan) — cool cast comes from rim light through the glass |
+| `no-door-spill` | Visible at spec position `[-1.8, 0.4, 1.0]` once camera pulled back to z=2.2 |
+| `no-contact-shadow` | Single shadow-caster (lamp), every desk object has castShadow on primary mesh, desk/floor/wall receiveShadow |
+| `default-chrome` | Atmospheric Departure Mono caption per snippet |
+| `mood-missing` | Warm-cool tension, lamp pool focal, dark quiet room — verified by owner |
+
+## Gates
+
+- `pnpm typecheck` ✅
+- `pnpm lint` ✅ (--max-warnings=0)
+- `pnpm lint:colors` ✅ (35 files clean)
+- `pnpm build` ✅
+- `pnpm bundle:check` ✅ — **63.0KB / 200KB budget** (entry chunk unchanged from Phase 0; three / r3f / postprocessing / drei all in the lazy `DeskRoute` chunk)
+
+## Iteration arc (compressed)
+
+1. Lighting-only gate v1 — coplanar desk + floor, lamp readable but unrooted
+2. Lighting-only gate v2 — real desk with legs, owner approved → proceeded to objects
+3. Order-of-operations §3-§7 — monitors, window, remaining objects, AudioToggle restyle
+4. PM review #1 — 5 issues: monitor-fill puddling, marginal door spill, keyboard outside lamp reach, notebook floating off desk, AudioToggle (already fixed, predated screenshot)
+5. PM review #2 (owner) — all objects floating by half-height (`position.y` confusion); seated every object on the desk
+6. Owner review — mug off desk, window detached from wall → mug position fix, back-wall cutout around window
+7. Owner review — window relocated to right side wall (FPP intent), back wall restored to solid
+8. **Owner approved (current state)**
+
+## Open items for next phase / polish
+
+1. **Right-wall fill lighting** — wall at x=+2.0 reads dark from camera POV because no light source reaches it. Owner accepted this as consistent with the reference image but flagged for later. Easiest fix: a tiny warm fill PointLight or extending lamp distance.
+2. **Departure Mono `.woff2`** — still pending from Phase 0; falls back to JetBrains Mono until dropped into `public/fonts/`.
+3. **Vercel project + custom domain** — still pending from Phase 0.
+4. **Monitor screens are flat fills** — `lighting-plan.svg` mentioned a subtle vertical gradient as polish, deferred.
+5. **Headphones silhouette ambiguity** in still frames — slight band angle adjustment would help; not urgent.
+6. **Lamp arm rotation math** uses two independent rotations (`tiltX`, `tiltZ`) — works for the current vertical arm but would get the rotation order wrong if the arm were angled sideways. Not urgent.
+
+## Next decision for owner
+
+Pick one:
+- **(a) Merge `phase-1A/checkpoint-a-revision` → `main` and start Checkpoint B** on a new branch `phase-1B/desk-interactions` (hover states, click→camera glide, panel slide-ins, audio loop).
+- **(b) Tune Checkpoint A further** before merging (right-wall lighting, anything else).
+
+Detailed iteration history is below for reference.
+
+---
+
 ## 2026-05-17 — Phase 0 docs bootstrapped
 - Did: Authored `docs/00-vision.md`, `01-srs.md`, `02-prd.md`, `03-architecture.md`, `04-roadmap.md` per CLAUDE.md protocol.
 - Why: Lock the thesis, requirements, MVP cut line, system shape, and phasing before any code is written.
