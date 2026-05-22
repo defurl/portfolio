@@ -1,81 +1,94 @@
-import { BG_PANEL, INK_GHOST, LAMP_WARM, SIGNAL_AMBER_HOT } from '../../../lib/style/colors';
+import { BG_PANEL, BG_PANEL_2, LAMP_WARM } from '../../../lib/style/colors';
 
-// Phase 1.6 — articulated desk lamp. Base + two-segment arm + cylindrical
-// shade with an emissive bulb visible through the open bottom.
-// The PointLight that drives the scene's key light lives in DeskScene's
-// lighting setup; the geometry here is purely visual — the lamp arm
-// position and the light position must agree visually (see lighting.ts).
+// Phase 1 revision — banker's-lamp form per `lighting-plan.svg` lamp-shape spec:
+// open-bottom hemisphere shade (NOT a closed sphere), articulated arm rising
+// from a weighted base, bulb mesh dangling inside the shade rim, PointLight
+// position coincident with the bulb so the light actually spills downward.
+//
+// Geometry is sized for ~15cm shade radius / ~30cm arm length / ~10cm base.
+// The hemisphere is open at the bottom because three.js `SphereGeometry` with
+// `thetaStart=0, thetaLength=PI/2` returns the upper half-sphere — that's a
+// dome with the rim (the flat equatorial circle) facing DOWN. The bulb sits
+// just inside that rim opening; the inside surface of the dome is rendered
+// with a separate warm-emissive material so it reflects bounce light.
 
 interface LampProps {
-  position: [number, number, number]; // base position
+  /** Base position on the desk surface (lamp base sits at y ~= 0). */
+  position: [number, number, number];
+  /** World-space coordinate of the bulb / PointLight — must match LAMP_POSITION. */
+  bulbPosition: [number, number, number];
 }
 
-const BASE_R = 0.07;
-const BASE_H = 0.02;
-const ARM1_LEN = 0.32;
-const ARM2_LEN = 0.28;
-const SHADE_TOP_R = 0.05;
-const SHADE_BOT_R = 0.075;
-const SHADE_H = 0.08;
+const BASE_RADIUS = 0.05;
+const BASE_HEIGHT = 0.02;
+const ARM_RADIUS = 0.005;
+const SHADE_RADIUS = 0.075;
+const BULB_RADIUS = 0.015;
 
-export function Lamp({ position }: LampProps) {
+export function Lamp({ position, bulbPosition }: LampProps) {
+  // Arm rises from the base (y = BASE_HEIGHT, local) to the shade rim near the
+  // bulb's world position. We compute the world-space arm endpoint and derive
+  // the cylinder length + tilt rather than chaining rotations (which is what
+  // misaligned the previous attempt).
+  const baseTopWorld: [number, number, number] = [position[0], position[1] + BASE_HEIGHT, position[2]];
+  const dx = bulbPosition[0] - baseTopWorld[0];
+  const dy = bulbPosition[1] - baseTopWorld[1];
+  const dz = bulbPosition[2] - baseTopWorld[2];
+  const armLength = Math.sqrt(dx * dx + dy * dy + dz * dz);
+  // Cylinder default points along +Y. Tilt it so its top end lands at the bulb.
+  const tiltX = Math.atan2(dz, dy); // rotation around X (forward/back lean)
+  const tiltZ = -Math.atan2(dx, dy); // rotation around Z (left/right lean)
+  // Midpoint of arm in world space
+  const armMid: [number, number, number] = [
+    (baseTopWorld[0] + bulbPosition[0]) / 2,
+    (baseTopWorld[1] + bulbPosition[1]) / 2,
+    (baseTopWorld[2] + bulbPosition[2]) / 2,
+  ];
+
   return (
-    <group position={position}>
-      {/* Base — flat disc */}
-      <mesh castShadow position={[0, BASE_H / 2, 0]}>
-        <cylinderGeometry args={[BASE_R, BASE_R * 1.05, BASE_H, 32]} />
-        <meshStandardMaterial color={BG_PANEL} roughness={0.55} metalness={0.45} />
+    <>
+      {/* Base — weighted disc on the desk */}
+      <mesh castShadow position={[position[0], position[1] + BASE_HEIGHT / 2, position[2]]}>
+        <cylinderGeometry args={[BASE_RADIUS, BASE_RADIUS * 1.08, BASE_HEIGHT, 32]} />
+        <meshStandardMaterial color={BG_PANEL} roughness={0.6} metalness={0.7} />
       </mesh>
 
-      {/* Lower arm — angled forward and up. */}
-      <group position={[0, BASE_H, 0]} rotation={[0.55, 0, 0]}>
-        <mesh castShadow position={[0, ARM1_LEN / 2, 0]}>
-          <cylinderGeometry args={[0.009, 0.011, ARM1_LEN, 12]} />
-          <meshStandardMaterial color={INK_GHOST} roughness={0.5} metalness={0.6} />
-        </mesh>
-        {/* Elbow joint */}
-        <mesh position={[0, ARM1_LEN, 0]}>
-          <sphereGeometry args={[0.014, 16, 16]} />
-          <meshStandardMaterial color={INK_GHOST} roughness={0.4} metalness={0.65} />
-        </mesh>
+      {/* Arm — single straight cylinder from base top to the bulb position */}
+      <mesh castShadow position={armMid} rotation={[tiltX, 0, tiltZ]}>
+        <cylinderGeometry args={[ARM_RADIUS, ARM_RADIUS, armLength, 12]} />
+        <meshStandardMaterial color={BG_PANEL} roughness={0.6} metalness={0.7} />
+      </mesh>
 
-        {/* Upper arm — angled forward, slightly downward toward the desk. */}
-        <group position={[0, ARM1_LEN, 0]} rotation={[-1.2, 0, 0]}>
-          <mesh castShadow position={[0, ARM2_LEN / 2, 0]}>
-            <cylinderGeometry args={[0.008, 0.009, ARM2_LEN, 12]} />
-            <meshStandardMaterial color={INK_GHOST} roughness={0.5} metalness={0.6} />
-          </mesh>
-
-          {/* Shade — narrow opening points down/forward to make a pool on the desk */}
-          <group position={[0, ARM2_LEN, 0]} rotation={[0.7, 0, 0]}>
-            <mesh castShadow>
-              <cylinderGeometry args={[SHADE_TOP_R, SHADE_BOT_R, SHADE_H, 24, 1, true]} />
-              <meshStandardMaterial
-                color={BG_PANEL}
-                roughness={0.6}
-                metalness={0.35}
-                side={2}
-              />
-            </mesh>
-            {/* Top cap so we don't see the bulb from the back */}
-            <mesh position={[0, SHADE_H / 2 + 0.001, 0]}>
-              <cylinderGeometry args={[SHADE_TOP_R, SHADE_TOP_R, 0.004, 24]} />
-              <meshStandardMaterial color={BG_PANEL} roughness={0.6} metalness={0.35} />
-            </mesh>
-            {/* Bulb — emissive sphere just inside the bottom opening. This is
-                the bright source we'll selectively bloom in 1.3. */}
-            <mesh position={[0, -SHADE_H / 2 + 0.02, 0]}>
-              <sphereGeometry args={[0.022, 16, 16]} />
-              <meshStandardMaterial
-                color={SIGNAL_AMBER_HOT}
-                emissive={LAMP_WARM}
-                emissiveIntensity={4}
-                toneMapped={false}
-              />
-            </mesh>
-          </group>
-        </group>
+      {/* Shade — OPEN-BOTTOM hemisphere centered on the bulb. The dome surface
+          extends UP from y=bulbY (rim) to y=bulbY+SHADE_RADIUS (top). Slight
+          forward tilt aims the opening at the keyboard/notebook zone. */}
+      <group position={bulbPosition} rotation={[-0.18, 0, 0]}>
+        {/* Outside surface */}
+        <mesh castShadow>
+          <sphereGeometry args={[SHADE_RADIUS, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2]} />
+          <meshStandardMaterial color={BG_PANEL} roughness={0.6} metalness={0.7} side={2} />
+        </mesh>
+        {/* Inside surface — slightly smaller, warm emissive so the bounce
+            light visible in the reference image reads correctly. */}
+        <mesh>
+          <sphereGeometry args={[SHADE_RADIUS - 0.002, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2]} />
+          <meshStandardMaterial
+            color={BG_PANEL_2}
+            emissive={LAMP_WARM}
+            emissiveIntensity={0.4}
+            roughness={0.55}
+            metalness={0.1}
+            side={1}
+          />
+        </mesh>
       </group>
-    </group>
+
+      {/* Bulb — small sphere at the bulb position. MeshBasicMaterial keeps it
+          unaffected by scene lighting; bloom picks it up. */}
+      <mesh position={bulbPosition}>
+        <sphereGeometry args={[BULB_RADIUS, 16, 16]} />
+        <meshBasicMaterial color={LAMP_WARM} toneMapped={false} />
+      </mesh>
+    </>
   );
 }

@@ -25,11 +25,14 @@
 
 **Goal:** the cinematic landing is the entire experience for now. If we only shipped this, it would already be defensible.
 
-- [ ] Scene boilerplate: dark room, FOV 50°, first-person desk-height camera
-- [ ] Lighting: warm desk lamp (key, bloom), cool monitor fills, cool rim from window
-- [ ] Film grain overlay (~3%)
-- [ ] Desk objects modeled / sourced (placeholder hand-built voxels OK pre-asset-pass):
-  - [ ] Monitor 1, Monitor 2, Mech keyboard, Coffee mug, Plant, Headphones, Notebook, Phone, Lamp, Window frame, Door hint
+### Checkpoint A — scene foundation + desk objects ✅ *(merged 2026-05-18)*
+- [x] Scene boilerplate: dark room, FOV 50°, first-person desk-height camera
+- [x] Lighting: warm desk lamp (key, bloom), cool monitor fills, cool rim from window
+- [x] Film grain overlay (~3%)
+- [x] Desk objects modeled (hand-built primitives):
+  - [x] Monitor 1, Monitor 2, Mech keyboard, Coffee mug, Plant, Headphones, Notebook, Phone, Lamp, Window frame, Door spill
+
+### Checkpoint B — interactions + panels *(active)*
 - [ ] Object hover state: glow + Departure Mono label
 - [ ] Click → camera zoom + DOM panel slide-in (480px, right side)
 - [ ] Panels (real content, even if short):
@@ -37,8 +40,10 @@
   - [ ] TerminalPanel (rolling log: real recent commits via GitHub API at build time)
   - [ ] NotebookPanel (renders `content/writing/*.md`)
   - [ ] Phone → mailto reveal
-- [ ] AudioToggle (visible from first paint, OFF by default)
-- [ ] Rain texture animated on window pane
+- [ ] AudioToggle wired to lo-fi loop (visible from first paint, OFF by default)
+
+### Checkpoint C — mobile reduced-fidelity variant
+- [ ] Rain texture animated on window pane *(1.18, Checkpoint B tail / C)*
 - [ ] Mobile reduced-fidelity variant: orthographic-ish framing, taps trigger object reveals
 
 **Exit gate:** A stranger lands cold, clicks Monitor 1 within 10s, reads a real project, leaves convinced. Lighthouse ≥85.
@@ -78,6 +83,9 @@
 - [ ] Mobile: lower instance count, simplified pulse, no traffic streams
 
 **Exit gate:** During market hours, watching the city for 30s feels alive in a way that maps to the actual market.
+
+**Phase 3 risk — window rim-light interplay shifts when the real city lands.**
+Checkpoint A ships a placeholder "city beyond" (two stacked emissive planes at `VOXEL_GLOW_SOFT`, intensity 1.4/0.55) visible through the right-wall window. When Phase 3 replaces it with the real voxel skyline — hundreds of individual building lights — the average luminance behind the glass will change, possibly significantly. The wall area around the window may suddenly read brighter (many lit windows) or dimmer (depending on the city's average luminance vs. the placeholder). The desk scene's rim-light balance (currently `VOXEL_GLOW_SOFT` DirectionalLight at intensity 1.2) will likely need a re-tune once the real city is in. Not a bug — a planned iteration. Budget a desk-scene lighting re-verification pass when the window-from-desk render goes live.
 
 ## Phase 4 — Layer 3, the Neural Network *(week 6–7)*
 

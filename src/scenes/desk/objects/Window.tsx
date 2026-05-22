@@ -1,74 +1,96 @@
-import { BG_NIGHT, BG_PANEL_2, RAIN_STREAK, VOXEL_GLOW_SOFT } from '../../../lib/style/colors';
+import { BG_NIGHT, BG_PANEL, BG_VOID, VOXEL_GLOW_SOFT } from '../../../lib/style/colors';
 
-// Phase 1.6 — window frame to the right of the desk. Tall vertical
-// rectangle, dark frame, a single glass plane with a placeholder cool
-// tint (rain shader lands in 1.18 of the prompt — Checkpoint B time).
-// In Checkpoint A this exists so the rim light has a visual source and
-// the right side of the frame reads as "out there is a city."
+// Phase 1 revision — window mounted on the BACK wall, facing the camera.
+// (Previously had rotation `[0, -PI/2, 0]` as if mounted on a right-side wall,
+// but the scene only has a back wall, so the window was floating mid-air.)
+//
+// Glass is NOT a saturated cyan plane. It's a near-transparent
+// `MeshPhysicalMaterial` with `color: BG_NIGHT` — the cool cast we see
+// comes from the rim DirectionalLight passing through, not from the glass
+// being tinted. The "city beyond" is a placeholder plane behind the window.
 
 interface WindowProps {
   position: [number, number, number];
+  rotation?: [number, number, number];
 }
 
 const W = 0.7;
 const H = 1.0;
 const FRAME_T = 0.04;
-const DEPTH = 0.06;
+const FRAME_DEPTH = 0.06;
+const GLASS_THICKNESS = 0.02;
 
-export function Window({ position }: WindowProps) {
+export function Window({ position, rotation = [0, 0, 0] }: WindowProps) {
   return (
-    <group position={position} rotation={[0, -Math.PI / 2, 0]}>
-      {/* Frame: build as four boxes (top/bottom/left/right) so the
-          glass plane sits inside a real opening. */}
-      {/* Top */}
+    <group position={position} rotation={rotation}>
+      {/* Top frame */}
       <mesh castShadow position={[0, H / 2 - FRAME_T / 2, 0]}>
-        <boxGeometry args={[W, FRAME_T, DEPTH]} />
-        <meshStandardMaterial color={BG_PANEL_2} roughness={0.7} metalness={0.15} />
+        <boxGeometry args={[W, FRAME_T, FRAME_DEPTH]} />
+        <meshStandardMaterial color={BG_PANEL} roughness={0.7} metalness={0.15} />
       </mesh>
-      {/* Bottom */}
+      {/* Bottom frame */}
       <mesh castShadow position={[0, -H / 2 + FRAME_T / 2, 0]}>
-        <boxGeometry args={[W, FRAME_T, DEPTH]} />
-        <meshStandardMaterial color={BG_PANEL_2} roughness={0.7} metalness={0.15} />
+        <boxGeometry args={[W, FRAME_T, FRAME_DEPTH]} />
+        <meshStandardMaterial color={BG_PANEL} roughness={0.7} metalness={0.15} />
       </mesh>
-      {/* Left */}
+      {/* Left frame */}
       <mesh castShadow position={[-W / 2 + FRAME_T / 2, 0, 0]}>
-        <boxGeometry args={[FRAME_T, H - FRAME_T * 2, DEPTH]} />
-        <meshStandardMaterial color={BG_PANEL_2} roughness={0.7} metalness={0.15} />
+        <boxGeometry args={[FRAME_T, H - FRAME_T * 2, FRAME_DEPTH]} />
+        <meshStandardMaterial color={BG_PANEL} roughness={0.7} metalness={0.15} />
       </mesh>
-      {/* Right */}
+      {/* Right frame */}
       <mesh castShadow position={[W / 2 - FRAME_T / 2, 0, 0]}>
-        <boxGeometry args={[FRAME_T, H - FRAME_T * 2, DEPTH]} />
-        <meshStandardMaterial color={BG_PANEL_2} roughness={0.7} metalness={0.15} />
+        <boxGeometry args={[FRAME_T, H - FRAME_T * 2, FRAME_DEPTH]} />
+        <meshStandardMaterial color={BG_PANEL} roughness={0.7} metalness={0.15} />
       </mesh>
-      {/* Center mullion — horizontal divider, classic single-pane sash. */}
+      {/* Center horizontal mullion */}
       <mesh position={[0, 0, 0]}>
-        <boxGeometry args={[W - FRAME_T * 2, FRAME_T * 0.4, DEPTH * 0.6]} />
-        <meshStandardMaterial color={BG_PANEL_2} roughness={0.7} metalness={0.15} />
+        <boxGeometry args={[W - FRAME_T * 2, FRAME_T * 0.4, FRAME_DEPTH * 0.6]} />
+        <meshStandardMaterial color={BG_PANEL} roughness={0.7} metalness={0.15} />
       </mesh>
 
-      {/* Glass — cool-tinted plane suggesting night sky. Rain shader
-          replaces this material in Checkpoint B (1.18). */}
-      <mesh position={[0, 0, 0.001]}>
-        <planeGeometry args={[W - FRAME_T * 2, H - FRAME_T * 2]} />
-        <meshStandardMaterial
-          color={VOXEL_GLOW_SOFT}
-          emissive={BG_NIGHT}
-          emissiveIntensity={0.6}
-          roughness={0.2}
-          metalness={0.1}
-          transparent
-          opacity={0.92}
+      {/* Glass — transmissive, near-untinted. */}
+      <mesh position={[0, 0, 0]}>
+        <boxGeometry args={[W - FRAME_T * 2, H - FRAME_T * 2, GLASS_THICKNESS]} />
+        <meshPhysicalMaterial
+          color={BG_NIGHT}
+          transmission={0.3}
+          roughness={0.05}
+          metalness={0}
+          ior={1.45}
+          thickness={0.05}
         />
       </mesh>
 
-      {/* Three faint vertical streaks to suggest rain even before the shader.
-          Will be removed in Checkpoint B when the real rain shader lands. */}
-      {[-0.18, 0.04, 0.21].map((x, i) => (
-        <mesh key={`streak-${i}`} position={[x, -0.05 + i * 0.07, 0.003]}>
-          <planeGeometry args={[0.004, 0.4]} />
-          <meshBasicMaterial color={RAIN_STREAK} transparent opacity={0.35} />
-        </mesh>
-      ))}
+      {/* City beyond — placeholder. Sits ~30cm behind the window glass.
+          Sized slightly larger than the opening so the cyan glow fills the
+          visible cutout. Two stacked planes:
+            - Upper plane brighter (the lit city skyline at distance)
+            - Lower plane dimmer (the unlit / closer foreground)
+          Together they give a sense of depth without modeling real geometry.
+          Replaced by the real voxel city in Phase 3. */}
+      <mesh position={[0, 0.25, -0.3]}>
+        <planeGeometry args={[W * 0.92, H * 0.55]} />
+        <meshStandardMaterial
+          color={BG_VOID}
+          emissive={VOXEL_GLOW_SOFT}
+          emissiveIntensity={1.4}
+          roughness={1}
+          metalness={0}
+          toneMapped={false}
+        />
+      </mesh>
+      <mesh position={[0, -0.25, -0.3]}>
+        <planeGeometry args={[W * 0.92, H * 0.55]} />
+        <meshStandardMaterial
+          color={BG_VOID}
+          emissive={VOXEL_GLOW_SOFT}
+          emissiveIntensity={0.55}
+          roughness={1}
+          metalness={0}
+          toneMapped={false}
+        />
+      </mesh>
     </group>
   );
 }

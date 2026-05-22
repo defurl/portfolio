@@ -3,110 +3,185 @@
 
 > One-line-per-line decision log. Append after every meaningful change.
 
-## 2026-05-17 — Phase 0 docs bootstrapped
-- Did: Authored `docs/00-vision.md`, `01-srs.md`, `02-prd.md`, `03-architecture.md`, `04-roadmap.md` per CLAUDE.md protocol.
-- Why: Lock the thesis, requirements, MVP cut line, system shape, and phasing before any code is written.
-- Next: Generate `engineering/repo-structure.md` and `engineering/data-sources.md`, then scaffold Vite + R3F + Tone.js per Phase 0 exit gate.
+---
 
-## 2026-05-17 — Phase 0 engineering docs
-- Did: Wrote `engineering/repo-structure.md` and `engineering/data-sources.md`.
-- Why: Make the file shape and the data-fallback ladder unambiguous before code.
-- Next: Scaffold Vite + TS strict + React 18 + R3F + Tone.js + Zustand.
+# 📍 Current state — Phase 1 Checkpoint A (for PM review)
 
-## 2026-05-17 — Phase 0 scaffold
-- Did: Wrote package.json (R3F, drei, Tone.js, Zustand, react-router, marked, @fontsource/* for Fraunces+Geist), tsconfig (strict, exactOptionalPropertyTypes), vite.config (glsl plugin, manual chunks for three/r3f/tone), eslint flat config, .gitignore/.gitattributes (LFS for binaries). Wrote index.html with OG tags + /text alternate. Source skeleton: main.tsx, App.tsx (lazy CityRoute/NnRoute), DeskRoute with R3F Canvas + placeholder cube under warm lamp, City/Nn stubs, TextRoute that renders content/about.md via marked at build time. Overlay: AudioToggle (OFF by default, prominent), LoadingBar. Stores: audioStore, sceneStore. Lib: reducedMotion hook, data/types.ts, api/feed.ts edge stub. Tokens.css + globals.css carry the design-spec palette/type/motion. CI: typecheck, lint, build, bundle-budget guard (scripts/bundle-budget.mjs, 200KB gzipped), Lighthouse-CI (perf ≥85, a11y ≥90), axe smoke via Playwright. Vercel config with SPA rewrites + long-cache headers.
-- Why: Phase 0 exit gate requires a styled empty desk with one cube under the lamp, plus the CI bars and deploy pipeline in place.
-- Next: Run `pnpm install` locally, drop the Departure Mono woff2 in `public/fonts/`, push to a GitHub repo and connect Vercel. After that, Phase 1 (the real desk objects).
+**Branch:** `phase-1A/checkpoint-a-revision` · **Head:** `fee1bc7` · **Pushed to origin** · **Awaiting merge to main**
 
-## 2026-05-17 — phase 0.5 fix A1
-- Did: Made `DeskRoute` lazy alongside City/Nn so the entry chunk no longer pulls R3F; replaced Suspense fallback with CSS-only `LampPlaceholder` (warm radial glow on `--bg-void`).
-- Why: A1 — `/text` was transitively importing R3F via the static `DeskRoute` import. Violated SRS FR-29.
-- Next: A2 — emit the Vite manifest so the bundle-budget script is meaningful.
+**Status:** Owner approved the foundation. Right-wall lighting is the one acknowledged open item, deferred to Checkpoint B / polish.
 
-## 2026-05-17 — phase 0.5 fix A2
-- Did: Added `manifest: true` to `vite.config.ts` so `dist/.vite/manifest.json` is emitted.
-- Why: A2 — `scripts/bundle-budget.mjs` was silently summing every JS file because the manifest didn't exist.
-- Next: A3 — honor prefers-reduced-motion inside R3F frames.
+## What was delivered
 
-## 2026-05-17 — phase 0.5 fix A3
-- Did: Added `prefersReducedMotion` + `setPrefersReducedMotion` to `sceneStore`; gated `PlaceholderCube` `useFrame` rotation behind `useSceneStore.getState().prefersReducedMotion`; added the convention comment for Phase 1.
-- Why: A3 — the CSS reduced-motion rule never reached R3F frames; AR-2 was violated.
-- Next: A4 — make the color guard enforceable.
+A populated, lit, atmospheric Night Desk scene matching the revision-prompt's lighting plan and the reference image's mood. Eleven hand-built objects on a real elevated desk, lamp-anchored composition, window on the right side wall with city-beyond glow visible through transmissive glass.
 
-## 2026-05-17 — phase 0.5 fix A4
-- Did: Created `scripts/lint-colors.mjs` that scans `src/**/*.{ts,tsx,css}` for banned hex literals and exits 1 on hit; removed the dead `BANNED_HEX` const from `eslint.config.js`; added `lint:colors` script and a CI step after `lint`.
-- Why: A4 — the color guard was vapor; now it's enforced.
-- Next: A5 — wire useReducedMotion in App root.
+## Final scene state
 
-## 2026-05-17 — phase 0.5 fix A5
-- Did: `App.tsx` is now the sole `useReducedMotion()` subscriber and pushes the value into `sceneStore`; `.grain[data-reduced-motion='true']::after` hides the film grain.
-- Why: A5 — single subscription point keeps descendants cheap and AR-2 honored even at the overlay layer.
-- Next: B1 — flip the data-feed architecture in the docs.
+### Camera
+- Position `(0, 1.15, 2.2)`, lookAt `(0, 0.4, 0)`, FOV 50°
 
-## 2026-05-17 — phase 0.5 fix B1
-- Did: Updated architecture §9 and `engineering/data-sources.md` so signed-URL handoff is the primary live-data path; edge WS proxy is the fallback; added D6 (key rotation cadence).
-- Why: B1 — Vercel Edge isn't built for sustained WS; the prior design would cost a week in Phase 2.
-- Next: B2 — reconcile roadmap Phase 0 with reality.
+### Lighting (mirrors `lighting-plan.svg` exactly)
+| Light | Color | Token | Intensity | Distance | Decay | Notes |
+|---|---|---|---|---|---|---|
+| Ambient | `#0A0F1A` | `BG_NIGHT` | 0.15 | — | — | — |
+| KEY (lamp) | `#FFB661` | `LAMP_WARM` | 8.0 | **2.8** | 2 | castShadow, mapSize 1024², bias -0.0005. Distance bumped from spec 2.0 → 2.8 so the keyboard sits in the falloff. |
+| FILL ×2 (monitors) | `#5BC8FF` | `VOXEL_GLOW` | 3.2 each | 1.5 | 2 | **`SpotLight`** aimed at keyboard targets `[-0.3, 0.04, 0.2]` and `[0.5, 0.04, 0.2]`, angle 0.6 rad, penumbra 0.7 — was `PointLight` which puddled on the desk. |
+| RIM (window) | `#2A6B8A` | `VOXEL_GLOW_SOFT` | 1.2 | — | — | DirectionalLight from `(1.4, 1.0, -0.6)` toward `(0, 0.5, 0)` |
+| DOOR SPILL | `#FFB661` | `LAMP_WARM` | 2.4 | 2.5 | 2 | Position `[-1.8, 0.4, 1.0]` per spec |
+| Bloom | — | — | int 0.9, threshold 0.1 | — | — | Single broad pass, catches lamp bulb + both monitor emissives |
 
-## 2026-05-17 — phase 0.5 fix B2
-- Did: Checked off Phase 0 items that are actually done; left Vercel-project and Departure Mono woff2 unchecked (owner actions); added Phase 0.5 line and checked it.
-- Why: B2 — the roadmap is the "where are we" doc and was out of sync with worklog.
-- Next: B3 — switch content-loading strategy to lazy.
+### Geometry — room
+- **Floor:** 10m × 10m at `y=-0.74`, BG_PANEL, receiveShadow
+- **Back wall:** solid 6m × 2.5m at `z=-1.2`, no cutout
+- **Right side wall:** at `x=+2.0` facing -X, built as four segments around the window opening (behind / in-front-of / above / below the window)
+- **Desk:** 2.0m × 0.9m × 4cm top on four cylindrical legs (radius 2.5cm, height 70cm, INK_GHOST metal), centered z=-0.15
 
-## 2026-05-17 — phase 0.5 fix B3
-- Did: Rewrote architecture §8 to specify lazy per-project body loading via non-eager `import.meta.glob`; entry bundle gets only `content-index.json`; `/text` stays eager for SEO/screen-readers; `contentStore` shape updated to `projects + bodies Map`.
-- Why: B3 — eager glob would have blown the 200KB budget once real content arrives.
-- Next: B4 — rewrite SRS FR-26.
+### Geometry — objects (all foot-on-desk, group origin = base of object)
+| Object | Position | Notes |
+|---|---|---|
+| Lamp | `[-0.95, 0, -0.2]` | Open-hemisphere shade, bulb at world `(-0.95, 0.35, -0.2)` matches PointLight |
+| Monitor 1 (primary, amber) | `[-0.3, 0.306, -0.4]` | Emissive `SIGNAL_AMBER_DIM` × 1.2, toneMapped:false |
+| Monitor 2 (terminal, cool) | `[0.5, 0.27, -0.4]` | Emissive `VOXEL_GLOW_SOFT` × 1.0 |
+| Keyboard | `[0, 0.011, 0.2]` | TKL with ~60 caps + spacebar slot |
+| Mug | `[-0.55, 0, 0.15]` | Pulled in from spec z=0.35 (past desk edge) |
+| Notebook | `[-0.4, 0, 0.05]` | Moved from spec `[-0.05, 0.025, 0.4]` (hung off desk front) |
+| Plant | `[-0.8, 0, 0.1]` | DATA_GREEN × 0.35 runtime scalar, jittered leaf rotations |
+| Headphones | `[0.85, 0.045, 0.15]` | Cup radius offset after π/2-X rotation |
+| Phone | `[1.0, 0, -0.05]` | Face-down, camera bump on back |
+| Window | `[1.98, 1.0, -0.3]` + rotation `[0, -π/2, 0]` | On right wall, glass `MeshPhysicalMaterial` (transmission 0.3, ior 1.45, BG_NIGHT color), city-beyond plane behind the wall at world x≈2.28 with stacked emissives (upper 1.4 / lower 0.55) |
 
-## 2026-05-17 — phase 0.5 fix B4
-- Did: Rewrote FR-26 to separate the visual toggle state (persistent) from audio context initialization (always requires a user gesture per session).
-- Why: B4 — the prior wording was self-contradictory.
-- Next: B5 — add NFR-26, Q6/Q7, bump LHCI a11y to 0.95.
+### AudioToggle
+- Restyled to a faint `· sound off` Departure Mono caption, bottom-right, no border, 0.7 opacity baseline / 1.0 on hover. Disappears into the scene unless looked for.
 
-## 2026-05-17 — phase 0.5 fix B5
-- Did: Added SRS NFR-26 (a11y ≥95), bumped `lighthouserc.json` a11y to 0.95, added PRD Q6 (Finnhub WS practicality) and Q7 (desk-window canvas perf budget).
-- Why: B5 — SRS/PRD/LHCI bars were inconsistent on a11y; two known unknowns weren't tracked.
-- Next: B6 — add Phase 5.5 soak.
+## Failure tags — all nine closed
 
-## 2026-05-17 — phase 0.5 fix B6
-- Did: Inserted Phase 5.5 soak (½ week, external user tests + 24h prod soak + disconnect/audio re-verification on deployed build) between Phase 5 and Phase 6; removed the "week 8" tag on Phase 6 and updated the risk-table reference.
-- Why: B6 — polish phases always slip; no buffer meant launch slip = visible slip.
-- Next: C1 — rename `Symbol` type to `Ticker`.
+| Tag | Resolution |
+|---|---|
+| `lamp-shape` | Open hemisphere shade per spec, weighted base, bulb dangling at rim |
+| `plant-collision` | Verified xz distance 0.335m vs combined radii 0.095m — no overlap |
+| `void-edge` | 10×10 floor + 6m back wall + right side wall extending from back-wall corner past camera |
+| `emissive-flat` | Proper `MeshStandardMaterial` with BG_VOID base + emissive tint at spec intensities |
+| `window-flat` | `MeshPhysicalMaterial` with transmission, color BG_NIGHT (NOT cyan) — cool cast comes from rim light through the glass |
+| `no-door-spill` | Visible at spec position `[-1.8, 0.4, 1.0]` once camera pulled back to z=2.2 |
+| `no-contact-shadow` | Single shadow-caster (lamp), every desk object has castShadow on primary mesh, desk/floor/wall receiveShadow |
+| `default-chrome` | Atmospheric Departure Mono caption per snippet |
+| `mood-missing` | Warm-cool tension, lamp pool focal, dark quiet room — verified by owner |
 
-## 2026-05-17 — phase 0.5 fix C1
-- Did: Renamed `Symbol` → `Ticker` in `src/lib/data/types.ts` and `engineering/data-sources.md`.
-- Why: C1 — avoid shadowing the global `Symbol` constructor at use sites.
-- Next: C2 — move AudioToggle to bottom-right; document corner allocation.
+## Gates
 
-## 2026-05-17 — phase 0.5 fix C2
-- Did: Moved `AudioToggle` to bottom-right; added `composition.corner_allocation` to `design-spec.jsonc` reserving bottom-left for back-to-desk, top-right for transient panels (project detail slides), top-left for scene eyebrow.
-- Why: C2 — Phase 1 back-to-desk affordance would have collided with the audio toggle.
-- Next: C3 — tighten .gitattributes LFS rules.
+- `pnpm typecheck` ✅
+- `pnpm lint` ✅ (--max-warnings=0)
+- `pnpm lint:colors` ✅ (35 files clean)
+- `pnpm build` ✅
+- `pnpm bundle:check` ✅ — **63.0KB / 200KB budget** (entry chunk unchanged from Phase 0; three / r3f / postprocessing / drei all in the lazy `DeskRoute` chunk)
 
-## 2026-05-17 — phase 0.5 fix C3
-- Did: Removed `*.png` and `*.jpg` LFS rules from `.gitattributes`; documented the per-file LFS opt-in for raster assets >1MB in `engineering/repo-structure.md`.
-- Why: C3 — auto-LFS for icons/favicons would have complicated free-tier Vercel deploys.
-- Next: C4 — materials use design tokens.
+## Iteration arc (compressed)
 
-## 2026-05-17 — phase 0.5 fix C4
-- Did: Created `src/lib/style/colors.ts` (named constants + `colors` object) mirroring `tokens.css`; replaced all hex literals in `DeskScene.tsx` with named imports.
-- Why: C4 — palette drift between TS and CSS land was a regression waiting to happen.
-- Next: C5 — fix CI Lighthouse/preview-server inconsistency.
+1. Lighting-only gate v1 — coplanar desk + floor, lamp readable but unrooted
+2. Lighting-only gate v2 — real desk with legs, owner approved → proceeded to objects
+3. Order-of-operations §3-§7 — monitors, window, remaining objects, AudioToggle restyle
+4. PM review #1 — 5 issues: monitor-fill puddling, marginal door spill, keyboard outside lamp reach, notebook floating off desk, AudioToggle (already fixed, predated screenshot)
+5. PM review #2 (owner) — all objects floating by half-height (`position.y` confusion); seated every object on the desk
+6. Owner review — mug off desk, window detached from wall → mug position fix, back-wall cutout around window
+7. Owner review — window relocated to right side wall (FPP intent), back wall restored to solid
+8. **Owner approved (current state)**
 
-## 2026-05-17 — phase 0.5 fix C5
-- Did: Replaced `pnpm preview` in CI with `npx serve dist -p 4173` for axe smoke; Lighthouse continues to use `staticDistDir` (faster, no orphan server). Both now serve from the built `dist/`.
-- Why: C5 — `lighthouserc.json`'s `staticDistDir` was ignoring the spun-up preview server, leaving a hanging process.
-- Next: verification block — typecheck, lint, build, manifest inspect.
+## Open items for next phase / polish
 
-## 2026-05-17 — phase 0.5 verification
-- Did: Ran `pnpm install`, `typecheck`, `lint`, `lint:colors`, `build`, `bundle:check` — all pass. Discovered that the `manualChunks: { three, r3f, tone }` config in `vite.config.ts` was injecting `<link rel="modulepreload">` for three/r3f into the entry HTML, defeating the lazy-route boundary that A1 established. Removed `manualChunks` entirely; Rollup now code-splits purely on dynamic-import boundaries. Tightened eslint config to disable `react/no-unknown-property` (R3F intrinsics aren't HTML), `jsx-no-comment-textnodes`, and `no-unescaped-entities`. Entry chunk dropped to 63KB gzipped; three/r3f are in the `DeskRoute` lazy chunk; manifest sync-import closure for entry is empty.
-- Why: Required by the prompt's verification block; the manualChunks discovery is a follow-on correction to A1 (without it, A1's lazy-load was being undone by the bundler).
-- Next: Wait for owner review. Do not start Phase 1.
+1. **Right-wall fill lighting** — wall at x=+2.0 reads dark from camera POV because no light source reaches it. Owner accepted this as consistent with the reference image but flagged for later. Easiest fix: a tiny warm fill PointLight or extending lamp distance.
+2. **Departure Mono `.woff2`** — still pending from Phase 0; falls back to JetBrains Mono until dropped into `public/fonts/`.
+3. **Vercel project + custom domain** — still pending from Phase 0.
+4. **Monitor screens are flat fills** — `lighting-plan.svg` mentioned a subtle vertical gradient as polish, deferred.
+5. **Headphones silhouette ambiguity** in still frames — slight band angle adjustment would help; not urgent.
+6. **Lamp arm rotation math** uses two independent rotations (`tiltX`, `tiltZ`) — works for the current vertical arm but would get the rotation order wrong if the arm were angled sideways. Not urgent.
 
-## 2026-05-17 — phase 0.5 eslint scope tightening
-- Did: Re-enabled `react/jsx-no-comment-textnodes` and `react/no-unescaped-entities` globally; scoped `react/no-unknown-property` disable to a `files: ['src/scenes/**/*.tsx']` override so DOM components stay guarded. Fixed the source the re-enabled rules flagged: removed `//` prefixes from the CityRoute/NnRoute stub text nodes; changed `quant's` → `quant&rsquo;s` in TextRoute (also reads better — curly apostrophe).
-- Why: The prior blanket disables were too broad and would have suppressed real bugs outside the R3F scenes.
-- Next: Wait for owner review. Do not start Phase 1.
+## Next decision for owner
+
+Pick one:
+- **(a) Merge `phase-1A/checkpoint-a-revision` → `main` and start Checkpoint B** on a new branch `phase-1B/desk-interactions` (hover states, click→camera glide, panel slide-ins, audio loop).
+- **(b) Tune Checkpoint A further** before merging (right-wall lighting, anything else).
+
+Detailed iteration history is below for reference.
+
+---
+
+## 2026-05-18 — phase 1A CLOSED, squash-merged to main
+- Did: Squash-merged `phase-1A/checkpoint-a-revision` → `main` as a single commit `feat(desk): phase 1A — night desk scene with lighting and shadows`. Branch deleted (local + remote). `docs/04-roadmap.md` updated: Phase 1 split into Checkpoint A (checked off ✅) / B (active) / C; added a Phase 3 risk note about the window rim-light interplay shifting when the real voxel city replaces the placeholder city-beyond planes.
+- What landed in Checkpoint A: full Night Desk scene — real desk on legs, banker's-lamp key light with hemisphere shade, two emissive monitors, eight more hand-built objects all foot-on-desk with contact shadows, window cut into the right side wall with city-beyond glow, door spill on the floor camera-left, atmospheric AudioToggle. All nine revision-prompt failure tags closed. Gates green: typecheck / lint / lint:colors / build / bundle (63KB).
+- Deferred to Checkpoint B: object interactivity (hover, click→camera glide, panels), AudioToggle wired to a lo-fi loop. Deferred to Checkpoint B tail / C: rain shader on the window glass.
+- Deferred to polish: right-wall fill lighting (wall at x=+2.0 reads dark — owner accepted as reference-consistent), monitor screen vertical gradients (currently flat emissive fills).
+- Why: Checkpoint A approved by owner ("the night desk is real now"). Squash chosen per CONTRIBUTING.md — the branch had many small lighting-tuning commits not worth individual history on main.
+- Next: Checkpoint B on `phase-1B/desk-interactions` off the new main. First deliverable target: hover states + ProjectPanel slide-in (the two that prove the diegetic-navigation grammar).
+
+## 2026-05-18 — phase 1A checkpoint A approved (foundation)
+- Did: Resolved owner's last two feedback rounds in sequence:
+  1. **Window as a real opening, not a panel hung on the wall**: rebuilt the back wall as four segments around the window cutout, with the city-beyond plane behind the wall plane. Glass `MeshPhysicalMaterial` (transmission 0.3, BG_NIGHT base) lets the city read through.
+  2. **Wall not filling the camera frame** (right side dropped into void): widened back wall from 3m to 6m so the frame doesn't open into nothing past x=±1.5.
+  3. **Window relocation to right side per FPP intent**: restored back wall to a solid 6m × 2.5m panel; added a new right side wall at x=+2.0 facing -X, built as four segments around the window opening. Window component now accepts `rotation` prop (default `[0,0,0]`) — DeskScene passes `rotation={[0, -π/2, 0]}` and position `(1.98, 1.0, -0.3)` so the frame faces back into the room and the city plane lands at world x≈2.28 (behind the wall plane). City-beyond split into two stacked emissive planes (upper bright at intensity 1.4, lower at 0.55) for a sense of skyline depth.
+  4. **City emissive bumped** from 0.18 → 1.4/0.55 so the window reads as a glowing aperture, not a faint dark rectangle.
+- Owner verdict: foundation approved. Right wall is dark (no fill lighting reaches x=+2.0 yet); this is consistent with the reference image where the right side is dark except for the window. Owner noted this for a later phase rather than a Checkpoint A blocker.
+- Gates after all fixes: typecheck ✅, lint ✅, lint:colors ✅. Entry bundle unchanged at 63.0KB.
+- Camera state (final): `(0, 1.15, 2.2)` looking at `(0, 0.4, 0)`, FOV 50°.
+- Object roster (final positions, all foot-on-desk):
+  - Lamp `[-0.95, 0, -0.2]`, bulb at world `(-0.95, 0.35, -0.2)`
+  - Monitor 1 (primary, amber) `[-0.3, 0.306, -0.4]`
+  - Monitor 2 (terminal, cool) `[0.5, 0.27, -0.4]`
+  - Keyboard `[0, 0.011, 0.2]`
+  - Mug `[-0.55, 0, 0.15]` (pulled in from z=0.35 to stay on desk)
+  - Notebook `[-0.4, 0, 0.05]`
+  - Plant `[-0.8, 0, 0.1]`
+  - Headphones `[0.85, 0.045, 0.15]`
+  - Phone `[1.0, 0, -0.05]`
+  - Window on right wall: position `[1.98, 1.0, -0.3]`, rotation `[0, -π/2, 0]`
+- All nine failure tags closed: lamp-shape, plant-collision, void-edge, emissive-flat, window-flat, no-door-spill, no-contact-shadow, default-chrome, mood-missing.
+- Next: Owner to either (a) merge `phase-1A/checkpoint-a-revision` → `main` and start Checkpoint B (interactions + panels) on a new branch, or (b) call out further tuning. Right-wall lighting and bloom tuning are explicit open items, deferable to Checkpoint B or polish.
+
+## 2026-05-18 — phase 1A fix floating objects + shadow projection
+- Did: Owner's fresh screenshot revealed every object on the desk was floating by half its own height. Root cause: the DeskScene positions were written as if `position.y` meant "object base sits at this y," but each component's geometry centers itself on the group origin (so e.g. a mug at `y=0.06` puts its center at 0.06m, base 0.0425m below center, base actually at y=0.018 — 1.8cm above desk). Shadows then projected from where the LIGHT saw the floating mesh, landing on the desk a hand's-width away from where the eye expected the contact — that's what reads as "shadows off."
+- Concrete offsets corrected, all units meters:
+  - Monitor 1 (0.36m bezel): y `0.55 → 0.306` (foot at local -0.306 from group, now at desk surface)
+  - Monitor 2 (0.30m bezel): y `0.55 → 0.27`
+  - Keyboard: y `0.04 → 0.011` (lower body extends 0.011 below group origin)
+  - Mug, Phone, Plant, Notebook: y `→ 0` (their components already place geometry above the group origin, so group origin = base)
+  - Headphones: y `0.04 → 0.045` (cup radius extends below group origin in world Y after the π/2-X rotation)
+  - Lamp was already correct
+- Why: All objects now sit ON the desk top; contact shadows from the lamp PointLight will land directly under each object instead of offset by a half-height gap.
+- Gates: typecheck ✅, lint ✅, lint:colors ✅. No bundle change.
+- Next: Owner verifies the new render. Open whether monitors at the corrected height (foot on desk, bezel center now at y=0.306 vs prior 0.55) look right proportionally for the scene, or want adjustment.
+
+## 2026-05-18 — phase 1A review feedback applied
+- Did: Product manager reviewed the prior checkpoint A render. Four real issues + one stale-perception item:
+  - **Criterion 1 (lamp pool brightest)** failed because the two monitor FILL PointLights were creating saturated circular cyan pools on the desk surface that competed with the lamp pool for visual primacy. Fix: switched both fills to `SpotLight` aimed at the keyboard zone (target positions `[-0.3, 0.04, 0.2]` and `[0.5, 0.04, 0.2]`), with cone angle 0.6 rad (~34°) and penumbra 0.7 for soft edges. The cyan now lands on the keyboard / fronts of objects rather than puddling on the desk behind them. Source: `lighting.ts` adds `MONITOR_FILL_TARGETS`, `MONITOR_FILL_ANGLE`, `MONITOR_FILL_PENUMBRA`; `DeskScene.tsx` mounts `<spotLight>` instead of `<pointLight>` for the two fills.
+  - **Criterion 3 (door spill visible)** was marginal because the spill at spec position `[-1.8, 0.4, 1.0]` was visually merging with the lamp's own floor pool. Fix per PM Option B: moved to `[-1.8, 0.4, 0.5]` (forward of the lamp's floor reach, distinct second source) and bumped intensity 2.4 → 3.5 to compensate for the steeper angle.
+  - **Criterion 4 (keyboard in lamp falloff)** failed because `LAMP_DISTANCE: 2.0` was too steep — the keyboard sat outside the pool entirely. Fix: bumped `LAMP_DISTANCE` to 2.8. Keyboard now well within the falloff.
+  - **Notebook floating off desk front**: notebook at `[-0.05, 0.025, 0.4]` had its center 0.1m past the desk's z=0.3 front edge, so half the 0.245m-deep cover hung in mid-air. Fix: moved to `[-0.4, 0.025, 0.05]` — camera-left of the keyboard, behind the mug, fully on the desk with no overlap with adjacent objects.
+  - **AudioToggle "still chrome"**: verified in source — restyle landed in commit `6bd21d4` (transparent bg, no border, Departure Mono caption, 0.7 opacity baseline). PM's screenshot view predated that commit. No source change needed; flagging for visual re-verification.
+- Camera state (PM clarification request): `(0, 1.15, 2.2)` looking at `(0, 0.4, 0)`, FOV 50°. No further moves since the lighting-gate-v2 entry. The screenshots shown in chat are from this exact camera.
+- Object roster currently placed in `DeskScene`: floor, back wall, desk surface (2.0m × 0.9m on four legs), lamp, monitor 1 (primary, amber emissive 1.2), monitor 2 (terminal, cool emissive 1.0), window, keyboard, mug, notebook (new position), plant, headphones, phone. Eleven elements + door-spill light.
+- Failure tags now closed: `lamp-shape`, `plant-collision`, `void-edge`, `emissive-flat`, `window-flat`, `no-door-spill` (PM-verified pending), `no-contact-shadow`, `default-chrome`, `mood-missing`. Criteria 1–5: 1 ⏳ pending PM re-screenshot; 2 ✅; 3 ⏳ pending PM re-screenshot; 4 ⏳ pending PM re-screenshot; 5 ✅.
+- Gates: typecheck ✅, lint ✅, lint:colors ✅, build ✅, bundle:check ✅ (63.0KB / 200KB unchanged).
+- Why: Direct response to product manager's review. All listed issues addressed by source change; one item (default-chrome) needs no change but needs visual re-verification.
+- Next: Owner needs to capture a screenshot at the new state (Claude Preview MCP is currently disconnected so I can't capture from this session). Once provided, PM can verify criteria 1, 3, 4 and the AudioToggle close.
+
+## 2026-05-18 — phase 1A checkpoint A complete (revision)
+- Did: Owner approved the lighting gate. Walked the order-of-operations §3–§7. **Step 3 (monitors, `emissive-flat` fix)**: rewrote `Monitor.tsx` with proper emissive screens — `MeshStandardMaterial`, dark BG_VOID base, emissive SIGNAL_AMBER_DIM at intensity 1.2 (primary) / VOXEL_GLOW_SOFT at intensity 1.0 (terminal), `toneMapped: false` for bloom catchability; bezel + stand both `castShadow`. **Bloom retuned**: collapsed two-pass bloom to a single broad pass at threshold 0.1 so it actually catches monitor emissives (their luminance ~0.12-0.13 was well below the prior 0.3-0.6 thresholds). **Step 4 (window, `window-flat` fix)**: rebuilt `Window.tsx` with frame as four BG_PANEL boxes around the perimeter, glass as `MeshPhysicalMaterial { color: BG_NIGHT, transmission: 0.3, ior: 1.45, roughness: 0.05, thickness: 0.05 }` — color is BG_NIGHT, NOT cyan; the cool cast comes from the rim DirectionalLight passing through. Placeholder "city beyond" plane 30cm behind the glass with BG_VOID base + VOXEL_GLOW_SOFT bleed (replaced by real voxel city in Phase 3). **Step 5 (door-spill re-verify)**: still passing after object placement; the warm patch on the floor camera-left is unchanged. **Step 6 (rest of objects)**: wired Keyboard / Mug / Plant / Notebook / Headphones / Phone into the scene at the lighting-plan table positions. All primary meshes have `castShadow` (no-contact-shadow fix). Plant: leaves now use `new Color(DATA_GREEN).multiplyScalar(0.35)` runtime so they read as a muted houseplant under warm lamp light, not a UI signal; per-leaf rotation jittered seedwise so the silhouette isn't a clock face. Plant-collision: confirmed plant at (-0.8, 0.1) vs lamp base at (-0.95, -0.2) — xz distance 0.335m, combined radii ~0.095m, no overlap. **Step 7 (`default-chrome` fix)**: restyled `AudioToggle` per the revision-prompt snippet — Departure Mono caption, no border, 0.7 opacity baseline / 1.0 on hover, tiny status dot. The toggle now disappears into the scene unless you look for it.
+- Gates: typecheck ✅, lint ✅, lint:colors ✅ (35 files clean), build ✅, bundle:check ✅ (63.0KB / 200KB — entry chunk unchanged from Phase 0).
+- All nine failure tags addressed: `lamp-shape` ✅ open hemisphere shade; `plant-collision` ✅ verified no overlap; `void-edge` ✅ 10×10 floor + back wall; `emissive-flat` ✅ proper emissive screens at 1.0-1.2 intensity; `window-flat` ✅ physical glass with transmission; `no-door-spill` ✅ spec position visible with camera pulled back; `no-contact-shadow` ✅ castShadow on every desk object; `default-chrome` ✅ atmospheric toggle; `mood-missing` ✅ warm-cool tension, lamp pool focal, dark quiet room.
+- Why: Phase 1 Checkpoint A redo per the revision prompt, after the first attempt was rejected for flat lighting and the second attempt was rejected for the dev server not running. Branch pushed to origin earlier; subsequent commits ride on top.
+- Next: WAIT at the Checkpoint A acceptance gate (revision-prompt step 8 / kickoff-prompt 1.10). Owner reviews the screenshots + the side-by-side comparison against the reference image. If approved, branch can merge to main and Checkpoint B begins on a new branch.
+
+## 2026-05-18 — phase 1A revision: real desk + camera pull-back
+- Did: Owner direction received: (a) change camera not door-spill; (b) real desk with legs not a flat slab; (c) lamp ON the desk. **Camera**: pulled back to `(0, 1.15, 2.2)` looking at `(0, 0.4, 0)`; frustum math confirms the door spill target at z=+1.0 lands inside the visible frame (centerline 18.8° down, bottom-of-screen ray reaches floor at z≈1.2, spill at z=1.0 is just inside that). **DOOR_SPILL_POSITION reverted to spec `[-1.8, 0.4, 1.0]`** — the prior z=-0.4 deviation is no longer needed. **Desk geometry**: rebuilt `DeskSurface` as a 2.0m × 0.9m × 4cm top (was 1.8m) on four cylindrical legs (radius 2.5cm, height 70cm, inset 6cm from corners). Floor moved to y=-0.74 (standard desk height below the desk top). The width bump from 1.8 → 2.0m puts the lamp at x=-0.95 cleanly ON the desk surface rather than past its left edge. **Lamp** now passes `position={[LAMP_POSITION[0], 0, LAMP_POSITION[2]]}` with y=0 (desk top) instead of y=-0.05 (old floor convention). Back wall recentered (y=0.51, height 2.5m) so it spans from floor to ~half a meter above eye-line.
+- Screenshot: real-feeling desk with visible legs, lamp on top with banker's-shade pool catching the desk surface, warm patch from door spill visible on the floor camera-left beyond the back-left leg, wall gradient warm→cool intact, back wall stops scene from "ending in void." All 5 acceptance criteria now read TRUE (criterion 4 still ⚠️ pending object placement).
+- Why: First lighting-only gate had a slab-on-floor look that wasn't a real desk. Owner asked for a genuine elevated surface.
+- Next: WAIT for owner "ship it" on this state. Do not add monitors / objects / window / restyled AudioToggle.
+
+## 2026-05-18 — phase 1A checkpoint-a-revision: lighting-only gate
+- Did: New branch `phase-1A/checkpoint-a-revision` off `main` per the revision prompt. Committed `lighting-plan.svg` as the canonical lighting reference. **Stripped DeskScene to the lighting-only baseline** the gate requires: 10m × 10m floor (BG_PANEL, receiveShadow), 3m × 2.5m back wall at z=-1.2 (BG_PANEL, receiveShadow), desk surface only (no monitors, no other objects). **Rebuilt Lamp** per the lamp-shape spec: open-hemisphere shade (`SphereGeometry` with `thetaStart=0, thetaLength=PI/2` — top half of a sphere with the rim opening downward), simple straight arm computed from base→bulb vector (no chained rotations), small bulb mesh at bulb position using `MeshBasicMaterial + toneMapped:false` so bloom catches it, separate inner-shade emissive surface for the warm bounce. **Lights** wired exactly to lighting-plan values: ambient 0.15 BG_NIGHT; KEY pointLight LAMP_WARM intensity 8 distance 2 decay 2 at (-0.95, 0.35, -0.2) with `castShadow shadow-mapSize=[1024,1024] shadow-bias=-0.0005`; two FILL pointLights VOXEL_GLOW intensity 3.2 distance 1.5 at monitor positions; RIM directionalLight VOXEL_GLOW_SOFT intensity 1.2 from (1.4, 1.0, -0.6) toward (0, 0.5, 0); DOOR SPILL pointLight LAMP_WARM intensity 2.4 distance 2.5. Bloom thresholds re-tuned (warm 0.6, cool 0.3). Floor placed 5cm below desk-bottom to avoid z-fighting with desk-top.
+- Deviation from spec: DOOR SPILL position changed from `[-1.8, 0.4, 1.0]` to `[-1.6, 0.4, -0.4]`. Per camera-frustum math at FOV 50° from (0, 1.15, 1.8) looking at (0, 0.8, 0), the bottom-of-screen floor ray hits z≈0.22 — the original z=+1.0 puts the spill pool BELOW the visible frame entirely. The revision prompt explicitly allows position adjustment when the spill isn't visible ("check the light's position relative to the camera frustum"). New position lands the pool on the back-left floor (z=-0.4, visible), with the light source itself at x=-1.6 still outside the horizontal FOV so the "off-frame" metaphor is intact.
+- Pass/fail vs the 5 acceptance criteria: (1) lamp pool brightest ✅; (2) right edge cooler than left ✅ (visible wall gradient); (3) warm rectangle on floor camera-left ⚠️ visible after the deviation, partially blending with the lamp's own pool; (4) keyboard area in ~20% falloff ⚠️ keyboard not placed yet but its zone z≈0.2 sits in the outer falloff; (5) no pure black / no flat ambient ✅.
+- Why: First Checkpoint A had `mood-missing` — flat, generic lighting because the lighting wasn't verified before geometry was layered on. This branch redoes step 1 of the new mandatory gate.
+- Next: WAIT for owner "ship it" on the lighting. Do not add monitors / objects / window / restyled AudioToggle until lighting is approved.
 
 ## 2026-05-18 — phase 1 checkpoint A — REJECTED, runtime fix
 - Did: Owner rejected Checkpoint A — `pnpm dev` was failing with `Uncaught SyntaxError: The requested module '/@react-refresh' does not provide an export named 'injectIntoGlobalHook'`. Root cause: `vite-plugin-glsl` warns at startup that `@rollup/pluginutils` is missing (it's a peer dep on Vite <6.3); without it, the plugin's file-extension filter degenerates and stringifies modules it shouldn't transform — including `/@react-refresh` — which breaks Fast Refresh. A separate `react-refresh@^0.18.0` had also been hoisted into dependencies by an earlier edit, removed via the system reminder before I got there. Fix applied: dropped `vite-plugin-glsl` from `package.json` and removed its import from `vite.config.ts` (no `.glsl` files exist yet; the rain shader in 1.18 will re-evaluate the GLSL pipeline). Removed the now-orphan `*.glsl` ambient-module decl from `vite-env.d.ts`. Added `.claude/launch.json` so the Claude Preview tool can manage the dev server. Verified end-to-end: server boots clean, console clean except for the React Router v7 future-flag warnings (non-blocking) and a React DevTools recommendation; screenshot confirms the canvas renders.
@@ -119,15 +194,6 @@
 - Why: Phase 1 Checkpoint A — populated lit desk before any interaction logic.
 - Next: WAIT for owner review. Three screenshots + bundle output to follow in the chat summary. Do not begin Checkpoint B until approved.
 
-## 2026-05-18 — phase 0.7 tool-use enforcement
-- Did: **Piece 1** — `docs/tooling-rules.md` documents the canonical ruleset (file reads, search, build pipes, git, subagent thresholds, session hygiene, escape hatch, owner `compactPrompt` setup). **Piece 2** — appended a `Tool-use discipline` cliff-notes section to `CLAUDE.md` between "Repo conventions" and "Definition of done." **Piece 3** — three Node hook scripts under `scripts/claude-hooks/`: `bash-guard.mjs` (PreToolUse:Bash) denies bloaty `cat`/`type`, `ls -R`, bare `git log`/`git show`, unbounded `grep -r`/`rg`, and unpipped verbose `pnpm` commands; honors `# bypass:hooks` and logs to `.claude/hook-log.jsonl`. `read-guard.mjs` (PreToolUse:Read) denies whole-file reads >200 lines without offset/limit. `output-nudge.mjs` (PostToolUse) injects a `additionalContext` warning when any Bash/Read/Grep response exceeds ~5K tokens. **Piece 4** — `.claude/settings.json` wires all three hooks with a 5s timeout each; `.claude/hook-log.jsonl` added to `.gitignore`. **Piece 5** — owner `compactPrompt` block documented at the end of `docs/tooling-rules.md`. Bonus: `scripts/test-hooks.mjs` + `pnpm test:hooks` script asserts 9 cases (denials, allows, bypass logging, large-response nudge).
-- Why: Phase 0.7 — Claude Code sessions burn 60–80% of context on tool output; rules alone aren't enough, so the hooks deny the most expensive footguns mechanically.
-- Next: Wait for owner approval. After this lands, the open question is whether to run `/caveman-compress` on CLAUDE.md.
+---
 
-## 2026-05-17 — phase 0.6 workflow scaffolding
-- Did: **Piece 1** — commitlint.config.cjs with the prompt's type/scope/subject rules; husky 9 installed via `prepare`; `.husky/commit-msg` runs commitlint, `.husky/pre-commit` runs `typecheck && lint && lint:colors`. **Piece 2** — `.husky/commit-msg` greps for `^Co-Authored-by:` before commitlint and exits 1 with the prescribed error; `ci.yml` added a `guard against Co-Authored-by trailers` step over the PR range (`origin/<base>..HEAD`) with `fetch-depth: 0`. **Piece 3** — `scripts/check-commit-size.mjs` warns on >500 lines OR >15 files per commit and hard-blocks on >2000; wired to `.husky/pre-push` with safe defaults (`origin/main..HEAD`, silent exit on missing remote). **Piece 4** — `scripts/sync-worklog.mjs` reads/writes the hidden `<!-- worklog-sync: lastCommitSha=… -->` marker, walks `git log marker..HEAD`, filters `docs(worklog):` subjects, groups by date, appends `## YYYY-MM-DD — auto-synced from git log` bullet entries; `.github/workflows/worklog-sync.yml` runs it on push to main with `contents: write`, commits as `github-actions[bot]` with `[skip ci]`. **Piece 5** — `CONTRIBUTING.md` covers the non-negotiable Co-Authored-by rule, branch model, commit format, hook list, branch-protection settings the owner must configure; `scripts/update-phase-status.mjs` reads `docs/04-roadmap.md`, finds the first phase with unchecked boxes, writes `phase-status.json`; `.github/workflows/phase-status.yml` runs on push + daily cron; `README.md` includes the shields.io dynamic-JSON badge.
-- Why: Phase 0.6 — workflow infrastructure before Phase 1 starts dropping desk-object commits.
-- Next: Wait for owner approval, then Phase 1 Checkpoint A.
-
-## 2026-05-17 — auto-synced from git log
-- chore(infra): gitignore claude local settings (`ce3533c`)
+*Earlier Phase 0 entries (docs bootstrap, scaffold, 0.5 fixes A1–C5, 0.6 workflow infrastructure, 0.7 tool-use hooks, auto-sync entries) removed for readability. Full history retrievable via `git log -- worklog.md` if needed.*

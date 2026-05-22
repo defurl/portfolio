@@ -1,14 +1,17 @@
-import { BG_PANEL_2, INK_GHOST, SIGNAL_AMBER_DIM, VOXEL_GLOW_SOFT } from '../../../lib/style/colors';
+import { BG_PANEL_2, BG_VOID, INK_GHOST, SIGNAL_AMBER_DIM, VOXEL_GLOW_SOFT } from '../../../lib/style/colors';
 
-// Phase 1.6/1.7 — desk monitors.
-// Hand-built primitives only: a thin bezel box + a slightly inset emissive
-// screen plane + a small stand. Targeting a ~24" monitor for primary, ~22"
-// secondary. The screen is the recognizable element; the rest exists to
-// silhouette correctly and not steal attention.
+// Phase 1.6/1.7 — desk monitors. Hand-built primitives only.
+// Materials per `lighting-plan.svg` MATERIALS section (emissive-flat fix):
+//   - Monitor 1 screen: MeshStandardMaterial · emissive SIGNAL_AMBER_DIM ·
+//     intensity 1.2 · bloom target.
+//   - Monitor 2 screen: MeshStandardMaterial · emissive VOXEL_GLOW_SOFT ·
+//     intensity 1.0 · bloom target.
 //
-// Two emissive tints map to the two monitors' roles:
-// - Monitor 1 (projects): SIGNAL_AMBER_DIM — hints at the warm content beyond.
-// - Monitor 2 (terminal): VOXEL_GLOW_SOFT — colder, more rolling-log coded.
+// `color` is set to BG_VOID so the unlit base reads dark — the emissive layer
+// is what makes the screen "glow." `toneMapped: false` keeps the emissive
+// values raw so the bloom layer can catch the luminance.
+//
+// Contact shadows (no-contact-shadow fix): bezel + stand both castShadow.
 
 export type MonitorVariant = 'primary' | 'terminal';
 
@@ -23,39 +26,40 @@ const BEZEL_THICKNESS = 0.012;
 const PANEL_DEPTH = 0.024;
 
 export function Monitor({ position, variant, width = 0.62, height = 0.36 }: MonitorProps) {
-  const emissive = variant === 'primary' ? SIGNAL_AMBER_DIM : VOXEL_GLOW_SOFT;
-  // Primary monitor is slightly tilted back; secondary sits flatter.
-  const tilt = variant === 'primary' ? -0.06 : -0.04;
+  const isPrimary = variant === 'primary';
+  const emissiveTint = isPrimary ? SIGNAL_AMBER_DIM : VOXEL_GLOW_SOFT;
+  const emissiveIntensity = isPrimary ? 1.2 : 1.0;
+  const tilt = isPrimary ? -0.06 : -0.04;
 
   return (
     <group position={position} rotation={[tilt, 0, 0]}>
-      {/* Bezel / panel housing */}
+      {/* Bezel — thin housing around the screen */}
       <mesh castShadow>
         <boxGeometry args={[width, height, PANEL_DEPTH]} />
         <meshStandardMaterial color={BG_PANEL_2} roughness={0.55} metalness={0.35} />
       </mesh>
 
-      {/* Inset emissive screen — sits ~2mm proud of the bezel front face. */}
+      {/* Screen — dark base, emissive content tone. Sits 1mm proud of bezel. */}
       <mesh position={[0, 0, PANEL_DEPTH / 2 + 0.001]}>
         <planeGeometry args={[width - BEZEL_THICKNESS * 2, height - BEZEL_THICKNESS * 2]} />
         <meshStandardMaterial
-          color={emissive}
-          emissive={emissive}
-          emissiveIntensity={variant === 'primary' ? 0.55 : 0.4}
+          color={BG_VOID}
+          emissive={emissiveTint}
+          emissiveIntensity={emissiveIntensity}
           roughness={1}
           metalness={0}
           toneMapped={false}
         />
       </mesh>
 
-      {/* Stand neck — short cylinder behind/below the bezel. */}
-      <mesh position={[0, -height / 2 - 0.06, -0.02]}>
+      {/* Stand neck */}
+      <mesh castShadow position={[0, -height / 2 - 0.06, -0.02]}>
         <cylinderGeometry args={[0.012, 0.014, 0.12, 12]} />
         <meshStandardMaterial color={INK_GHOST} roughness={0.6} metalness={0.5} />
       </mesh>
 
-      {/* Foot — flat disc. */}
-      <mesh position={[0, -height / 2 - 0.12, -0.02]}>
+      {/* Foot */}
+      <mesh castShadow position={[0, -height / 2 - 0.12, -0.02]}>
         <cylinderGeometry args={[0.09, 0.11, 0.012, 24]} />
         <meshStandardMaterial color={INK_GHOST} roughness={0.5} metalness={0.55} />
       </mesh>

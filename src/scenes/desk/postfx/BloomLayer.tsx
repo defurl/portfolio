@@ -2,39 +2,36 @@ import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import { useSceneStore } from '../../../lib/stores/sceneStore';
 import { useAdaptiveFps } from '../../../lib/perf/useAdaptiveFps';
 
-// Phase 1.3 — selective bloom on the lamp bulb + monitor screens.
+// Phase 1.3 — selective bloom on the lamp bulb + (later) monitor emissives.
 //
-// Single EffectComposer with a wide-kernel warm bloom tuned via
-// luminanceThreshold so only the truly bright emissives (the lamp bulb
-// and the monitor emissive planes) pass through. A second pass with a
-// tighter kernel hugs the monitor screens without washing the desk.
+// Thresholds match the materials in `lighting-plan.svg`:
+//   - lamp bulb: MeshBasicMaterial, raw LAMP_WARM, toneMapped:false →
+//     linear luminance well above 1.0 → warm bloom (threshold 0.6) catches.
+//   - monitor 1 emissive: SIGNAL_AMBER_DIM at intensity 1.2 (added later) →
+//     warm bloom catches the warm content tone.
+//   - monitor 2 emissive: VOXEL_GLOW_SOFT at intensity 1.0 (added later) →
+//     cool bloom (threshold 0.3) catches the cool content tone.
 //
-// Bloom is disabled when:
-//   - prefers-reduced-motion is active (vestibular caution; static bloom
-//     is fine in principle but cheap to drop)
-//   - sustained FPS drops below 50 for 2s (adaptive perf)
+// Bloom disabled when prefers-reduced-motion is set OR when adaptive FPS
+// detects sustained low frame rate. Both are intentional perf escape hatches.
 export function BloomLayer() {
   const reduced = useSceneStore(s => s.prefersReducedMotion);
   const lowFps = useAdaptiveFps(50, 2000);
 
   if (reduced || lowFps) return null;
 
+  // Threshold tuning notes:
+  //   - Lamp bulb (MeshBasicMaterial LAMP_WARM, toneMapped:false): luminance ~0.55.
+  //   - Monitor 1 emissive (SIGNAL_AMBER_DIM × intensity 1.2): luminance ~0.12.
+  //   - Monitor 2 emissive (VOXEL_GLOW_SOFT × intensity 1.0): luminance ~0.13.
+  // To catch both the lamp bulb AND the monitor screens (all flagged "bloom
+  // target" in the lighting plan), thresholds need to sit below ~0.12.
   return (
     <EffectComposer>
-      {/* Warm bloom — luminance threshold tuned so only the lamp bulb passes.
-          The lamp bulb's emissiveIntensity is 4 with toneMapped:false, which
-          puts its luminance comfortably above 1.0 in linear space. */}
+      {/* Single broad bloom — soft warm/cool halos around everything emissive. */}
       <Bloom
-        intensity={0.85}
-        luminanceThreshold={0.9}
-        luminanceSmoothing={0.2}
-        mipmapBlur
-      />
-      {/* Cool/tight bloom hugging monitor screens. Lower threshold catches
-          the dimmer monitor emissives without picking up the lamp twice. */}
-      <Bloom
-        intensity={0.35}
-        luminanceThreshold={0.4}
+        intensity={0.9}
+        luminanceThreshold={0.1}
         luminanceSmoothing={0.4}
         mipmapBlur
       />
