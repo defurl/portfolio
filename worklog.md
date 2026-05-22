@@ -105,6 +105,23 @@ Detailed iteration history is below for reference.
 
 ---
 
+## 2026-05-18 — phase 1B first deliverable: hover states + ProjectPanel
+- Did: New branch `phase-1B/desk-interactions` off main. Built the first Checkpoint B slice — the hover/click/panel grammar, proven end-to-end on Monitor 1.
+  - **`interactionStore`** (new Zustand store): `hovered` (object under pointer), `focus` (object the camera glided to), `panel` (open DOM panel). Actions: `setHovered`, `focusObject(id, panel)`, `returnToDesk`.
+  - **`InteractiveObject`** wrapper (1.11): pointer over/out writes `hovered` to the store, sets the document cursor (pointer only when clickable), shows a Departure Mono one-word label via drei `<Html>` (transform=false, prepend, pointerEvents=none). Wraps Monitor 1/2, Window, Notebook, Headphones, Phone. Hover-scale lift was tried and dropped — scaling a wrapping group moved object feet off the desk; the label + cursor + monitor emissive lift carry the affordance instead.
+  - **Monitor emissive lift** (1.11): Monitor reads `hovered === hoverId` from the store and lifts screen emissive ×1.2 on hover. Instant swap (no easing frame loop) — still appears under reduced motion.
+  - **`CameraRig`** (1.12): hand-rolled time-parameterized glide, 2200ms, easeInOutCubic (solver-free stand-in for the design-spec camera-bezier). On `focus` change it lerps camera position + a tracked lookAt point from current pose to the target pose in `cameraPoses.ts`. Reduced motion → instant snap. REST pose = Checkpoint-A framing.
+  - **`ScenePanel`** (1.13): generic right-side slide-in, 480px, `backdrop-filter: blur(20px)` over `--bg-panel`@0.85, 1px `--ink-ghost` left border, slide via transform over `--dur-reveal`. Esc closes; × button closes. CSS comment flags the documented glass-morphism exception.
+  - **`ProjectPanel`** (1.14): driven by `content/projects.json` index; click a project → `loadProjectBody(id)` (lazy `import.meta.glob`, non-eager) renders the markdown body in place; "← back to list" returns. `content/projects.json` + three real-reading placeholder projects authored (`svi-vol-surface`, `execution-sim`, `feature-store` with markdown bodies — no Lorem Ipsum).
+  - **`lib/content/load.ts`** (B3 strategy): `getProjectIndex()` sync, `loadProjectBody(id)` async via non-eager glob.
+  - **`BackToDesk`** (1.12): bottom-left Departure Mono affordance, visible only when `focus !== null`, reverses the glide.
+- Wired: Monitor 1 fully (hover → label "projects" + emissive lift; click → camera glide → ProjectPanel slide-in; close/back → glide home). Monitor 2 / Window / Notebook / Headphones / Phone get hover + label only — their click panels (terminal/notebook/contact) are the next slice.
+- Gates: typecheck ✅, lint ✅, lint:colors ✅ (47 files), build ✅, bundle ✅ 63.0KB. Dev server boots clean — HTTP 200, modules transform correctly.
+- **Visual verification owed**: per the PM's Checkpoint B retrospective, acceptance needs rendered-behavior screenshots (hover before/after, panel mid-slide, camera glide start/mid/end). The Claude Preview MCP is disconnected this session — I can't capture them. Owner screenshots requested in chat.
+- Deferred to next slice: TerminalPanel (1.15) + GitHub activity fetch, NotebookPanel (1.16), Phone flip (1.17), audio loop (1.18), door-spill hover (no marker geometry yet), subtle hover feedback for non-nav objects (lamp/mug/plant/keyboard), eased emissive lift.
+- Why: First Checkpoint B deliverable — the two interactions (hover + ProjectPanel) that prove the diegetic-navigation grammar works.
+- Next: WAIT for owner review of the hover + ProjectPanel behavior. Then wire the remaining panels.
+
 ## 2026-05-18 — phase 1A CLOSED, squash-merged to main
 - Did: Squash-merged `phase-1A/checkpoint-a-revision` → `main` as a single commit `feat(desk): phase 1A — night desk scene with lighting and shadows`. Branch deleted (local + remote). `docs/04-roadmap.md` updated: Phase 1 split into Checkpoint A (checked off ✅) / B (active) / C; added a Phase 3 risk note about the window rim-light interplay shifting when the real voxel city replaces the placeholder city-beyond planes.
 - What landed in Checkpoint A: full Night Desk scene — real desk on legs, banker's-lamp key light with hemisphere shade, two emissive monitors, eight more hand-built objects all foot-on-desk with contact shadows, window cut into the right side wall with city-beyond glow, door spill on the floor camera-left, atmospheric AudioToggle. All nine revision-prompt failure tags closed. Gates green: typecheck / lint / lint:colors / build / bundle (63KB).
