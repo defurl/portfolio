@@ -1,0 +1,101 @@
+/* ProjectPanel — list view + single-project body view. */
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2.25rem;
+}
+
+.entry {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: var(--step-3);
+  color: var(--ink-paper);
+  transition: color var(--dur-ui) var(--ease-ui);
+}
+.entry:hover .title,
+.entry:focus-visible .title {
+  color: var(--signal-amber);
+}
+
+.thesis {
+  font-family: var(--font-body);
+  font-size: var(--step-1-up);
+  line-height: 1.6;
+  color: var(--ink-muted);
+}
+
+.back {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin-bottom: 1.75rem;
+  font-family: var(--font-mono);
+  font-size: var(--step-1);
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+  cursor: pointer;
+  transition: color var(--dur-ui) var(--ease-ui);
+}
+.back:hover,
+.back:focus-visible {
+  color: var(--signal-amber);
+}
+
+.loading {
+  font-family: var(--font-mono);
+  font-size: var(--step-1);
+  color: var(--ink-faint);
+}
+
+.prose {
+  font-family: var(--font-body);
+  font-size: var(--step-1-up);
+  line-height: 1.7;
+  color: var(--ink-paper);
+}
+.prose :global(h2) {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: var(--step-3);
+  margin: 0 0 1rem 0;
+}
+.prose :global(p) {
+  margin: 0 0 1rem 0;
+  color: var(--ink-muted);
+}
+.prose :global(strong) {
+  color: var(--ink-paper);
+  font-weight: 500;
+}
+
+.links {
+  list-style: none;
+  margin: 2rem 0 0 0;
+  padding: 1.25rem 0 0 0;
+  border-top: 1px solid var(--ink-ghost);
+  display: flex;
+  gap: 1.5rem;
+}
+.links a {
+  font-family: var(--font-mono);
+  font-size: var(--step-1);
+  color: var(--signal-amber);
+}

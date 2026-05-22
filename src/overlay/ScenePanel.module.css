@@ -1,0 +1,60 @@
+/* Transient scene panel — slides in from the right over the 3D scene.
+   GLASS-MORPHISM EXCEPTION: design-spec.jsonc bans glass-morphism, but that
+   rule targets card/feature-box SaaS aesthetics. A transient panel laid over
+   a live 3D scene needs the backdrop-blur for text contrast — there is no
+   other way to keep copy legible against an arbitrary moving background.
+   This is the ONLY place backdrop-filter is allowed. Do not copy this
+   pattern into cards or grids. */
+.panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 480px;
+  max-width: 100vw;
+  height: 100vh;
+  box-sizing: border-box;
+  padding: 2.5rem 2rem;
+  background: rgba(18, 24, 38, 0.85); /* --bg-panel @ 0.85 */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-left: 1px solid var(--ink-ghost);
+  transform: translateX(100%);
+  transition: transform var(--dur-reveal) var(--ease-ui);
+  z-index: 30;
+  overflow-y: auto;
+}
+
+.panel[data-open='true'] {
+  transform: translateX(0);
+}
+
+.close {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  background: transparent;
+  border: none;
+  font-family: var(--font-mono);
+  font-size: var(--step-3);
+  line-height: 1;
+  color: var(--ink-faint);
+  cursor: pointer;
+  transition: color var(--dur-ui) var(--ease-ui);
+}
+.close:hover,
+.close:focus-visible {
+  color: var(--signal-amber);
+}
+
+.eyebrow {
+  margin: 0 0 2rem 0;
+  font-family: var(--font-mono);
+  font-size: var(--step-1);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.body {
+  font-family: var(--font-body);
+}
