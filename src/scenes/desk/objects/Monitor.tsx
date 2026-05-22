@@ -1,4 +1,5 @@
 import { BG_PANEL_2, BG_VOID, INK_GHOST, SIGNAL_AMBER_DIM, VOXEL_GLOW_SOFT } from '../../../lib/style/colors';
+import { useInteractionStore } from '../../../lib/stores/interactionStore';
 
 // Phase 1.6/1.7 — desk monitors. Hand-built primitives only.
 // Materials per `lighting-plan.svg` MATERIALS section (emissive-flat fix):
@@ -20,15 +21,22 @@ interface MonitorProps {
   variant: MonitorVariant;
   width?: number;
   height?: number;
+  /** Interaction-store id — when set, the screen lifts emissive ~20% on hover. */
+  hoverId?: string;
 }
 
 const BEZEL_THICKNESS = 0.012;
 const PANEL_DEPTH = 0.024;
+const HOVER_EMISSIVE_LIFT = 1.2;
 
-export function Monitor({ position, variant, width = 0.62, height = 0.36 }: MonitorProps) {
+export function Monitor({ position, variant, width = 0.62, height = 0.36, hoverId }: MonitorProps) {
   const isPrimary = variant === 'primary';
   const emissiveTint = isPrimary ? SIGNAL_AMBER_DIM : VOXEL_GLOW_SOFT;
-  const emissiveIntensity = isPrimary ? 1.2 : 1.0;
+  const baseIntensity = isPrimary ? 1.2 : 1.0;
+  // Emissive lift on hover (1.11). Instant value swap — "still appears" under
+  // reduced motion without an easing frame loop.
+  const hovered = useInteractionStore(s => hoverId != null && s.hovered === hoverId);
+  const emissiveIntensity = hovered ? baseIntensity * HOVER_EMISSIVE_LIFT : baseIntensity;
   const tilt = isPrimary ? -0.06 : -0.04;
 
   return (
