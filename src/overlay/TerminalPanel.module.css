@@ -1,0 +1,73 @@
+/* TerminalPanel — build-time GitHub activity, terminal-coded. */
+
+.header {
+  margin: 0 0 1.5rem 0;
+  font-family: var(--font-mono);
+  font-size: var(--step-1);
+  color: var(--ink-faint);
+}
+
+.log {
+  list-style: none;
+  margin: 0 0 2rem 0;
+  padding: 0;
+  max-height: 50vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+/* Rolling-scroll tail (1.15) — slow drift, only when reduced-motion is off
+   and the content actually overflows. With the current placeholder data
+   (private repo → no public events) the list is short and this is inert. */
+.log[data-scroll='true'] {
+  animation: terminal-tail 24s linear infinite;
+}
+@keyframes terminal-tail {
+  from { transform: translateY(0); }
+  to { transform: translateY(-20px); }
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.ts {
+  font-family: var(--font-mono);
+  font-size: var(--step-1);
+  color: var(--ink-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.repo {
+  font-family: var(--font-mono);
+  font-size: var(--step-1);
+  color: var(--ink-paper);
+}
+
+.msg {
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  line-height: 1.5;
+  color: var(--ink-muted);
+}
+
+.empty {
+  margin: 0 0 2rem 0;
+  font-family: var(--font-mono);
+  font-size: var(--step-1);
+  color: var(--ink-faint);
+}
+
+.bio {
+  margin: 0;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--ink-ghost);
+  font-family: var(--font-body);
+  font-size: var(--step-1-up);
+  line-height: 1.7;
+  color: var(--ink-muted);
+}
