@@ -6,8 +6,11 @@
   "packageManager": "pnpm@9.0.0",
   "scripts": {
     "dev": "vite",
+    "predev": "node scripts/fetch-github-activity.mjs",
+    "prebuild": "node scripts/fetch-github-activity.mjs",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
+    "fetch:activity": "node scripts/fetch-github-activity.mjs",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --max-warnings=0",
     "lint:colors": "node scripts/lint-colors.mjs",
