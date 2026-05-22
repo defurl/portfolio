@@ -105,6 +105,20 @@ Detailed iteration history is below for reference.
 
 ---
 
+## 2026-05-18 — phase 1B remaining panels: terminal, notebook, phone, audio
+- Did: Owner approved the first slice (hover + ProjectPanel); continued Checkpoint B with the rest of 1.15–1.18.
+  - **Label-lingering fix**: `InteractiveObject` now suppresses the hover label whenever `focus !== null`, so a label doesn't float over an open panel when the pointer is still physically over a mesh.
+  - **TerminalPanel (1.15)**: `scripts/fetch-github-activity.mjs` hits the GitHub public-events API for `defurl` at build time, filters PushEvent/PullRequestEvent in the last 7 days, writes `src/generated/github-activity.json` (gitignored). Reads `GITHUB_TOKEN` from env if present; excludes repos in `scripts/github-activity-exclude.json` (empty `[]`); writes a graceful stub on any failure. Wired as `predev`/`prebuild` + a CI step before typecheck. `lib/content/activity.ts` gives the blob a stable type. `TerminalPanel` shows `// defurl — last 7 days`, the commit list (or a graceful empty/stub line — the repo is private so public events are currently empty), a slow rolling-scroll on the list when motion is allowed, and an ~80-word bio derived from `about.md`.
+  - **NotebookPanel (1.16)**: `content/writing.json` index + two real-reading placeholder pieces (`on-lookahead`, `sonifying-the-tape` — actual short essays, no Lorem Ipsum). `load.ts` extended with `getWritingIndex` / `loadWritingBody` (same lazy non-eager glob pattern). `NotebookPanel` reuses `ProjectPanel.module.css` — same list/body shape.
+  - **Phone (1.17)**: rebuilt `Phone` with an inner flip group pivoting about the phone's centre-line; `focus === 'phone'` drives a 700ms Z-rotation flip (instant under reduced motion). A screen mesh on the face + a drei `<Html>` mailto link (`amorelyn.work@gmail.com`, Departure Mono amber) that mounts only once the flip is >85% complete so it doesn't show through the back mid-rotation.
+  - **Audio (1.18)**: `src/audio/engine.ts` — Tone.js is **dynamically imported on first enable** (audio is opt-in, so its ~heavy library stays out of the bundle until opted into). A simple four-chord minor-key pad loop at 0.3 master gain through a lowpass + reverb, 68 BPM. `Tone.start()` is the user-gesture unlock, satisfied because the toggle click is in the call stack. `DeskAudio` bridges `audioStore.enabled` → `setDeskAudio`. The headphones object's click toggles audio (no camera glide, no panel).
+  - **Interaction wiring**: Monitor 2 → terminal panel, Notebook → notebook panel, Phone → contact (flip), Headphones → audio toggle, Window → camera glide toward the window (no panel — the `/city` transition lands with Layer 2).
+- Gates: typecheck ✅, lint ✅, lint:colors ✅ (54 files), build ✅, bundle ✅ 63.0KB (Tone.js stays in its own dynamic chunk, never the entry).
+- Deferred: door-spill hover (no marker geometry), subtle hover feedback for non-nav objects, localStorage audio-preference persistence (B4 nuance — current behaviour is the dominant rule: OFF by default, no autoplay, opt-in), `--dur-camera` subjective tuning.
+- **Visual verification owed**: per the PM retrospective, Checkpoint B acceptance needs rendered-behavior evidence. Claude Preview MCP still disconnected — owner screenshots requested for the WAIT review.
+- Why: Completes Checkpoint B's interaction surface (1.11–1.18).
+- Next: WAIT at the Checkpoint B review gate (1.20). Owner verifies all object interactions + panels, then Checkpoint C (mobile).
+
 ## 2026-05-18 — phase 1B first deliverable: hover states + ProjectPanel
 - Did: New branch `phase-1B/desk-interactions` off main. Built the first Checkpoint B slice — the hover/click/panel grammar, proven end-to-end on Monitor 1.
   - **`interactionStore`** (new Zustand store): `hovered` (object under pointer), `focus` (object the camera glided to), `panel` (open DOM panel). Actions: `setHovered`, `focusObject(id, panel)`, `returnToDesk`.
