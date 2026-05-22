@@ -1,5 +1,6 @@
 import { marked } from 'marked';
 import projectsIndex from '../../../content/projects.json';
+import writingIndex from '../../../content/writing.json';
 
 // Content loader (architecture §8, B3 lazy strategy).
 // - The project INDEX (id/title/category/district/thesis/links) is a small
@@ -21,8 +22,20 @@ export interface ProjectIndexEntry {
   links: ProjectLink[];
 }
 
-// Non-eager glob — each value is a loader function returning the raw markdown.
-const bodyLoaders = import.meta.glob('/content/projects/*.md', {
+export interface WritingIndexEntry {
+  id: string;
+  title: string;
+  date: string;
+}
+
+// Non-eager globs — each value is a loader returning the raw markdown.
+const projectBodies = import.meta.glob('/content/projects/*.md', {
+  query: '?raw',
+  import: 'default',
+  eager: false,
+}) as Record<string, () => Promise<string>>;
+
+const writingBodies = import.meta.glob('/content/writing/*.md', {
   query: '?raw',
   import: 'default',
   eager: false,
@@ -35,7 +48,20 @@ export function getProjectIndex(): ProjectIndexEntry[] {
 
 /** Async — resolves to rendered HTML for the project's markdown body. */
 export async function loadProjectBody(id: string): Promise<string> {
-  const loader = bodyLoaders[`/content/projects/${id}.md`];
+  const loader = projectBodies[`/content/projects/${id}.md`];
+  if (!loader) return '<p>Body unavailable.</p>';
+  const raw = await loader();
+  return marked.parse(raw) as string;
+}
+
+/** Synchronous — the writing index. */
+export function getWritingIndex(): WritingIndexEntry[] {
+  return writingIndex.writing as WritingIndexEntry[];
+}
+
+/** Async — resolves to rendered HTML for a writing piece's markdown body. */
+export async function loadWritingBody(id: string): Promise<string> {
+  const loader = writingBodies[`/content/writing/${id}.md`];
   if (!loader) return '<p>Body unavailable.</p>';
   const raw = await loader();
   return marked.parse(raw) as string;
