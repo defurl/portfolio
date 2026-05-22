@@ -36,6 +36,7 @@ import { BloomLayer } from './postfx/BloomLayer';
 import { InteractiveObject } from './InteractiveObject';
 import { CameraRig } from './CameraRig';
 import { useInteractionStore } from '../../lib/stores/interactionStore';
+import { useAudioStore } from '../../lib/stores/audioStore';
 
 // The Night Desk scene. All eleven objects (10 visible + door-spill light)
 // per the revision prompt order-of-operations §3–§7.
@@ -177,9 +178,9 @@ export function DeskScene() {
           lowest face on the desk. All others (Mug/Phone/Plant/Notebook)
           have group origin = base, so y=0. */}
       {/* ── Interactive nav objects (Checkpoint B) ────────────────────────
-          Monitor 1 is fully wired (click → camera glide → ProjectPanel).
-          The rest are hover+label only this round; their click targets
-          (terminal / notebook / contact panels) land in the next slice. */}
+          Monitor 1/2 + Notebook open side panels; Phone flips for contact;
+          Headphones toggle audio (no camera glide); Window glides the camera
+          toward it (the /city scene transition lands with Layer 2). */}
       <InteractiveObject
         id="monitor1"
         label="projects"
@@ -189,13 +190,24 @@ export function DeskScene() {
         <Monitor variant="primary" position={[-0.3, 0.306, -0.4]} hoverId="monitor1" />
       </InteractiveObject>
 
-      <InteractiveObject id="monitor2" label="terminal" labelPosition={[0.5, 0.56, -0.4]}>
+      <InteractiveObject
+        id="monitor2"
+        label="terminal"
+        labelPosition={[0.5, 0.56, -0.4]}
+        onActivate={() => focusObject('monitor2', 'terminal')}
+      >
         <Monitor variant="terminal" position={[0.5, 0.27, -0.4]} width={0.5} height={0.3} hoverId="monitor2" />
       </InteractiveObject>
 
       {/* Window mounted on the RIGHT side wall — wall plane at x=2.0, frame
-          2cm inside. Rotated -π/2 around Y so the frame faces -X. */}
-      <InteractiveObject id="window" label="city" labelPosition={[1.7, 1.6, -0.3]}>
+          2cm inside. Rotated -π/2 around Y so the frame faces -X. Click
+          glides the camera to it; no panel (the /city transition is Layer 2). */}
+      <InteractiveObject
+        id="window"
+        label="city"
+        labelPosition={[1.7, 1.6, -0.3]}
+        onActivate={() => focusObject('window', null)}
+      >
         <Window position={[1.98, 1.0, -0.3]} rotation={[0, -Math.PI / 2, 0]} />
       </InteractiveObject>
 
@@ -205,15 +217,31 @@ export function DeskScene() {
       <Mug position={[-0.55, 0, 0.15]} />
       <Plant position={[-0.8, 0, 0.1]} />
 
-      <InteractiveObject id="notebook" label="notebook" labelPosition={[-0.4, 0.2, 0.05]}>
+      <InteractiveObject
+        id="notebook"
+        label="notebook"
+        labelPosition={[-0.4, 0.2, 0.05]}
+        onActivate={() => focusObject('notebook', 'notebook')}
+      >
         <Notebook position={[-0.4, 0, 0.05]} />
       </InteractiveObject>
 
-      <InteractiveObject id="headphones" label="sound" labelPosition={[0.85, 0.26, 0.15]}>
+      {/* Headphones toggle the desk audio — no camera glide, no panel. */}
+      <InteractiveObject
+        id="headphones"
+        label="sound"
+        labelPosition={[0.85, 0.26, 0.15]}
+        onActivate={() => useAudioStore.getState().toggle()}
+      >
         <Headphones position={[0.85, 0.045, 0.15]} />
       </InteractiveObject>
 
-      <InteractiveObject id="phone" label="contact" labelPosition={[1.0, 0.18, -0.05]}>
+      <InteractiveObject
+        id="phone"
+        label="contact"
+        labelPosition={[1.0, 0.18, -0.05]}
+        onActivate={() => focusObject('phone', 'contact')}
+      >
         <Phone position={[1.0, 0, -0.05]} />
       </InteractiveObject>
 
