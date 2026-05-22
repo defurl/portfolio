@@ -37,6 +37,10 @@ export function InteractiveObject({
 }: InteractiveObjectProps) {
   const [hovered, setHovered] = useState(false);
   const setHoveredStore = useInteractionStore(s => s.setHovered);
+  // Suppress labels once the camera has focused an object — otherwise the
+  // pointer still being physically over a mesh leaves its label floating
+  // over the open panel.
+  const focused = useInteractionStore(s => s.focus !== null);
 
   const enter = (e: ThreeEvent<PointerEvent>) => {
     e.stopPropagation();
@@ -66,7 +70,7 @@ export function InteractiveObject({
   return (
     <group onPointerOver={enter} onPointerOut={leave} onClick={click}>
       {children}
-      {label && hovered && (
+      {label && hovered && !focused && (
         <Html position={labelPosition} transform={false} prepend center pointerEvents="none">
           <span className={labelStyles.label}>{label}</span>
         </Html>
