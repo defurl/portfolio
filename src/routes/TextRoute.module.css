@@ -13,7 +13,9 @@
 .eyebrow {
   font-family: var(--font-mono);
   font-size: var(--step-1);
-  color: var(--ink-faint);
+  /* WCAG AA: --ink-faint (#5A6275) on --bg-void gives ~3.35:1 contrast —
+     fails 4.5:1 for normal text. --ink-muted (#9BA3B4) gives ~8:1. */
+  color: var(--ink-muted);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   margin: 0 0 1rem 0;
