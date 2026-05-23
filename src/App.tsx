@@ -3,6 +3,7 @@ import { Route, Routes } from 'react-router-dom';
 import { TextRoute } from './routes/TextRoute';
 import { LampPlaceholder } from './overlay/LampPlaceholder';
 import { useReducedMotion } from './lib/motion/reducedMotion';
+import { useIsMobile } from './lib/motion/useMediaQuery';
 import { useSceneStore } from './lib/stores/sceneStore';
 
 // /text is the only statically imported route — it must stay in the entry chunk
@@ -13,15 +14,24 @@ const CityRoute = lazy(() => import('./routes/CityRoute').then(m => ({ default: 
 const NnRoute = lazy(() => import('./routes/NnRoute').then(m => ({ default: m.NnRoute })));
 
 export function App() {
-  // Single subscription site for the media query — descendants read from sceneStore.
+  // Single subscription site for media queries — descendants read from sceneStore.
   const reduced = useReducedMotion();
+  const mobile = useIsMobile();
   const setReduced = useSceneStore(s => s.setPrefersReducedMotion);
+  const setIsMobile = useSceneStore(s => s.setIsMobile);
   useEffect(() => {
     setReduced(reduced);
   }, [reduced, setReduced]);
+  useEffect(() => {
+    setIsMobile(mobile);
+  }, [mobile, setIsMobile]);
 
   return (
-    <div className="grain" data-reduced-motion={reduced ? 'true' : 'false'}>
+    <div
+      className="grain"
+      data-reduced-motion={reduced ? 'true' : 'false'}
+      data-mobile={mobile ? 'true' : 'false'}
+    >
       <Suspense fallback={<LampPlaceholder />}>
         <Routes>
           <Route path="/" element={<DeskRoute />} />
