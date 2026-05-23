@@ -9,6 +9,7 @@
     "predev": "node scripts/fetch-github-activity.mjs",
     "prebuild": "node scripts/fetch-github-activity.mjs",
     "build": "tsc --noEmit && vite build",
+    "postbuild": "node scripts/prerender-text-route.mjs && node scripts/preload-desk-chunk.mjs",
     "preview": "vite preview",
     "fetch:activity": "node scripts/fetch-github-activity.mjs",
     "typecheck": "tsc --noEmit",
@@ -17,6 +18,7 @@
     "bundle:check": "node scripts/bundle-budget.mjs",
     "a11y:check": "node scripts/a11y-smoke.mjs",
     "test:hooks": "node scripts/test-hooks.mjs",
+    "capture:states": "node scripts/capture-states.mjs",
     "lh:check": "lhci autorun",
     "prepare": "husky"
   },

@@ -31,7 +31,10 @@ export function TerminalPanel() {
   const panel = useInteractionStore(s => s.panel);
   const returnToDesk = useInteractionStore(s => s.returnToDesk);
   const reduced = useSceneStore(s => s.prefersReducedMotion);
+  const isMobile = useSceneStore(s => s.isMobile);
   const open = panel === 'terminal';
+  // Rolling-scroll disabled on mobile (1.21) and under reduced motion.
+  const scrollEnabled = !reduced && !isMobile;
 
   const activity = getActivity();
   const hasItems = activity.items.length > 0;
@@ -43,7 +46,7 @@ export function TerminalPanel() {
       {hasItems ? (
         <ul
           className={styles.log}
-          data-scroll={!reduced}
+          data-scroll={scrollEnabled}
         >
           {activity.items.map((it, i) => (
             <li key={`${it.ts}-${i}`} className={styles.row}>

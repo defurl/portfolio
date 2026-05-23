@@ -6,17 +6,26 @@ import { TerminalPanel } from '../overlay/TerminalPanel';
 import { NotebookPanel } from '../overlay/NotebookPanel';
 import { BackToDesk } from '../overlay/BackToDesk';
 import { DeskAudio } from '../overlay/DeskAudio';
+import { useSceneStore } from '../lib/stores/sceneStore';
 
-// Camera — pulled back to z=2.2 and tilted down by aiming the lookAt at
-// y=0.4. FOV 50° per the design-spec. The CameraRig (inside DeskScene)
-// takes over the camera each frame for click-to-focus glides; this initial
-// pose is the rest position the rig glides back to.
+// Desktop camera: seated first-person at z=2.2 / lookAt y=0.4, FOV 50°.
+// Mobile camera (1.21): slightly raised, ~45° looking down at the desk,
+// FOV reduced + framing widened so all eleven objects fit without scroll.
+// The CameraRig takes over per-frame on focus changes; the rest pose is
+// derived from these initial Canvas params plus the lookAt invocation.
 export function DeskRoute() {
+  const isMobile = useSceneStore(s => s.isMobile);
+
+  const cameraProps = isMobile
+    ? { position: [0, 1.6, 2.4] as [number, number, number], fov: 38 }
+    : { position: [0, 1.15, 2.2] as [number, number, number], fov: 50 };
+  const lookAt: [number, number, number] = isMobile ? [0, -0.05, -0.1] : [0, 0.4, 0];
+
   return (
     <>
       <Canvas
-        camera={{ position: [0, 1.15, 2.2], fov: 50 }}
-        onCreated={({ camera }) => camera.lookAt(0, 0.4, 0)}
+        camera={cameraProps}
+        onCreated={({ camera }) => camera.lookAt(...lookAt)}
         dpr={[1, 2]}
         gl={{ antialias: true, powerPreference: 'high-performance' }}
         shadows
@@ -24,14 +33,11 @@ export function DeskRoute() {
       >
         <DeskScene />
       </Canvas>
-      {/* DOM overlays — siblings of the Canvas. Each panel self-hides unless
-          its own panel id is active in the interaction store. */}
       <ProjectPanel />
       <TerminalPanel />
       <NotebookPanel />
       <BackToDesk />
       <AudioToggle />
-      {/* Renders nothing — bridges the audio store to the Tone.js engine. */}
       <DeskAudio />
     </>
   );

@@ -14,3 +14,4 @@ coverage
 .claude/hook-log.jsonl
 phase-*-prompt.md
 src/generated
+captures

@@ -32,6 +32,13 @@ html, body, #root {
   text-rendering: optimizeLegibility;
 }
 
+/* Mobile (1.24): tighter body line-height. */
+@media (max-width: 768px) {
+  html, body, #root {
+    line-height: 1.5;
+  }
+}
+
 body {
   overflow: hidden;
 }

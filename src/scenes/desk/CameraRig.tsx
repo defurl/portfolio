@@ -3,7 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { Vector3 } from 'three';
 import { useInteractionStore } from '../../lib/stores/interactionStore';
 import { useSceneStore } from '../../lib/stores/sceneStore';
-import { REST_POSE, FOCUS_POSES, type CameraPose } from './cameraPoses';
+import { REST_POSE, REST_POSE_MOBILE, FOCUS_POSES, type CameraPose } from './cameraPoses';
 
 // Hand-rolled cinematic camera glide (Checkpoint B 1.12). On `focus` change
 // the camera lerps position + lookAt from its current pose to the target
@@ -38,7 +38,8 @@ export function CameraRig() {
     // Detect a focus change → start a new glide.
     if (focus !== lastFocus.current) {
       lastFocus.current = focus;
-      const dest: CameraPose = focus ? FOCUS_POSES[focus] : REST_POSE;
+      const restPose: CameraPose = useSceneStore.getState().isMobile ? REST_POSE_MOBILE : REST_POSE;
+      const dest: CameraPose = focus ? FOCUS_POSES[focus] : restPose;
       fromPos.current.copy(camera.position);
       fromTarget.current.copy(lookAt.current);
       toPos.current.set(...dest.position);

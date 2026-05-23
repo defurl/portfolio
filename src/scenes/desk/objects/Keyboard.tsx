@@ -1,13 +1,17 @@
 import { BG_PANEL_2, INK_FAINT, INK_GHOST } from '../../../lib/style/colors';
+import { useSceneStore } from '../../../lib/stores/sceneStore';
 
 // Phase 1.6 — mechanical keyboard, TKL, very low profile.
 // The keycaps are 60 hand-placed tiny rounded boxes; recognizable as a
 // keyboard in silhouette without going for realism. PBT-coded muted caps,
 // no legends (legends at this scale would be illegible noise).
 //
-// Layout: 14 cols × 5 rows (close to a TKL footprint without the F-row).
-const COLS = 14;
-const ROWS = 5;
+// Layout: 14 cols × 5 rows. Mobile (1.21) collapses to 8×3 — same
+// silhouette, far fewer draw calls.
+const COLS_DESKTOP = 14;
+const ROWS_DESKTOP = 5;
+const COLS_MOBILE = 8;
+const ROWS_MOBILE = 3;
 const CAP_W = 0.022;
 const CAP_D = 0.022;
 const CAP_H = 0.010;
@@ -19,6 +23,9 @@ interface KeyboardProps {
 }
 
 export function Keyboard({ position }: KeyboardProps) {
+  const isMobile = useSceneStore(s => s.isMobile);
+  const COLS = isMobile ? COLS_MOBILE : COLS_DESKTOP;
+  const ROWS = isMobile ? ROWS_MOBILE : ROWS_DESKTOP;
   const totalW = COLS * CAP_W + (COLS - 1) * GAP;
   const totalD = ROWS * CAP_D + (ROWS - 1) * GAP;
   const caps: JSX.Element[] = [];

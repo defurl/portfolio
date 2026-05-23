@@ -15,6 +15,13 @@ export const REST_POSE: CameraPose = {
   target: [0, 0.4, 0],
 };
 
+/** Mobile rest pose (1.21) — raised, tilted further down, FOV-tightened by
+ *  DeskRoute. Frames more of the desk for the orthographic-ish overview. */
+export const REST_POSE_MOBILE: CameraPose = {
+  position: [0, 1.6, 2.4],
+  target: [0, -0.05, -0.1],
+};
+
 // Focus poses. The monitor screen sits left-of-centre in each so the 480px
 // panel sliding in from the right doesn't occlude it.
 export const FOCUS_POSES: Record<ObjectId, CameraPose> = {
