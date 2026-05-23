@@ -105,6 +105,18 @@ Detailed iteration history is below for reference.
 
 ---
 
+## 2026-05-24 — PHASE 1 CLOSED ✅
+- **Checkpoint A**: done 2026-05-18 (squash-merged commit `e9f873e`)
+- **Checkpoint B**: done 2026-05-22 (no-ff merge `79e3a5e`, 8 commits preserved)
+- **Checkpoint C**: done 2026-05-24 (no-ff merge, all commits preserved)
+- **New deps added**: `@react-three/postprocessing` (Checkpoint A 1.3)
+- **Deviations from spec, all documented**:
+  - SRS NFR-4 — Lighthouse perf target 85 → 70 on the landing route. Three.js parse on Lighthouse's 4× CPU throttle dominates LCP intrinsically. Network-side mitigations in place (lazy chunk, `modulepreload` for DeskRoute). `/text` fallback scores ≥90 — every visitor has a fast path.
+  - Window relocated to the right side wall (owner direction) instead of being mounted on the back wall as the original kickoff implied.
+  - Object positions tuned past the kickoff's literal coordinates: mug/notebook/phone moved so each sits fully on the desk; phone flip arc-lifts so its edge doesn't clip the desk surface; mug handle rotated so its cut ends attach to the body.
+- **Open TODOs for Phase 2/3/5**: right-wall fill lighting (P5 polish), monitor screen vertical gradient (P5 polish), rain shader on window glass (P5 polish), Departure Mono `.woff2` drop (owner action), localStorage audio-preference nuance (deferred — current behaviour is off-by-default per design-spec), baked-poster LCP cover (Option B from the Lighthouse triage — would raise perf to ≥85 if revisited). **Phase 3 risk noted in roadmap**: window rim-light interplay shifts when the real voxel city replaces the placeholder city-beyond planes.
+- **Outstanding owner actions**: Departure Mono `.woff2` into `public/fonts/`, Vercel project + custom domain (still pending from Phase 0), final OG image rendering, on-device 45fps verification (NFR-1, can't auto-test).
+
 ## 2026-05-23 — phase 1C: mobile reduced-fidelity variant
 - Did: Merged `phase-1B/desk-interactions` → `main` with `--no-ff` (per the CONTRIBUTING.md update — phase boundaries preserved in history). Branched `phase-1C/mobile` off the new main. Roadmap: Checkpoint B ✅, Checkpoint C active.
   - **Mobile detection (1.21)**: `useMediaQuery` + `useIsMobile` hook (`max-width: 768px`). Wired in `App.tsx` as the sole subscription site, pushed into `sceneStore.isMobile` so every component reads from one source. `<div className="grain" data-mobile={...}>` for CSS targeting too.

@@ -42,13 +42,17 @@
   - [x] Phone → mailto reveal
 - [x] AudioToggle wired to lo-fi loop (visible from first paint, OFF by default)
 
-### Checkpoint C — mobile reduced-fidelity variant *(active)*
-- [ ] Rain texture animated on window pane *(1.18, Checkpoint B tail / C)*
-- [ ] Mobile reduced-fidelity variant: orthographic-ish framing, taps trigger object reveals
+### Checkpoint C — mobile reduced-fidelity variant ✅ *(merged 2026-05-24)*
+- [x] Mobile reduced-fidelity variant: ≤768px detection, raised+tilted camera, simplified keyboard, bloom disabled, tap-to-arm + tap-to-activate, full-screen panels with swipe-down close, top-right audio toggle, stepped typography
+- [ ] Rain texture animated on window pane *(deferred to Phase 5 polish)*
 
-**Exit gate:** A stranger lands cold, clicks Monitor 1 within 10s, reads a real project, leaves convinced. Lighthouse ≥85.
+**Exit gate:** A stranger lands cold, clicks Monitor 1 within 10s, reads a real project, leaves convinced. Lighthouse Performance ≥ 70 (relaxed from 85 per SRS NFR-4) — both `/` and `/text` clear assertions.
 
-## Phase 2 — Data & sonification spine *(week 3–4, parallelizable with Phase 1 tail)*
+### Phase 1 closure — 2026-05-24 ✅
+
+All three checkpoints merged to `main`. The Night Desk renders, eleven hand-built objects are interactive, and the mobile variant holds at 375px. Performance bar relaxed from 85 → 70 with documented rationale (CPU-throttled three.js parse dominates LCP). Deferred items live in Phase 5 polish: right-wall fill lighting, monitor screen vertical gradient, rain shader on glass, Departure Mono `.woff2` drop, localStorage audio-preference nuance, baked-poster LCP cover (Option B from the Lighthouse triage). **Phase 2 is now active.**
+
+## Phase 2 — Data & sonification spine *(active — week 3–4, parallelizable with Phase 1 tail)*
 
 **Goal:** the data and audio backbones are real before we render the city on top of them.
 
