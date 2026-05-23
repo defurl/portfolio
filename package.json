@@ -9,6 +9,7 @@
     "predev": "node scripts/fetch-github-activity.mjs",
     "prebuild": "node scripts/fetch-github-activity.mjs",
     "build": "tsc --noEmit && vite build",
+    "postbuild": "node scripts/prerender-text-route.mjs",
     "preview": "vite preview",
     "fetch:activity": "node scripts/fetch-github-activity.mjs",
     "typecheck": "tsc --noEmit",
