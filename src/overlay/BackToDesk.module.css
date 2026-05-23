@@ -1,0 +1,23 @@
+/* Back-to-desk affordance — bottom-left per design-spec corner allocation
+   (bottom-left is reserved for navigation; bottom-right is the audio toggle). */
+.back {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  background: transparent;
+  border: none;
+  padding: 0.4rem 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  color: var(--ink-faint);
+  opacity: 0.8;
+  cursor: pointer;
+  transition: opacity var(--dur-ui) var(--ease-ui), color var(--dur-ui) var(--ease-ui);
+  z-index: 30;
+}
+.back:hover,
+.back:focus-visible {
+  opacity: 1;
+  color: var(--signal-amber);
+}

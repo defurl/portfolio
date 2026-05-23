@@ -1,0 +1,15 @@
+{
+  "$comment": "Writing index for the desk notebook panel. Bodies live as content/writing/<id>.md. Placeholder content for Checkpoint B — owner replaces in Phase 5.",
+  "writing": [
+    {
+      "id": "on-lookahead",
+      "title": "On Lookahead",
+      "date": "2026-03-04"
+    },
+    {
+      "id": "sonifying-the-tape",
+      "title": "Sonifying the Tape",
+      "date": "2026-01-19"
+    }
+  ]
+}

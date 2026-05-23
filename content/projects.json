@@ -1,4 +1,29 @@
 {
-  "$comment": "Phase 0 stub. Real entries arrive in Phase 5 content lock.",
-  "projects": []
+  "$comment": "Project index for the desk Monitor 1 panel. Bodies live as content/projects/<id>.md and load on demand. Placeholder content for Checkpoint B — owner replaces with real projects in Phase 5.",
+  "projects": [
+    {
+      "id": "svi-vol-surface",
+      "title": "No-Arbitrage Vol Surface",
+      "category": "research",
+      "district": "research",
+      "thesis": "An SVI parameterization that fits the full equity implied-volatility surface from sparse option quotes, with calendar and butterfly arbitrage ruled out at solve time.",
+      "links": [{ "label": "repo", "url": "https://github.com/defurl" }]
+    },
+    {
+      "id": "execution-sim",
+      "title": "Limit-Order-Book Execution Sim",
+      "category": "trading",
+      "district": "trading",
+      "thesis": "A queue-position-aware backtester that replays L2 order-book data to estimate fill probability and slippage before a strategy ever touches a live venue.",
+      "links": [{ "label": "repo", "url": "https://github.com/defurl" }]
+    },
+    {
+      "id": "feature-store",
+      "title": "Point-in-Time Feature Store",
+      "category": "infrastructure",
+      "district": "infrastructure",
+      "thesis": "A feature store that guarantees point-in-time correctness for model training — no lookahead leakage from sloppy time-series joins.",
+      "links": [{ "label": "repo", "url": "https://github.com/defurl" }]
+    }
+  ]
 }

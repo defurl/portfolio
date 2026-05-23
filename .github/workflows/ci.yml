@@ -37,6 +37,16 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
+
+      # Generate src/generated/github-activity.json before typecheck — the
+      # TerminalPanel imports it, and it's gitignored so a fresh checkout
+      # doesn't have it. GITHUB_TOKEN raises the API rate limit; on any
+      # failure the script writes a graceful stub so the build never breaks.
+      - name: fetch github activity
+        run: pnpm fetch:activity
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - run: pnpm typecheck
       - run: pnpm lint
       - run: pnpm lint:colors

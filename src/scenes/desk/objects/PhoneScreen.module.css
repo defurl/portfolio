@@ -1,0 +1,15 @@
+/* Mailto link shown on the phone screen once flipped face-up (1.17). */
+.mailto {
+  font-family: var(--font-mono);
+  font-size: var(--step-1);
+  letter-spacing: 0.03em;
+  color: var(--signal-amber);
+  background: rgba(5, 7, 13, 0.85); /* --bg-void @ 0.85 */
+  border: 1px solid var(--ink-ghost);
+  padding: 0.35rem 0.6rem;
+  white-space: nowrap;
+  text-decoration: none;
+}
+.mailto:hover {
+  color: var(--signal-amber-hot);
+}
