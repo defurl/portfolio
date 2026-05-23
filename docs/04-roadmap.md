@@ -32,17 +32,17 @@
 - [x] Desk objects modeled (hand-built primitives):
   - [x] Monitor 1, Monitor 2, Mech keyboard, Coffee mug, Plant, Headphones, Notebook, Phone, Lamp, Window frame, Door spill
 
-### Checkpoint B — interactions + panels *(active)*
-- [ ] Object hover state: glow + Departure Mono label
-- [ ] Click → camera zoom + DOM panel slide-in (480px, right side)
-- [ ] Panels (real content, even if short):
-  - [ ] ProjectPanel (driven by `content/projects.json`)
-  - [ ] TerminalPanel (rolling log: real recent commits via GitHub API at build time)
-  - [ ] NotebookPanel (renders `content/writing/*.md`)
-  - [ ] Phone → mailto reveal
-- [ ] AudioToggle wired to lo-fi loop (visible from first paint, OFF by default)
+### Checkpoint B — interactions + panels ✅ *(merged 2026-05-22)*
+- [x] Object hover state: glow + Departure Mono label
+- [x] Click → camera zoom + DOM panel slide-in (480px, right side)
+- [x] Panels (real content, even if short):
+  - [x] ProjectPanel (driven by `content/projects.json`)
+  - [x] TerminalPanel (rolling log: real recent commits via GitHub API at build time)
+  - [x] NotebookPanel (renders `content/writing/*.md`)
+  - [x] Phone → mailto reveal
+- [x] AudioToggle wired to lo-fi loop (visible from first paint, OFF by default)
 
-### Checkpoint C — mobile reduced-fidelity variant
+### Checkpoint C — mobile reduced-fidelity variant *(active)*
 - [ ] Rain texture animated on window pane *(1.18, Checkpoint B tail / C)*
 - [ ] Mobile reduced-fidelity variant: orthographic-ish framing, taps trigger object reveals
 

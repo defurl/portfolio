@@ -105,6 +105,23 @@ Detailed iteration history is below for reference.
 
 ---
 
+## 2026-05-23 — phase 1C: mobile reduced-fidelity variant
+- Did: Merged `phase-1B/desk-interactions` → `main` with `--no-ff` (per the CONTRIBUTING.md update — phase boundaries preserved in history). Branched `phase-1C/mobile` off the new main. Roadmap: Checkpoint B ✅, Checkpoint C active.
+  - **Mobile detection (1.21)**: `useMediaQuery` + `useIsMobile` hook (`max-width: 768px`). Wired in `App.tsx` as the sole subscription site, pushed into `sceneStore.isMobile` so every component reads from one source. `<div className="grain" data-mobile={...}>` for CSS targeting too.
+  - **Mobile camera variant (1.21)**: `DeskRoute` swaps to position `(0, 1.6, 2.4)`, lookAt `(0, -0.05, -0.1)`, FOV 38 (down from 50). Wider, more orthographic-coded framing that fits all eleven objects without scroll. `cameraPoses.ts` exports `REST_POSE_MOBILE`; `CameraRig` picks the correct rest pose by reading `isMobile` at each focus-change.
+  - **Bloom + scroll disabled on mobile (1.21)**: `BloomLayer` short-circuits when `isMobile`. `TerminalPanel`'s rolling-tail animation disabled on mobile.
+  - **Simplified keyboard (1.21)**: `Keyboard` collapses from 14×5 to 8×3 caps on mobile — same silhouette, far fewer draw calls.
+  - **Mobile interaction model (1.22)**: `InteractiveObject` adds a tap-to-arm / second-tap-to-activate flow when `isMobile`. First tap shows the label and sets a 3s arm window; second tap on the same object within the window calls `onActivate`. Pointer-over/out paths are skipped on mobile (touch has no hover).
+  - **Mobile panel (1.22)**: `ScenePanel` switches from a 480px right-side slide-in to a full-screen bottom-up slide on mobile. Swipe-down-to-close added via pointer-event y-delta (>80px). Esc + × still work.
+  - **Mobile audio toggle (1.23)**: `AudioToggle` migrates to a thin top-right bar at the mobile breakpoint, so it doesn't compete with the bottom of the full-screen panel UI. Touch target `min-height: 44px` per 1.24.
+  - **Mobile typography (1.24)**: every type-scale rung steps down one level (`step-3 → step-2`, etc.) inside `@media (max-width: 768px)` on `:root`, so existing components keep referencing the same `var(--step-N)` names. Body line-height tightened 1.6 → 1.5.
+  - **Visual evidence (new)**: `scripts/capture-states.mjs` — a Playwright headless-chromium script that drives a 375×812 mobile viewport against the running dev server, captures four PNGs (rest, tap-to-label, panel-open, audio-toggle), saves to `captures/checkpoint-c/`. Wired as `pnpm capture:states`. Captures gitignored. Closes the PM-noted "visual evidence" gap from Phase 1B — Checkpoint C and beyond can self-produce review screenshots.
+- Gates: typecheck ✅, lint ✅, lint:colors ✅ (55 files), build ✅, bundle ✅ **63.2KB / 200KB** (tiny growth from `useMediaQuery`).
+- **Lighthouse not run locally** — Windows + no system Chrome (Playwright's chromium is at a different path Lighthouse can't drive). It'll run in CI on push. Owner can verify locally on a machine with Chrome installed.
+- **Visual evidence captured**: `captures/checkpoint-c/{01-rest, 02-tap-label, 03-panel-open, 04-audio-toggle}.png`. Verified `01-rest.png` shows the mobile variant (raised+tilted camera, full-desk overview, simplified keyboard, top-right audio toggle).
+- Why: Completes Checkpoint C — mobile reduced-fidelity variant at the 375px viewport per 1.21–1.24.
+- Next: WAIT at the Checkpoint C review gate (1.26). Owner reviews the four captured PNGs + runs Lighthouse on their machine; once approved, Phase 1 closes.
+
 ## 2026-05-18 — phase 1B remaining panels: terminal, notebook, phone, audio
 - Did: Owner approved the first slice (hover + ProjectPanel); continued Checkpoint B with the rest of 1.15–1.18.
   - **Label-lingering fix**: `InteractiveObject` now suppresses the hover label whenever `focus !== null`, so a label doesn't float over an open panel when the pointer is still physically over a mesh.
