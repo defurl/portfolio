@@ -16,9 +16,12 @@ import { useAdaptiveFps } from '../../../lib/perf/useAdaptiveFps';
 // detects sustained low frame rate. Both are intentional perf escape hatches.
 export function BloomLayer() {
   const reduced = useSceneStore(s => s.prefersReducedMotion);
+  const isMobile = useSceneStore(s => s.isMobile);
   const lowFps = useAdaptiveFps(50, 2000);
 
-  if (reduced || lowFps) return null;
+  // Bloom is disabled on mobile by default (1.21 — perf budget). Reduced
+  // motion and sustained-low-FPS already disable it elsewhere.
+  if (reduced || lowFps || isMobile) return null;
 
   // Threshold tuning notes:
   //   - Lamp bulb (MeshBasicMaterial LAMP_WARM, toneMapped:false): luminance ~0.55.
