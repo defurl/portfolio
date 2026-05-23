@@ -19,6 +19,18 @@
   transition: opacity 220ms var(--ease-ui), color 220ms var(--ease-ui);
   cursor: pointer;
   z-index: 20;
+  /* Touch target ≥44×44 per 1.24 — bumped via min-height. */
+  min-height: 44px;
+}
+
+/* Mobile (1.23): toggle migrates to a thin top-right bar so it doesn't
+   compete with the bottom of the full-screen panel UI. */
+@media (max-width: 768px) {
+  .toggle {
+    bottom: auto;
+    top: 0.85rem;
+    right: 1rem;
+  }
 }
 
 .toggle:hover,

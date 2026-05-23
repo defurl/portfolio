@@ -53,3 +53,20 @@
   --font-body: 'Geist', -apple-system, sans-serif;
   --font-mono: 'Departure Mono', 'JetBrains Mono', ui-monospace, monospace;
 }
+
+/* Mobile (1.24): step down every type-scale rung by one — step-3 → step-2,
+   step-2 → step-1-up, etc. Tighter body line-height. Existing components
+   keep their `var(--step-N)` references — the values shift under them. */
+@media (max-width: 768px) {
+  :root {
+    --step-1: 0.7rem;
+    --step-0: 0.8rem;
+    --step-1-up: 0.875rem;
+    --step-2: 1rem;
+    --step-3: 1.25rem;
+    --step-4: 1.5rem;
+    --step-5: 2rem;
+    --step-6: 3rem;
+    --step-7: 4.5rem;
+  }
+}
