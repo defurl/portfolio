@@ -239,10 +239,10 @@ export function DeskScene() {
       <InteractiveObject
         id="phone"
         label="contact"
-        labelPosition={[1.0, 0.18, -0.05]}
+        labelPosition={[0.7, 0.18, -0.1]}
         onActivate={() => focusObject('phone', 'contact')}
       >
-        <Phone position={[0.94, 0, 0.0]} />
+        <Phone position={[0.7, 0, -0.1]} />
       </InteractiveObject>
 
       <BloomLayer />

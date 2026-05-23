@@ -25,10 +25,12 @@ export function Mug({ position }: MugProps) {
         <cylinderGeometry args={[TOP_R - 0.004, BOT_R - 0.004, HEIGHT - 0.002, 32, 1, true]} />
         <meshStandardMaterial color={INK_PAPER} roughness={0.7} metalness={0} side={2} />
       </mesh>
-      {/* Handle — a torus segment on the −X side, facing the camera's view
-          of the mug (the desk's outer edge). +X put it pointing inward,
-          away from where the eye lands. */}
-      <mesh position={[-(TOP_R + 0.012), HEIGHT / 2, 0]} rotation={[0, 0, -Math.PI / 2]}>
+      {/* Handle — a half-torus on the −X side. After the +π/2 Z rotation
+          the arc's two cut ends sit vertically (above & below) and meet
+          the mug body at the rim, with the bulge arcing OUTWARD (−X)
+          away from the cup. (The prior −π/2 rotation flipped this — the
+          ends pointed into open space and the bulge poked into the body.) */}
+      <mesh position={[-TOP_R, HEIGHT / 2, 0]} rotation={[0, 0, Math.PI / 2]}>
         <torusGeometry args={[0.022, 0.006, 12, 24, Math.PI]} />
         <meshStandardMaterial color={BG_VOID} roughness={0.4} metalness={0.15} />
       </mesh>
