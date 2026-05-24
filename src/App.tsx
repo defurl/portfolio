@@ -12,6 +12,9 @@ import { useSceneStore } from './lib/stores/sceneStore';
 const DeskRoute = lazy(() => import('./routes/DeskRoute').then(m => ({ default: m.DeskRoute })));
 const CityRoute = lazy(() => import('./routes/CityRoute').then(m => ({ default: m.CityRoute })));
 const NnRoute = lazy(() => import('./routes/NnRoute').then(m => ({ default: m.NnRoute })));
+const DebugReplayRoute = lazy(() =>
+  import('./routes/DebugReplayRoute').then(m => ({ default: m.DebugReplayRoute })),
+);
 
 export function App() {
   // Single subscription site for media queries — descendants read from sceneStore.
@@ -38,6 +41,7 @@ export function App() {
           <Route path="/city" element={<CityRoute />} />
           <Route path="/nn" element={<NnRoute />} />
           <Route path="/text" element={<TextRoute />} />
+          <Route path="/debug/replay" element={<DebugReplayRoute />} />
         </Routes>
       </Suspense>
     </div>
