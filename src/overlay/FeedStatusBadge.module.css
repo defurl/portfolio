@@ -1,0 +1,48 @@
+/* REPLAY badge — bottom-left, sits a few px above BackToDesk so it never
+   stacks with it. Fades to 0 when a panel is focused so the BackToDesk
+   affordance and panel get visual priority. Departure Mono (var(--font-mono),
+   which falls back where Departure Mono isn't loaded yet). */
+.badge {
+  position: fixed;
+  bottom: 3rem;
+  left: 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: var(--ink-faint);
+  opacity: 0.6;
+  transition: opacity var(--dur-ui) var(--ease-ui);
+  z-index: 30;
+  user-select: none;
+  pointer-events: auto;
+}
+.badge[data-focused='true'] {
+  opacity: 0;
+  pointer-events: none;
+}
+.badge:hover,
+.badge:focus-visible {
+  opacity: 1;
+}
+
+.tooltip {
+  position: absolute;
+  bottom: 1.6rem;
+  left: 0;
+  width: 18rem;
+  padding: 0.5rem 0.7rem;
+  background: var(--bg-panel);
+  border: 1px solid var(--ink-ghost);
+  color: var(--ink-muted);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  opacity: 0;
+  transition: opacity var(--dur-ui) var(--ease-ui);
+  pointer-events: none;
+}
+.badge:hover .tooltip,
+.badge:focus-visible .tooltip {
+  opacity: 1;
+}

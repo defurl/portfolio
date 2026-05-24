@@ -6,6 +6,8 @@ import { TerminalPanel } from '../overlay/TerminalPanel';
 import { NotebookPanel } from '../overlay/NotebookPanel';
 import { BackToDesk } from '../overlay/BackToDesk';
 import { DeskAudio } from '../overlay/DeskAudio';
+import { FeedStatusBadge } from '../overlay/FeedStatusBadge';
+import { DeskData } from '../scenes/desk/DeskData';
 import { useSceneStore } from '../lib/stores/sceneStore';
 
 // Desktop camera: seated first-person at z=2.2 / lookAt y=0.4, FOV 50°.
@@ -37,8 +39,10 @@ export function DeskRoute() {
       <TerminalPanel />
       <NotebookPanel />
       <BackToDesk />
+      <FeedStatusBadge />
       <AudioToggle />
       <DeskAudio />
+      <DeskData />
     </>
   );
 }
