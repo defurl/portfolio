@@ -5,6 +5,13 @@
 
 ---
 
+## 2026-05-24
+- Did: phase 2a scaffolded — types extended (loopStartTs, IndexDirection, MarketSession, SymbolMap, ReplayDataset), replay adapter, synthetic generator, capture script (prepared, not run), /debug/replay route, 392KB committed tape
+- Why: option a accepted — replay-first data spine, no network calls in live path, adapter shape ready for live swap in phase 5
+- Next: post checkpoint a evidence, wait for owner review before checkpoint b (orchestrator + marketStore + window indicator)
+
+---
+
 # 📍 Current state — Phase 1 Checkpoint A (for PM review)
 
 **Branch:** `phase-1A/checkpoint-a-revision` · **Head:** `fee1bc7` · **Pushed to origin** · **Awaiting merge to main**
