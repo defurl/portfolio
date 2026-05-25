@@ -5,6 +5,11 @@
 
 ---
 
+## 2026-05-24 (later)
+- Did: phase 2b — marketStore (zustand, Map of ticks + index + session + status), createMarketOrchestrator (replay-only impl with TODO(phase-5) for live/rest), DeskData bridge, /lib/data/clock.ts session derivation (NY tz via Intl), FeedStatusBadge bottom-left with tooltip, Window indicator lerps city emissive (direction) + sky emissive (session) in useFrame from store.getState(), dev hooks `__phase2b_setSession/setDirection/focus` (DEV-only, dead-code-eliminated in prod), design-spec corner_allocation updated, capture-phase2b.mjs script
+- Why: option a payoff is the data-driven window — wire the spine to the visible scene, with the orchestrator's shape already future-proof for B/C live adapters
+- Next: gate evidence post for checkpoint b → wait → checkpoint c (sonification)
+
 ## 2026-05-24
 - Did: phase 2a scaffolded — types extended (loopStartTs, IndexDirection, MarketSession, SymbolMap, ReplayDataset), replay adapter, synthetic generator, capture script (prepared, not run), /debug/replay route, 392KB committed tape
 - Why: option a accepted — replay-first data spine, no network calls in live path, adapter shape ready for live swap in phase 5

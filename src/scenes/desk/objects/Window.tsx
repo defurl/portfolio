@@ -1,13 +1,29 @@
-import { BG_NIGHT, BG_PANEL, BG_VOID, VOXEL_GLOW_SOFT } from '../../../lib/style/colors';
+import { useRef } from 'react';
+import { useFrame } from '@react-three/fiber';
+import { Color, type MeshStandardMaterial } from 'three';
+import {
+  BG_NIGHT,
+  BG_PANEL,
+  BG_VOID,
+  LAMP_WARM,
+  VOXEL_GLOW,
+  VOXEL_GLOW_SOFT,
+} from '../../../lib/style/colors';
+import { useMarketStore } from '../../../lib/stores/marketStore';
+import { useSceneStore } from '../../../lib/stores/sceneStore';
+import type { IndexDirection, MarketSession } from '../../../lib/data/types';
 
-// Phase 1 revision — window mounted on the BACK wall, facing the camera.
-// (Previously had rotation `[0, -PI/2, 0]` as if mounted on a right-side wall,
-// but the scene only has a back wall, so the window was floating mid-air.)
+// The window is the desk's payoff in Phase 2: the "city-beyond" plane shifts
+// subtly with the market.
+//   - Lower plane (city) tint shifts on `index.direction`:
+//       up   → 5% toward LAMP_WARM
+//       down → 5% toward VOXEL_GLOW (cooler/saturated cyan)
+//       flat → no shift
+//   - Upper plane (sky) shifts on `session` over a wider color/intensity range.
 //
-// Glass is NOT a saturated cyan plane. It's a near-transparent
-// `MeshPhysicalMaterial` with `color: BG_NIGHT` — the cool cast we see
-// comes from the rim DirectionalLight passing through, not from the glass
-// being tinted. The "city beyond" is a placeholder plane behind the window.
+// Reads from `useMarketStore.getState()` inside useFrame — no React-level
+// subscription, no re-renders. Both planes lerp toward their target every
+// frame at SHIFT_RATE; under prefers-reduced-motion we snap instead.
 
 interface WindowProps {
   position: [number, number, number];
@@ -20,7 +36,62 @@ const FRAME_T = 0.04;
 const FRAME_DEPTH = 0.06;
 const GLASS_THICKNESS = 0.02;
 
+const CITY_BASE = new Color(VOXEL_GLOW_SOFT);
+const CITY_WARM = new Color(LAMP_WARM);
+const CITY_COOL = new Color(VOXEL_GLOW);
+const SHIFT = 0.05; // 5% of the way toward the target hue
+
+const cityTarget = new Color();
+function cityColorFor(dir: IndexDirection | undefined, out: Color): Color {
+  out.copy(CITY_BASE);
+  if (dir === 'up') out.lerp(CITY_WARM, SHIFT);
+  else if (dir === 'down') out.lerp(CITY_COOL, SHIFT);
+  return out;
+}
+
+interface SkyState {
+  color: Color;
+  intensity: number;
+}
+const SKY_TABLE: Record<MarketSession, SkyState> = {
+  'pre-market': { color: new Color(BG_VOID).lerp(new Color(LAMP_WARM), 0.04), intensity: 0.5 },
+  open: { color: new Color(VOXEL_GLOW_SOFT), intensity: 1.4 },
+  lunch: { color: new Color(BG_NIGHT).lerp(new Color(VOXEL_GLOW_SOFT), 0.3), intensity: 0.9 },
+  close: { color: new Color(VOXEL_GLOW_SOFT).lerp(new Color(LAMP_WARM), 0.15), intensity: 1.1 },
+  'after-hours': { color: new Color(BG_VOID).lerp(new Color(VOXEL_GLOW_SOFT), 0.2), intensity: 0.35 },
+  closed: { color: new Color(BG_VOID), intensity: 0.25 },
+};
+
+// Lerp speed: roughly 1 second to ~95% of target. dt is per-frame seconds.
+const LERP_K = 0.05;
+
 export function Window({ position, rotation = [0, 0, 0] }: WindowProps) {
+  const skyRef = useRef<MeshStandardMaterial>(null);
+  const cityRef = useRef<MeshStandardMaterial>(null);
+
+  useFrame(() => {
+    const { index, session } = useMarketStore.getState();
+    const reduced = useSceneStore.getState().prefersReducedMotion;
+
+    if (cityRef.current) {
+      cityColorFor(index?.direction, cityTarget);
+      if (reduced) cityRef.current.emissive.copy(cityTarget);
+      else cityRef.current.emissive.lerp(cityTarget, LERP_K);
+    }
+
+    if (skyRef.current) {
+      const sky = SKY_TABLE[session];
+      if (reduced) {
+        skyRef.current.emissive.copy(sky.color);
+        skyRef.current.emissiveIntensity = sky.intensity;
+      } else {
+        skyRef.current.emissive.lerp(sky.color, LERP_K);
+        skyRef.current.emissiveIntensity +=
+          (sky.intensity - skyRef.current.emissiveIntensity) * LERP_K;
+      }
+    }
+  });
+
   return (
     <group position={position} rotation={rotation}>
       {/* Top frame */}
@@ -49,7 +120,7 @@ export function Window({ position, rotation = [0, 0, 0] }: WindowProps) {
         <meshStandardMaterial color={BG_PANEL} roughness={0.7} metalness={0.15} />
       </mesh>
 
-      {/* Glass — transmissive, near-untinted. */}
+      {/* Glass */}
       <mesh position={[0, 0, 0]}>
         <boxGeometry args={[W - FRAME_T * 2, H - FRAME_T * 2, GLASS_THICKNESS]} />
         <meshPhysicalMaterial
@@ -62,16 +133,11 @@ export function Window({ position, rotation = [0, 0, 0] }: WindowProps) {
         />
       </mesh>
 
-      {/* City beyond — placeholder. Sits ~30cm behind the window glass.
-          Sized slightly larger than the opening so the cyan glow fills the
-          visible cutout. Two stacked planes:
-            - Upper plane brighter (the lit city skyline at distance)
-            - Lower plane dimmer (the unlit / closer foreground)
-          Together they give a sense of depth without modeling real geometry.
-          Replaced by the real voxel city in Phase 3. */}
+      {/* Sky beyond — upper plane, tracks session. */}
       <mesh position={[0, 0.25, -0.3]}>
         <planeGeometry args={[W * 0.92, H * 0.55]} />
         <meshStandardMaterial
+          ref={skyRef}
           color={BG_VOID}
           emissive={VOXEL_GLOW_SOFT}
           emissiveIntensity={1.4}
@@ -80,9 +146,11 @@ export function Window({ position, rotation = [0, 0, 0] }: WindowProps) {
           toneMapped={false}
         />
       </mesh>
+      {/* City beyond — lower plane, tracks index.direction. */}
       <mesh position={[0, -0.25, -0.3]}>
         <planeGeometry args={[W * 0.92, H * 0.55]} />
         <meshStandardMaterial
+          ref={cityRef}
           color={BG_VOID}
           emissive={VOXEL_GLOW_SOFT}
           emissiveIntensity={0.55}

@@ -146,7 +146,7 @@
       "No card grids. No 'feature box' layouts. If you find yourself reaching for a grid, stop and rethink."
     ],
     "corner_allocation": {
-      "bottom_left":  "navigation affordances — 'back to desk', scene breadcrumb",
+      "bottom_left":  "navigation affordances — 'back to desk', scene breadcrumb. The feed-status badge ('· replay · YYYY-MM-DD') also lives here, stacked above the back-to-desk affordance, and fades to 0 when a panel is focused so it never competes for attention.",
       "bottom_right": "global controls — audio toggle, /text link, fidelity toggle",
       "top_left":     "scene title / eyebrow label (when shown at all)",
       "top_right":    "transient panels — project detail slides in here at ~480px"
