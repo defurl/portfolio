@@ -20,10 +20,7 @@ If a `Co-Authored-by:` line lands on `main`, history rewriting is required to re
   - `phase-N/<slug>` for phase work — e.g., `phase-1A/desk-objects`
   - `fix/<slug>` for bug fixes
   - `chore/<slug>` for tooling/config
-- Merge strategy:
-  - **Squash-and-merge** for PRs with >3 commits or messy histories.
-  - **Rebase-and-merge** for tightly-scoped PRs with 1–3 well-crafted commits.
-  - The owner picks per PR.
+- Merge strategy: prefer --no-ff merge commits to preserve phase boundaries in the history. Rebase-and-merge is acceptable for small PRs (≤3 commits) where the phase boundary isn't meaningful. Squash-and-merge is reserved for emergency PRs (revert, hotfix) where consolidating is genuinely useful.
 
 ## Commit message format
 

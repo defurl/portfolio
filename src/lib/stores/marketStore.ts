@@ -27,6 +27,20 @@ interface MarketState {
 
 const INITIAL_STATUS: FeedStatus = { kind: 'error', reason: 'orchestrator not started' };
 
+// Tick event side-channel — for consumers (audio engine, future visualizers)
+// that need every tick event, not just the latest-per-ticker state. Storing
+// every tick in Zustand state would force re-renders we don't want.
+const tickListeners = new Set<(t: MarketTick) => void>();
+export function subscribeTickEvent(h: (t: MarketTick) => void): () => void {
+  tickListeners.add(h);
+  return () => {
+    tickListeners.delete(h);
+  };
+}
+function emitTickEvent(t: MarketTick) {
+  for (const l of tickListeners) l(t);
+}
+
 export const useMarketStore = create<MarketState>((set) => ({
   ticks: new Map(),
   index: null,
@@ -39,6 +53,7 @@ export const useMarketStore = create<MarketState>((set) => ({
       next.set(tick.ticker, tick);
       return { ticks: next };
     });
+    emitTickEvent(tick);
   },
   applyIndex(snap) {
     set({ index: snap });

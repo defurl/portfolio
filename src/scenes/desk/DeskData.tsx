@@ -24,17 +24,20 @@ export function DeskData() {
 
     void orch.start();
 
-    // Dev-only hooks for Phase 2B visual verification. Stripped in prod build
-    // (import.meta.env.DEV is statically false → dead-code elimination).
+    // Dev-only hooks for visual/audio verification. Stripped from prod
+    // (`import.meta.env.DEV` is statically false → dead-code elimination).
+    // Phase-agnostic `__market` namespace so City and NN can add hooks here
+    // without re-namespacing each phase.
     if (import.meta.env.DEV) {
-      const w = window as unknown as Record<string, unknown>;
-      w.__phase2b_setSession = (s: Parameters<typeof setSession>[0]) => setSession(s);
-      w.__phase2b_focus = (id: ObjectId | null) => {
+      const w = window as unknown as { __market?: Record<string, unknown> };
+      const ns: Record<string, unknown> = w.__market ?? {};
+      ns.setSession = (s: Parameters<typeof setSession>[0]) => setSession(s);
+      ns.focus = (id: ObjectId | null) => {
         const is = useInteractionStore.getState();
         if (id === null) is.returnToDesk();
         else is.focusObject(id, null);
       };
-      w.__phase2b_setDirection = (dir: 'up' | 'flat' | 'down') => {
+      ns.setDirection = (dir: 'up' | 'flat' | 'down') => {
         const cur = useMarketStore.getState().index;
         applyIndex({
           spy: cur?.spy ?? 530,
@@ -44,6 +47,17 @@ export function DeskData() {
           ts: Date.now(),
         });
       };
+      ns.setVix = (vix: number) => {
+        const cur = useMarketStore.getState().index;
+        applyIndex({
+          spy: cur?.spy ?? 530,
+          qqq: cur?.qqq ?? 458,
+          vix,
+          direction: cur?.direction ?? 'flat',
+          ts: Date.now(),
+        });
+      };
+      w.__market = ns;
     }
 
     return () => {

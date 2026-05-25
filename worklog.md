@@ -5,6 +5,11 @@
 
 ---
 
+## 2026-05-25
+- Did: phase 2c sonification — engine rewrite with pad (mode by direction, lydian/aeolian/phrygian cycles, lfo'd lowpass + reverb), bass (sine sub, beat-driven, BPM ramped from VIX 60→92), tick percussion (noise burst through bandpass, panned by ticker charcode, dynamic p95-of-60s volume threshold), tape-coded chebyshev saturation on master, per-scene gain buses with 1.5s crossfade, prefers-reduced-motion lengthens pad glide + mutes ticks + holds 60 BPM. marketStore.subscribeTickEvent side-channel. DeskAudio wires engine to audioStore/sceneStore/marketStore. Smoke test: 0 errors over enable + direction-change + vix-spike sequence.
+- Why: phase 2 exit gate — the desk audio must be the market, not a fixed loop. Engine surface is imperative (setEnabled/setScene/setIndex/pushTick/setReducedMotion) so scene switching in phase 3 is one call from City/NN routes.
+- Next: post checkpoint c gate evidence; owner runs the 30s/1m pleasantness test by ear.
+
 ## 2026-05-24 (later)
 - Did: phase 2b — marketStore (zustand, Map of ticks + index + session + status), createMarketOrchestrator (replay-only impl with TODO(phase-5) for live/rest), DeskData bridge, /lib/data/clock.ts session derivation (NY tz via Intl), FeedStatusBadge bottom-left with tooltip, Window indicator lerps city emissive (direction) + sky emissive (session) in useFrame from store.getState(), dev hooks `__phase2b_setSession/setDirection/focus` (DEV-only, dead-code-eliminated in prod), design-spec corner_allocation updated, capture-phase2b.mjs script
 - Why: option a payoff is the data-driven window — wire the spine to the visible scene, with the orchestrator's shape already future-proof for B/C live adapters

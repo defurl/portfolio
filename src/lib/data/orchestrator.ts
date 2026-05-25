@@ -10,6 +10,8 @@ import type { FeedStatus, IndexSnapshot, MarketTick } from './types';
 // TODO(phase-5): add finnhub-ws adapter and alphavantage-rest adapter, plus
 // a fallback ladder live → rest → replay → error. The orchestrator's external
 // surface (start/stop/onTick/onIndex/onStatus) does not change.
+// See docs/03-architecture.md §9 ("Edge function — deferred") for the design
+// of the live-data path and the security reasoning behind keeping it deferred.
 
 export interface MarketOrchestrator {
   start(): Promise<void>;

@@ -10,8 +10,7 @@
 //   7. REPLAY badge faded to 0 when a panel is focused
 //
 // Sessions and direction are injected by calling the marketStore actions via
-// a small dev hook exposed on window — see `__phase2bSetSession` /
-// `__phase2bSetDirection` in DeskData.
+// a small dev hook namespace exposed on window — see `__market` in DeskData.
 import { chromium } from 'playwright';
 import { mkdir } from 'node:fs/promises';
 
@@ -65,14 +64,14 @@ async function main() {
   async function setSession(session) {
     await page.evaluate((s) => {
       // @ts-ignore - dev hook
-      window.__phase2b_setSession?.(s);
+      window.__market?.setSession(s);
     }, session);
     await page.waitForTimeout(2000);
   }
   async function setDirection(dir) {
     await page.evaluate((d) => {
       // @ts-ignore - dev hook
-      window.__phase2b_setDirection?.(d);
+      window.__market?.setDirection(d);
     }, dir);
     await page.waitForTimeout(2000);
   }
@@ -81,7 +80,7 @@ async function main() {
   // frame. Glide to the window focus pose so the indicator is centred.
   await page.evaluate(() => {
     // @ts-ignore - interactionStore exposes focusObject via dev hook
-    window.__phase2b_focus?.('window');
+    window.__market?.focus('window');
   });
   await page.waitForTimeout(2500); // camera glide is 2200ms
 
@@ -111,12 +110,12 @@ async function main() {
   // Return to desk first, then focus Monitor 1 (opens the projects panel).
   await page.evaluate(() => {
     // @ts-ignore
-    window.__phase2b_focus?.(null);
+    window.__market?.focus(null);
   });
   await page.waitForTimeout(2400);
   await page.evaluate(() => {
     // @ts-ignore
-    window.__phase2b_focus?.('monitor1');
+    window.__market?.focus('monitor1');
   });
   await page.waitForTimeout(2600); // glide
   await page.screenshot({ path: `${OUT_DIR}/07-panel-open-badge-faded.png` });
