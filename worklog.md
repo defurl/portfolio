@@ -5,6 +5,11 @@
 
 ---
 
+## 2026-05-25 (phase 3a)
+- Did: phase 3a city foundation — sky dome (vertex-shader gradient, three-band fog→glow→top, horizon color tracks marketStore.session over 6s, snaps under reduced-motion), river (8×120m emissive strip on x=0, sine modulation 0.5–0.7 over 6s, holds at 0.6 reduced), ground plane (200×200, BG_NIGHT base + emissive 0.02), FogExp2 BG_NIGHT 0.012, HemisphereLight BG_NIGHT/VOXEL_GLOW_SOFT @ 0.35, DirectionalLight VOXEL_GLOW_SOFT @ 0.4 no-shadow, AmbientLight BG_VOID @ 0.05, CityBloom postfx (threshold 0.4, catches the river only), CityCameraDev (DEV-only `window.__city.setCamera` hook for verification captures since the spec overview camera doesn't show sky over an empty ground). DeskData reused as the market-data bridge in CityRoute. CityRoute lazy chunk: 3.9 KB.
+- Why: phase 1A discipline — lighting and atmosphere before geometry. The sky shader needs explicit linear→sRGB encoding because ShaderMaterial outputs raw linear and the canvas treats it as sRGB (otherwise BG_VOID renders as pure black).
+- Next: capture three sessions → checkpoint a gate; wait for owner review before checkpoint b (GitHub fetch + buildings).
+
 ## 2026-05-25 (later)
 - Did: phase 2 closed — checkpoint c approved (owner ear-test passed: "sound is alright"), 2c merged to main with --no-ff, roadmap updated to show all three checkpoints done + q6 resolution recorded
 - Why: exit gate met — data spine + sonification both run from replay tape, pull-the-network test passes, audio is opt-in and pleasant enough to leave on

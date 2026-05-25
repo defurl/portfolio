@@ -1,0 +1,358 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1400" font-family="ui-monospace, 'JetBrains Mono', Menlo, monospace">
+  <!-- ============================================================ -->
+  <!-- LAYER 2: VOXEL CITY — TECHNICAL PLAN                          -->
+  <!-- Spec for Claude Code: districts, building rules, lighting,    -->
+  <!-- camera bounds. Implementable without rendering.               -->
+  <!-- Companion to lighting-plan.svg.                               -->
+  <!-- ============================================================ -->
+
+  <rect x="0" y="0" width="1600" height="1400" fill="#0A0F1A"/>
+
+  <text x="40" y="60" fill="#EDE6D3" font-size="28" font-weight="600">Layer 2 — Voxel City · City Plan</text>
+  <text x="40" y="92" fill="#9BA3B4" font-size="14">Top-down spec · districts arranged radially · camera flies over · buildings driven by live data + repo metadata</text>
+
+  <!-- ============================================================ -->
+  <!-- LEFT PANEL: PLAN VIEW                                         -->
+  <!-- ============================================================ -->
+
+  <rect x="40" y="120" width="950" height="900" fill="#121826" stroke="#2E3340" stroke-width="1"/>
+  <text x="60" y="150" fill="#5BC8FF" font-size="14" letter-spacing="2">CITY PLAN · TOP-DOWN</text>
+  <text x="60" y="172" fill="#5A6275" font-size="11">scale: 1 unit ≈ 4 m · districts ≈ 30m × 30m each · river spans z-axis at x=0</text>
+
+  <!-- Grid -->
+  <g stroke="#1A2230" stroke-width="0.5">
+    <line x1="60" y1="240" x2="970" y2="240"/>
+    <line x1="60" y1="380" x2="970" y2="380"/>
+    <line x1="60" y1="520" x2="970" y2="520"/>
+    <line x1="60" y1="660" x2="970" y2="660"/>
+    <line x1="60" y1="800" x2="970" y2="800"/>
+    <line x1="60" y1="940" x2="970" y2="940"/>
+    <line x1="200" y1="200" x2="200" y2="1000"/>
+    <line x1="340" y1="200" x2="340" y2="1000"/>
+    <line x1="480" y1="200" x2="480" y2="1000"/>
+    <line x1="620" y1="200" x2="620" y2="1000"/>
+    <line x1="760" y1="200" x2="760" y2="1000"/>
+    <line x1="900" y1="200" x2="900" y2="1000"/>
+  </g>
+
+  <!-- North marker -->
+  <text x="515" y="195" fill="#5A6275" font-size="10" text-anchor="middle">↑ N (=-Z away from desk window)</text>
+
+  <!-- River — vertical strip of dark glow at x=center -->
+  <rect x="500" y="200" width="30" height="800" fill="#2A6B8A" opacity="0.2"/>
+  <text x="515" y="500" fill="#5BC8FF" font-size="9" text-anchor="middle" transform="rotate(90 515 500)" opacity="0.6">river · data conduit · faint cyan flow</text>
+
+  <!-- District: TRADING (top-left quadrant) -->
+  <rect x="200" y="240" width="280" height="280" fill="#FFA630" opacity="0.06" stroke="#FFA630" stroke-width="1" stroke-dasharray="3 3"/>
+  <text x="340" y="270" fill="#FFA630" font-size="12" font-weight="600" text-anchor="middle">TRADING</text>
+  <text x="340" y="288" fill="#9BA3B4" font-size="9" text-anchor="middle">order books · execution · markets</text>
+
+  <!-- Trading buildings — denser, taller average, amber-coded glow -->
+  <g fill="#1A2230" stroke="#FFA630" stroke-width="0.5">
+    <rect x="220" y="310" width="22" height="22"/>
+    <rect x="260" y="320" width="28" height="18"/>
+    <rect x="310" y="305" width="20" height="32"/>
+    <rect x="350" y="315" width="36" height="22"/>
+    <rect x="410" y="300" width="24" height="38"/>
+    <rect x="450" y="318" width="26" height="20"/>
+    <rect x="225" y="355" width="32" height="28"/>
+    <rect x="275" y="360" width="24" height="22"/>
+    <rect x="320" y="350" width="28" height="34"/>
+    <rect x="365" y="358" width="22" height="26"/>
+    <rect x="410" y="350" width="34" height="30"/>
+    <rect x="455" y="365" width="20" height="18"/>
+    <rect x="220" y="405" width="26" height="22"/>
+    <rect x="265" y="400" width="30" height="28"/>
+    <rect x="315" y="408" width="24" height="20"/>
+    <rect x="360" y="395" width="32" height="34"/>
+    <rect x="410" y="405" width="22" height="22"/>
+    <rect x="450" y="398" width="28" height="30"/>
+    <rect x="230" y="450" width="20" height="24"/>
+    <rect x="270" y="445" width="28" height="32"/>
+    <rect x="315" y="455" width="26" height="22"/>
+    <rect x="360" y="448" width="22" height="28"/>
+    <rect x="395" y="455" width="30" height="22"/>
+    <rect x="445" y="450" width="24" height="30"/>
+  </g>
+
+  <!-- District: RESEARCH (top-right quadrant) -->
+  <rect x="540" y="240" width="280" height="280" fill="#5BC8FF" opacity="0.06" stroke="#5BC8FF" stroke-width="1" stroke-dasharray="3 3"/>
+  <text x="680" y="270" fill="#5BC8FF" font-size="12" font-weight="600" text-anchor="middle">RESEARCH</text>
+  <text x="680" y="288" fill="#9BA3B4" font-size="9" text-anchor="middle">notebooks · papers · vol surfaces</text>
+
+  <!-- Research buildings — irregular, curved-feeling, cooler glow, more spaced -->
+  <g fill="#1A2230" stroke="#5BC8FF" stroke-width="0.5">
+    <rect x="560" y="310" width="32" height="26"/>
+    <rect x="610" y="320" width="24" height="22"/>
+    <rect x="660" y="305" width="38" height="32"/>
+    <rect x="720" y="318" width="28" height="20"/>
+    <rect x="770" y="312" width="32" height="28"/>
+    <rect x="565" y="355" width="26" height="32"/>
+    <rect x="610" y="365" width="30" height="22"/>
+    <rect x="660" y="350" width="22" height="36"/>
+    <rect x="700" y="358" width="34" height="28"/>
+    <rect x="755" y="362" width="28" height="24"/>
+    <rect x="570" y="405" width="36" height="26"/>
+    <rect x="620" y="408" width="22" height="20"/>
+    <rect x="660" y="402" width="28" height="30"/>
+    <rect x="705" y="410" width="26" height="22"/>
+    <rect x="750" y="400" width="30" height="32"/>
+    <rect x="570" y="450" width="28" height="28"/>
+    <rect x="615" y="445" width="32" height="30"/>
+    <rect x="660" y="455" width="24" height="22"/>
+    <rect x="705" y="448" width="30" height="28"/>
+    <rect x="750" y="452" width="22" height="26"/>
+  </g>
+
+  <!-- District: INFRASTRUCTURE (bottom-left quadrant) -->
+  <rect x="200" y="540" width="280" height="280" fill="#4ADE80" opacity="0.05" stroke="#4ADE80" stroke-width="1" stroke-dasharray="3 3"/>
+  <text x="340" y="570" fill="#4ADE80" font-size="12" font-weight="600" text-anchor="middle">INFRASTRUCTURE</text>
+  <text x="340" y="588" fill="#9BA3B4" font-size="9" text-anchor="middle">pipelines · stores · dev tools</text>
+
+  <!-- Infra buildings — wide, low, regular grid, faint green glow -->
+  <g fill="#1A2230" stroke="#4ADE80" stroke-width="0.5">
+    <rect x="220" y="605" width="38" height="18"/>
+    <rect x="270" y="608" width="42" height="16"/>
+    <rect x="320" y="605" width="36" height="20"/>
+    <rect x="365" y="610" width="32" height="14"/>
+    <rect x="405" y="606" width="38" height="18"/>
+    <rect x="450" y="610" width="28" height="16"/>
+    <rect x="220" y="640" width="32" height="18"/>
+    <rect x="262" y="635" width="40" height="22"/>
+    <rect x="312" y="640" width="34" height="16"/>
+    <rect x="355" y="642" width="38" height="20"/>
+    <rect x="402" y="638" width="32" height="18"/>
+    <rect x="445" y="642" width="36" height="16"/>
+    <rect x="225" y="678" width="42" height="20"/>
+    <rect x="275" y="682" width="34" height="16"/>
+    <rect x="318" y="680" width="38" height="22"/>
+    <rect x="365" y="678" width="32" height="18"/>
+    <rect x="405" y="682" width="36" height="20"/>
+    <rect x="450" y="680" width="28" height="18"/>
+    <rect x="225" y="720" width="38" height="22"/>
+    <rect x="270" y="725" width="32" height="16"/>
+    <rect x="310" y="720" width="40" height="20"/>
+    <rect x="358" y="724" width="34" height="18"/>
+    <rect x="400" y="720" width="36" height="22"/>
+    <rect x="445" y="725" width="30" height="16"/>
+  </g>
+
+  <!-- District: ML (bottom-right quadrant) -->
+  <rect x="540" y="540" width="280" height="280" fill="#FFD27A" opacity="0.05" stroke="#FFD27A" stroke-width="1" stroke-dasharray="3 3"/>
+  <text x="680" y="570" fill="#FFD27A" font-size="12" font-weight="600" text-anchor="middle">ML</text>
+  <text x="680" y="588" fill="#9BA3B4" font-size="9" text-anchor="middle">applied models · inference · serving</text>
+
+  <!-- ML buildings — tall narrow, vertical-emphasized, soft amber-warm glow -->
+  <g fill="#1A2230" stroke="#FFD27A" stroke-width="0.5">
+    <rect x="565" y="600" width="18" height="40"/>
+    <rect x="595" y="610" width="22" height="32"/>
+    <rect x="630" y="600" width="16" height="44"/>
+    <rect x="660" y="608" width="20" height="36"/>
+    <rect x="695" y="602" width="18" height="42"/>
+    <rect x="725" y="610" width="22" height="34"/>
+    <rect x="760" y="600" width="18" height="40"/>
+    <rect x="565" y="660" width="20" height="36"/>
+    <rect x="600" y="668" width="16" height="28"/>
+    <rect x="630" y="660" width="22" height="40"/>
+    <rect x="665" y="665" width="18" height="32"/>
+    <rect x="695" y="660" width="20" height="38"/>
+    <rect x="730" y="668" width="16" height="30"/>
+    <rect x="760" y="660" width="22" height="36"/>
+    <rect x="565" y="720" width="16" height="42"/>
+    <rect x="595" y="725" width="20" height="34"/>
+    <rect x="630" y="720" width="18" height="40"/>
+    <rect x="665" y="728" width="22" height="32"/>
+    <rect x="700" y="722" width="16" height="38"/>
+    <rect x="730" y="725" width="20" height="36"/>
+    <rect x="765" y="720" width="18" height="40"/>
+  </g>
+
+  <!-- District: LAB (south, default for ambiguous) -->
+  <rect x="370" y="840" width="280" height="140" fill="#9BA3B4" opacity="0.05" stroke="#9BA3B4" stroke-width="1" stroke-dasharray="3 3"/>
+  <text x="510" y="870" fill="#9BA3B4" font-size="12" font-weight="600" text-anchor="middle">LAB</text>
+  <text x="510" y="888" fill="#5A6275" font-size="9" text-anchor="middle">experimental · unspecified · default</text>
+
+  <g fill="#1A2230" stroke="#9BA3B4" stroke-width="0.5">
+    <rect x="390" y="905" width="22" height="22"/>
+    <rect x="425" y="908" width="18" height="20"/>
+    <rect x="460" y="906" width="24" height="22"/>
+    <rect x="495" y="910" width="20" height="18"/>
+    <rect x="530" y="906" width="26" height="22"/>
+    <rect x="570" y="908" width="22" height="20"/>
+    <rect x="605" y="906" width="20" height="22"/>
+    <rect x="390" y="940" width="24" height="20"/>
+    <rect x="425" y="938" width="20" height="22"/>
+    <rect x="460" y="942" width="22" height="18"/>
+    <rect x="500" y="938" width="24" height="22"/>
+    <rect x="535" y="942" width="20" height="20"/>
+    <rect x="570" y="938" width="22" height="22"/>
+    <rect x="605" y="942" width="20" height="20"/>
+  </g>
+
+  <!-- Camera entry path: from desk window (south, outside city) -->
+  <!-- Window in desk scene at world (+x toward city); city camera entry from the south -->
+  <g>
+    <circle cx="515" cy="1020" r="6" fill="#FFA630"/>
+    <text x="515" y="1045" fill="#FFA630" font-size="10" text-anchor="middle">desk window entry</text>
+    <text x="515" y="1058" fill="#9BA3B4" font-size="9" text-anchor="middle">camera glides north toward city core</text>
+    <line x1="515" y1="1014" x2="515" y2="920" stroke="#FFA630" stroke-width="1" stroke-dasharray="4 4" opacity="0.6"/>
+    <polygon points="510,920 520,920 515,910" fill="#FFA630" opacity="0.8"/>
+  </g>
+
+  <!-- Camera bounds at hover-and-pan altitude -->
+  <rect x="180" y="220" width="660" height="660" fill="none" stroke="#FFA630" stroke-width="0.5" stroke-dasharray="2 4" opacity="0.4"/>
+  <text x="195" y="232" fill="#FFA630" font-size="9" opacity="0.7">camera pan bounds · altitude y=20m</text>
+
+  <!-- District zoom positions (where camera lands when district clicked) -->
+  <g>
+    <circle cx="340" cy="380" r="3" fill="#FFA630"/>
+    <circle cx="680" cy="380" r="3" fill="#5BC8FF"/>
+    <circle cx="340" cy="680" r="3" fill="#4ADE80"/>
+    <circle cx="680" cy="680" r="3" fill="#FFD27A"/>
+    <circle cx="510" cy="940" r="3" fill="#9BA3B4"/>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- RIGHT PANEL: BUILDING SPEC + LIGHTING + DATA BINDING          -->
+  <!-- ============================================================ -->
+
+  <rect x="1010" y="120" width="550" height="900" fill="#121826" stroke="#2E3340" stroke-width="1"/>
+
+  <!-- Section: Data binding -->
+  <text x="1030" y="150" fill="#5BC8FF" font-size="14" letter-spacing="2">DATA BINDING — per building</text>
+  <text x="1030" y="172" fill="#5A6275" font-size="11">From GitHub at build time + marketStore at runtime · all transformations deterministic</text>
+
+  <g font-size="11" fill="#EDE6D3">
+    <text x="1030" y="200" font-weight="600">Height (build-time):</text>
+    <text x="1030" y="218" fill="#9BA3B4">log10(repo_additions) × 3.5 m</text>
+    <text x="1030" y="234" fill="#5A6275" font-size="10">→ clamp [4m, 30m] · ~10 LOC = 4m floor · ~10k LOC ≈ 14m · 1M LOC ≈ 21m</text>
+
+    <text x="1030" y="258" font-weight="600">Width × depth (build-time):</text>
+    <text x="1030" y="276" fill="#9BA3B4">sqrt(commit_count) × 0.6 m, both dims</text>
+    <text x="1030" y="292" fill="#5A6275" font-size="10">→ clamp [3m, 12m] · chatty repos broader; tight repos slimmer</text>
+
+    <text x="1030" y="316" font-weight="600">District (build-time):</text>
+    <text x="1030" y="334" fill="#9BA3B4">README frontmatter `district:` line · fallback: language heuristic</text>
+    <text x="1030" y="350" fill="#5A6275" font-size="10">→ if missing AND language matches map: assign · else: LAB</text>
+
+    <text x="1030" y="374" font-weight="600">Style (build-time):</text>
+    <text x="1030" y="392" fill="#9BA3B4">primary_language → style preset (see mapping below)</text>
+
+    <text x="1030" y="416" font-weight="600">Archived state (build-time):</text>
+    <text x="1030" y="434" fill="#9BA3B4">if archived: emissive intensity × 0.4 · no aliveness</text>
+
+    <text x="1030" y="458" font-weight="600">Pulse / brightness (runtime):</text>
+    <text x="1030" y="476" fill="#9BA3B4">marketStore.index.direction modulates global building emissive ±15%</text>
+    <text x="1030" y="492" fill="#5A6275" font-size="10">→ up = brighter, down = dimmer · per-building offset for organic feel</text>
+
+    <text x="1030" y="516" font-weight="600">Window density (build-time):</text>
+    <text x="1030" y="534" fill="#9BA3B4">based on commit_count percentile within district</text>
+    <text x="1030" y="550" fill="#5A6275" font-size="10">→ top 25% = dense windows · bottom 25% = few lit windows · linear in between</text>
+  </g>
+
+  <!-- Section: Language → style mapping -->
+  <text x="1030" y="588" fill="#5BC8FF" font-size="14" letter-spacing="2">LANGUAGE → STYLE (voxel variations only)</text>
+  <text x="1030" y="610" fill="#5A6275" font-size="11">All styles are voxel · same block size, same lighting model · silhouette distinguishes</text>
+
+  <g font-size="10" fill="#EDE6D3">
+    <rect x="1030" y="624" width="14" height="14" fill="#1A2230" stroke="#FFA630"/>
+    <text x="1052" y="635">Python</text>
+    <text x="1140" y="635" fill="#9BA3B4">industrial: regular window grid, flat top</text>
+
+    <rect x="1030" y="644" width="14" height="14" fill="#1A2230" stroke="#5BC8FF"/>
+    <text x="1052" y="655">Rust</text>
+    <text x="1140" y="655" fill="#9BA3B4">deep base, sparse windows, vertical accent</text>
+
+    <rect x="1030" y="664" width="14" height="14" fill="#1A2230" stroke="#FFD27A"/>
+    <text x="1052" y="675">TypeScript / JavaScript</text>
+    <text x="1140" y="675" fill="#9BA3B4">glass-coded facade, dense window grid</text>
+
+    <rect x="1030" y="684" width="14" height="14" fill="#1A2230" stroke="#4ADE80"/>
+    <text x="1052" y="695">Go</text>
+    <text x="1140" y="695" fill="#9BA3B4">wide base, low aspect, distributed</text>
+
+    <rect x="1030" y="704" width="14" height="14" fill="#1A2230" stroke="#F87171"/>
+    <text x="1052" y="715">Jupyter Notebook</text>
+    <text x="1140" y="715" fill="#9BA3B4">asymmetric form, irregular windows</text>
+
+    <rect x="1030" y="724" width="14" height="14" fill="#1A2230" stroke="#9BA3B4"/>
+    <text x="1052" y="735">C / C++</text>
+    <text x="1140" y="735" fill="#9BA3B4">brutalist heavy mass, deep shadow</text>
+
+    <rect x="1030" y="744" width="14" height="14" fill="#1A2230" stroke="#5BC8FF" stroke-dasharray="2 2"/>
+    <text x="1052" y="755">Solidity</text>
+    <text x="1140" y="755" fill="#9BA3B4">hexagonal base, on-chain physics</text>
+
+    <rect x="1030" y="764" width="14" height="14" fill="#1A2230" stroke="#EDE6D3"/>
+    <text x="1052" y="775">HTML / CSS / static</text>
+    <text x="1140" y="775" fill="#9BA3B4">low single-story footprint, billboard</text>
+
+    <rect x="1030" y="784" width="14" height="14" fill="#1A2230" stroke="#FFB661"/>
+    <text x="1052" y="795">Shell / Dockerfile</text>
+    <text x="1140" y="795" fill="#9BA3B4">container stack visual, layered</text>
+
+    <rect x="1030" y="804" width="14" height="14" fill="#1A2230" stroke="#5A6275"/>
+    <text x="1052" y="815">Other / mixed / unknown</text>
+    <text x="1140" y="815" fill="#9BA3B4">default voxel form (rectangular)</text>
+  </g>
+
+  <!-- Section: City lighting -->
+  <text x="1030" y="852" fill="#FFA630" font-size="14" letter-spacing="2">CITY LIGHTING</text>
+  <g font-size="11" fill="#EDE6D3">
+    <text x="1030" y="876">Sky dome</text>
+    <text x="1200" y="876" fill="#9BA3B4">gradient · session-driven (see desk window § for palette mapping)</text>
+    <text x="1030" y="894">Skyline glow</text>
+    <text x="1200" y="894" fill="#9BA3B4">HemisphereLight · top BG_NIGHT · bottom dim VOXEL_GLOW_SOFT</text>
+    <text x="1030" y="912">Building emissives</text>
+    <text x="1200" y="912" fill="#9BA3B4">per-district color tint × window density × runtime pulse</text>
+    <text x="1030" y="930">Volumetric fog</text>
+    <text x="1200" y="930" fill="#9BA3B4">FogExp2 · color BG_NIGHT · density 0.012 · depth cue, not effect</text>
+    <text x="1030" y="948">Ambient</text>
+    <text x="1200" y="948" fill="#9BA3B4">AmbientLight · BG_VOID · intensity 0.05</text>
+    <text x="1030" y="966">Moon / distant light</text>
+    <text x="1200" y="966" fill="#9BA3B4">DirectionalLight from above · VOXEL_GLOW_SOFT · I=0.4 · no shadow</text>
+    <text x="1030" y="984">Bloom</text>
+    <text x="1200" y="984" fill="#9BA3B4">selective on building emissives only · threshold 0.6</text>
+    <text x="1030" y="1002">Postprocess</text>
+    <text x="1200" y="1002" fill="#9BA3B4">no DoF (cost) · slight chromatic aberration on bloom (≤0.4)</text>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- BOTTOM: CAMERA + INTERACTION SPEC                             -->
+  <!-- ============================================================ -->
+
+  <rect x="40" y="1040" width="1520" height="280" fill="#121826" stroke="#2E3340" stroke-width="1"/>
+  <text x="60" y="1070" fill="#FFA630" font-size="14" letter-spacing="2">CAMERA + INTERACTION</text>
+
+  <g font-size="11" fill="#EDE6D3">
+    <text x="60" y="1098" font-weight="600">Default state — city overview</text>
+    <text x="60" y="1116" fill="#9BA3B4">Camera at (0, 20, 35) looking at (0, 0, 0) · FOV 35° · subtle drift baseline</text>
+    <text x="60" y="1132" fill="#5A6275" font-size="10">Hover anywhere on screen pans camera within bounds [-15..+15 x, -10..+10 z] at altitude y=20</text>
+    <text x="60" y="1148" fill="#5A6275" font-size="10">Pan response is gentle (lerp 200ms) · cursor near edges drifts faster</text>
+
+    <text x="60" y="1180" font-weight="600">District zoom (click empty area of district label)</text>
+    <text x="60" y="1198" fill="#9BA3B4">Camera glides to district zoom position · 2.5s ease-camera curve</text>
+    <text x="60" y="1214" fill="#5A6275" font-size="10">Altitude drops to y=8 · individual buildings now hover-targetable</text>
+    <text x="60" y="1230" fill="#5A6275" font-size="10">"back to overview" affordance bottom-left appears once zoom completes</text>
+
+    <text x="60" y="1262" font-weight="600">Building click (in zoomed district)</text>
+    <text x="60" y="1280" fill="#9BA3B4">Camera nudges to building's elevation · ProjectPanel slides in from right</text>
+    <text x="60" y="1296" fill="#5A6275" font-size="10">Uses same panel component as Phase 1B Monitor 1 click · content from build-time GitHub fetch</text>
+
+    <text x="820" y="1098" font-weight="600">Entry — from desk window</text>
+    <text x="820" y="1116" fill="#9BA3B4">3s glide: window pixel-space transition → city overview camera</text>
+    <text x="820" y="1132" fill="#5A6275" font-size="10">During glide: city emissives lift from "seen through glass" to "full" emissive · sky reveals</text>
+
+    <text x="820" y="1164" font-weight="600">Entry — /city deep-link</text>
+    <text x="820" y="1182" fill="#9BA3B4">1.2s fade-in to city overview · no camera move · sky already at session-color</text>
+    <text x="820" y="1198" fill="#5A6275" font-size="10">OG image = render of city overview · render once during build, commit to /og-city.png</text>
+
+    <text x="820" y="1230" font-weight="600">Exit — back to desk</text>
+    <text x="820" y="1248" fill="#9BA3B4">"back to desk" bottom-left · 2.5s reverse glide camera through window plane</text>
+    <text x="820" y="1264" fill="#5A6275" font-size="10">On deep-link load, "back to desk" still works — navigates to / and replays the desk wake-up</text>
+
+    <text x="820" y="1296" fill="#5A6275" font-size="10">prefers-reduced-motion: all glides → 400ms crossfade · pan disabled · static camera at overview</text>
+  </g>
+
+  <text x="40" y="1370" fill="#5A6275" font-size="10">v1 · for Claude Code Phase 3 · companion to lighting-plan.svg · the voxel grammar is the same throughout (block size, lighting model) — silhouettes distinguish</text>
+</svg>
