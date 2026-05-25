@@ -52,22 +52,37 @@
 
 All three checkpoints merged to `main`. The Night Desk renders, eleven hand-built objects are interactive, and the mobile variant holds at 375px. Performance bar relaxed from 85 → 70 with documented rationale (CPU-throttled three.js parse dominates LCP). Deferred items live in Phase 5 polish: right-wall fill lighting, monitor screen vertical gradient, rain shader on glass, Departure Mono `.woff2` drop, localStorage audio-preference nuance, baked-poster LCP cover (Option B from the Lighthouse triage). **Phase 2 is now active.**
 
-## Phase 2 — Data & sonification spine *(active — week 3–4, parallelizable with Phase 1 tail)*
+## Phase 2 — Data & sonification spine ✅ *(closed 2026-05-25)*
 
 **Goal:** the data and audio backbones are real before we render the city on top of them.
 
-- [ ] `lib/data/types.ts` — `MarketTick`, `FeedStatus`, `SymbolMap`
-- [ ] `lib/data/finnhubWs.ts` via edge proxy
-- [ ] `lib/data/alphaVantageRest.ts` via edge proxy
-- [ ] `lib/data/replay.ts` + first replay dataset committed to `public/replay/`
-- [ ] `lib/data/orchestrator.ts` with fallback ladder + tests
-- [ ] Vercel edge function `api/feed.ts` with rate-limit guard
-- [ ] `marketStore` populated; "REPLAY" badge component
-- [ ] `audio/engine.ts` Tone.js master bus + scene buses
-- [ ] `audio/desk.ts` lo-fi loop (placeholder track) + rain swell
-- [ ] Desk's window renders a tiny live indicator (e.g., the sky color already responds to index direction) — proves the spine end-to-end
+**Q6 resolution:** Option A (replay-first, no live WS). Reasoning: free-tier Finnhub embeds the key in the WS URL → key exposure on a public site; Alpha Vantage's 25-calls/day cap makes Option B effectively replay anyway; the structural cost of supporting two modes (Option C) exceeded the marginal benefit. The orchestrator's interface preserves the upgrade path — Phase 5 can swap in a live adapter without changing consumers.
 
-**Exit gate:** Pull the network mid-session; the desk's window indicator keeps moving via replay.
+### Checkpoint A — types + replay layer ✅ *(merged 2026-05-24)*
+- [x] `lib/data/types.ts` extended (`MarketTick`, `FeedStatus` with `loopStartTs`, `IndexSnapshot` with `ts`, `IndexDirection`, `MarketSession`, `SymbolMap`, `ReplayDataset`)
+- [x] `lib/data/replay.ts` — adapter that walks a committed tape in real-time and loops with fresh `loopStartTs`
+- [x] `scripts/generate-synthetic-replay.mjs` — mean-reverting GBM + spikes → 33 tickers, ~5000 ticks, 392 KB
+- [x] `scripts/capture-replay.mjs` — owner-action, native Node 22 WebSocket, no third-party deps
+- [x] `/debug/replay` verification route
+
+### Checkpoint B — orchestrator + marketStore + window indicator ✅ *(merged 2026-05-25)*
+- [x] `lib/data/orchestrator.ts` — replay-only impl with `TODO(phase-5)` cross-ref to `03-architecture.md §9` for the deferred live path
+- [x] `lib/data/clock.ts` — `getSession()` from NY local time via `Intl`
+- [x] `lib/stores/marketStore.ts` — Zustand with `applyTick`/`applyIndex`/`setSession`/`setStatus`; map-clone on tick so shallow selectors work
+- [x] `FeedStatusBadge` — bottom-left REPLAY badge with the on-brand honesty tooltip, fades to 0 when a panel is focused
+- [x] Window indicator — city emissive lerps on `index.direction`; sky emissive lerps on `MarketSession`; both read `useMarketStore.getState()` inside `useFrame`, snap under reduced-motion
+- [x] Dev hooks namespaced under `window.__market` (phase-agnostic)
+
+### Checkpoint C — sonification ✅ *(merged 2026-05-25)*
+- [x] `audio/engine.ts` rewritten — per-scene gain buses with 1.5s crossfade, master = Gain 0.3 → 5 kHz lowpass → Chebyshev(2, wet 0.15) tape-coded saturation
+- [x] Pad voice — triangle PolySynth → LFO-modulated lowpass → reverb; mode by `index.direction` (aeolian/lydian/phrygian cycles); 1.5s portamento between chord triggers
+- [x] Bass voice — sine sub at chord-root; `Transport.bpm` ramps 4s to 60/68/80/92 BPM by VIX bucket
+- [x] Tick percussion — pink-noise burst through bandpass at 2.2 kHz; fires on ticks above p95-of-60s rolling volume threshold; panned by ticker first-letter charcode
+- [x] Reduced-motion: pad glide → 3s, BPM held at 60, tick percussion silenced
+- [x] `marketStore.subscribeTickEvent` side-channel for the engine (avoids storing every tick in Zustand state)
+- [x] FR-26 preserved — audio off by default, Tone.js stays dynamic-import, build/start only inside user-gesture stack
+
+**Exit gate (met):** Pull the network mid-session; the desk's window indicator keeps moving via replay, the sonification continues uninterrupted.
 
 ## Phase 3 — Layer 2, the Voxel City *(week 4–6)*
 

@@ -5,6 +5,11 @@
 
 ---
 
+## 2026-05-25 (later)
+- Did: phase 2 closed — checkpoint c approved (owner ear-test passed: "sound is alright"), 2c merged to main with --no-ff, roadmap updated to show all three checkpoints done + q6 resolution recorded
+- Why: exit gate met — data spine + sonification both run from replay tape, pull-the-network test passes, audio is opt-in and pleasant enough to leave on
+- Next: phase 3 — voxel city. Phase 3 risk (window rim-light re-tune) already documented in roadmap §3
+
 ## 2026-05-25
 - Did: phase 2c sonification — engine rewrite with pad (mode by direction, lydian/aeolian/phrygian cycles, lfo'd lowpass + reverb), bass (sine sub, beat-driven, BPM ramped from VIX 60→92), tick percussion (noise burst through bandpass, panned by ticker charcode, dynamic p95-of-60s volume threshold), tape-coded chebyshev saturation on master, per-scene gain buses with 1.5s crossfade, prefers-reduced-motion lengthens pad glide + mutes ticks + holds 60 BPM. marketStore.subscribeTickEvent side-channel. DeskAudio wires engine to audioStore/sceneStore/marketStore. Smoke test: 0 errors over enable + direction-change + vix-spike sequence.
 - Why: phase 2 exit gate — the desk audio must be the market, not a fixed loop. Engine surface is imperative (setEnabled/setScene/setIndex/pushTick/setReducedMotion) so scene switching in phase 3 is one call from City/NN routes.
