@@ -5,6 +5,11 @@
 
 ---
 
+## 2026-05-28 (phase 3d)
+- Did: phase 3d transitions — `transitionStore` + `SceneFade` overlay at App root; desk window click `useDeskToCity` orchestrates audio scene crossfade → existing window focus glide (1.5s) → 300ms fade-to-black → navigate('/city'). CityRoute mounts with `CityEntry` (deep-link: black → 1.2s fade-in; from-window: rig snaps to south-entry pose (0,32,95)→(0,6,0) then glides 2s to overview while fade-in plays). DeskRoute mount handles the inbound fade-out → fade-in if returning from /city. `CityBack` extended: 'overview' mode now reads "← back to desk" and triggers a 300ms fade-out + navigate('/'). Reduced-motion path skips all glides + fades. `scripts/prerender-city-route.mjs` postbuild emits `dist/city/index.html` with city-specific og:image/title/description (3/3 swaps). `scripts/generate-og-city.mjs` (manual-run) saved `public/og-city.png` 1200×630. New `pnpm og:city` script.
+- Why: phase 3 exit requires both entry paths working + an OG image. Single transitionStore keeps the timeline coherent across desk↔city and respects FR-26 reduced-motion at every step.
+- Next: post checkpoint d gate → phase 3 close.
+
 ## 2026-05-27 (phase 3c)
 - Did: phase 3c — `cityStore` (3-mode focus: overview/district/building + hovered), `CityCameraRig` (overview pan-and-drift at 200ms time-constant + parallax trail + orbital drift; district zoom 2.5s ease-in-out cubic; building nudge), district label click handlers (only-active-in-overview, dim to 0.3 once zoomed), building hover+click (only-active-when-its-district-is-zoomed, 200ms debounce, +20% emissive on hover, drei `<Html>` callout), `CityBuildingPanel` reuses `ScenePanel` shell + `ProjectPanel.module.css` typography, lazy README fetch via marked, stats row, github link, `CityBack` affordance bottom-left.
 - Why: respect the spec's progressive disclosure — overview is the pannable atmospheric layer, district zoom is the lens, building click is the detail. Hover only at close range avoids overview-altitude finicky targeting (per §3.20 risk register).

@@ -1,6 +1,7 @@
 import { Canvas } from '@react-three/fiber';
 import { CityScene } from '../scenes/city/CityScene';
 import { CityCameraRig } from '../scenes/city/CityCameraRig';
+import { CityEntry } from '../scenes/city/CityEntry';
 import { DeskData } from '../scenes/desk/DeskData';
 import { AudioToggle } from '../overlay/AudioToggle';
 import { DeskAudio } from '../overlay/DeskAudio';
@@ -35,6 +36,7 @@ export function CityRoute() {
       <FeedStatusBadge />
       <CityBack />
       <CityBuildingPanel />
+      <CityEntry />
       <AudioToggle />
       <DeskAudio />
       <DeskData />

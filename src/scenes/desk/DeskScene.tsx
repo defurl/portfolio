@@ -36,6 +36,7 @@ import { BloomLayer } from './postfx/BloomLayer';
 import { InteractiveObject } from './InteractiveObject';
 import { CameraRig } from './CameraRig';
 import { useInteractionStore } from '../../lib/stores/interactionStore';
+import { useDeskToCity } from './useDeskToCity';
 import { useAudioStore } from '../../lib/stores/audioStore';
 
 // The Night Desk scene. All eleven objects (10 visible + door-spill light)
@@ -49,6 +50,7 @@ import { useAudioStore } from '../../lib/stores/audioStore';
 // separated from the lamp's own floor pool.
 export function DeskScene() {
   const focusObject = useInteractionStore(s => s.focusObject);
+  const enterCity = useDeskToCity();
 
   // Directional rim light needs a Three.js Object3D as its `.target`.
   const rimTarget = useMemo(() => {
@@ -206,7 +208,7 @@ export function DeskScene() {
         id="window"
         label="city"
         labelPosition={[1.7, 1.6, -0.3]}
-        onActivate={() => focusObject('window', null)}
+        onActivate={enterCity}
       >
         <Window position={[1.98, 1.0, -0.3]} rotation={[0, -Math.PI / 2, 0]} />
       </InteractiveObject>
