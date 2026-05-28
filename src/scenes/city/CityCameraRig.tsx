@@ -3,7 +3,11 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { Vector3 } from 'three';
 import { useCityStore, type CityFocus } from '../../lib/stores/cityStore';
 import { useSceneStore } from '../../lib/stores/sceneStore';
-import { getCityBuildings, type District } from '../../lib/content/buildings';
+import {
+  DISTRICT_DEFS,
+  findPlaced,
+  type District,
+} from '../../lib/content/buildings';
 
 // City camera state machine.
 //
@@ -24,32 +28,32 @@ const GLIDE_DURATION_S = 2.5;
 const DRIFT_PERIOD_S = 6;
 const DRIFT_RADIUS = 0.6;
 
-const DISTRICT_CENTER: Record<District, [number, number]> = {
-  trading: [-22.5, -22.5],
-  research: [22.5, -22.5],
-  infrastructure: [-22.5, 22.5],
-  ml: [22.5, 22.5],
-  lab: [0, 45],
-};
-
+// District zoom — high-altitude tilted isometric view that frames the whole
+// district without sitting nose-to-glass with the front-row buildings. Y=18
+// + Z+32 + lookAt y=1.5 yields a Ghibli-skyline composition under FOV 35°.
 function districtPose(d: District): {
   pos: [number, number, number];
   target: [number, number, number];
 } {
-  const [cx, cz] = DISTRICT_CENTER[d];
-  return { pos: [cx, 8, cz + 15], target: [cx, 4, cz] };
+  const [cx, cz] = DISTRICT_DEFS[d].center;
+  return { pos: [cx, 18, cz + 32], target: [cx, 1.5, cz] };
 }
 
+// Building focus — camera lands in the row-gap *behind* the building (z+10),
+// at an isometric altitude derived from the building's own height so the
+// lens never sits inside the mesh and front-row neighbours don't occlude.
 function buildingPose(buildingId: string): {
   pos: [number, number, number];
   target: [number, number, number];
 } {
-  const m = getCityBuildings();
-  const b = m.buildings.find((x) => x.id === buildingId);
-  if (!b) return { pos: OVERVIEW_POS, target: OVERVIEW_TARGET };
-  const dPose = districtPose(b.district);
-  // Nudge slightly forward toward the district center but a touch lower.
-  return { pos: [dPose.pos[0], 6, dPose.pos[2] - 5], target: dPose.target };
+  const pb = findPlaced(buildingId);
+  if (!pb) return { pos: OVERVIEW_POS, target: OVERVIEW_TARGET };
+  const [bx, , bz] = pb.position;
+  const bH = pb.geom.height;
+  return {
+    pos: [bx, Math.max(6, bH * 0.65 + 3), bz + 10],
+    target: [bx, bH * 0.4, bz],
+  };
 }
 
 function targetFor(focus: CityFocus): {

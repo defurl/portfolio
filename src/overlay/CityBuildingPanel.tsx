@@ -33,7 +33,9 @@ function compactNumber(n: number): string {
 
 export function CityBuildingPanel() {
   const focus = useCityStore((s) => s.focus);
-  const back = useCityStore((s) => s.backToOverview);
+  // Closing a building panel returns to the parent district, not all the
+  // way to overview — preserves the user's exploration depth.
+  const back = useCityStore((s) => s.backToDistrict);
 
   const buildingId = focus.mode === 'building' ? focus.buildingId : null;
   const data: BuildingData | undefined = useMemo(() => {

@@ -1,20 +1,26 @@
 import { useCityStore } from '../lib/stores/cityStore';
 import styles from './BackToDesk.module.css';
 
-// "back to overview" / "back to desk" affordance for the city scene. Reuses
-// the BackToDesk module CSS for visual consistency. Visible whenever the
-// city focus is not 'overview'. Click reverses the most recent zoom.
+// Context-aware back affordance:
+//   - in 'building' mode → "← back to district" (returns to parent district)
+//   - in 'district' mode → "← back to overview"
+//   - in 'overview' → hidden
+// Preserves the user's exploration depth on close.
 export function CityBack() {
   const focus = useCityStore((s) => s.focus);
+  const backToDistrict = useCityStore((s) => s.backToDistrict);
+  const backToOverview = useCityStore((s) => s.backToOverview);
   if (focus.mode === 'overview') return null;
-  const label = '← back to overview';
+  if (focus.mode === 'building') {
+    return (
+      <button type="button" className={styles.back} onClick={backToDistrict}>
+        ← back to district
+      </button>
+    );
+  }
   return (
-    <button
-      type="button"
-      className={styles.back}
-      onClick={() => useCityStore.getState().backToOverview()}
-    >
-      {label}
+    <button type="button" className={styles.back} onClick={backToOverview}>
+      ← back to overview
     </button>
   );
 }

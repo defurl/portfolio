@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { District } from '../content/buildings';
+import { districtOf, type District } from '../content/buildings';
 
 // City interaction state. Three camera modes, plus the currently hovered
 // building id (debounced 200ms by the InteractiveBuilding wrapper).
@@ -27,15 +27,19 @@ export const useCityStore = create<CityState>((set, get) => ({
   openBuilding: (buildingId) => set({ focus: { mode: 'building', buildingId }, hovered: null }),
   backToOverview: () => set({ focus: { mode: 'overview' }, hovered: null }),
   backToDistrict: () => {
-    // From building → back to the building's district.
+    // From building → back to the building's parent district. We look the
+    // district up via the placement registry so the store never needs to
+    // store district alongside building id.
     const f = get().focus;
     if (f.mode !== 'building') {
-      set({ focus: { mode: 'overview' } });
+      set({ focus: { mode: 'overview' }, hovered: null });
       return;
     }
-    // We need the building's district — but cityStore doesn't carry it.
-    // The caller (panel) passes via openBuilding; building-mode callers can
-    // also call zoomDistrict directly. For now: building close → overview.
-    set({ focus: { mode: 'overview' }, hovered: null });
+    const district = districtOf(f.buildingId);
+    if (!district) {
+      set({ focus: { mode: 'overview' }, hovered: null });
+      return;
+    }
+    set({ focus: { mode: 'district', district }, hovered: null });
   },
 }));
