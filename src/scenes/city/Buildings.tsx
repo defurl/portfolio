@@ -1,7 +1,9 @@
-import { useMemo, useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
-import { Billboard, Text } from '@react-three/drei';
+import { useMemo, useRef, useEffect } from 'react';
+import { useFrame, type ThreeEvent } from '@react-three/fiber';
+import { Billboard, Html, Text } from '@react-three/drei';
 import { type MeshStandardMaterial } from 'three';
+import { useCityStore } from '../../lib/stores/cityStore';
+import labelStyles from '../desk/HoverLabel.module.css';
 import {
   BG_PANEL,
   DATA_GREEN,
@@ -142,14 +144,53 @@ interface OneBuildingProps {
 
 function Building({ data, geom, position, accentColor }: OneBuildingProps) {
   const windowsRef = useRef<MeshStandardMaterial>(null);
+  const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { width, depth, height, style, emissiveScale, windowDensity } = geom;
 
+  // Hover targetability is gated by city focus mode — only at district zoom.
+  const hovered = useCityStore((s) => s.hovered === data.id);
+  const focus = useCityStore((s) => s.focus);
+  const hoverable = focus.mode === 'district' && focus.district === data.district;
+  const showCallout = hovered && hoverable;
+
   // Pulse: window emissive intensity tracks directionPulse.value × scale.
+  // Hover lift adds +20% emissive while hovered (per §3.21).
   useFrame(() => {
     const m = windowsRef.current;
     if (!m) return;
-    m.emissiveIntensity = windowDensity * emissiveScale * directionPulse.value * 1.4;
+    const base = windowDensity * emissiveScale * directionPulse.value * 1.4;
+    m.emissiveIntensity = showCallout ? base * 1.2 : base;
   });
+
+  useEffect(() => () => {
+    if (hoverTimer.current) clearTimeout(hoverTimer.current);
+  }, []);
+
+  const onEnter = (e: ThreeEvent<PointerEvent>) => {
+    if (!hoverable) return;
+    e.stopPropagation();
+    // 200ms debounce to avoid flicker when traveling past many buildings.
+    if (hoverTimer.current) clearTimeout(hoverTimer.current);
+    hoverTimer.current = setTimeout(() => {
+      useCityStore.getState().setHovered(data.id);
+    }, 200);
+    document.body.style.cursor = 'pointer';
+  };
+  const onLeave = (e: ThreeEvent<PointerEvent>) => {
+    if (!hoverable) return;
+    e.stopPropagation();
+    if (hoverTimer.current) {
+      clearTimeout(hoverTimer.current);
+      hoverTimer.current = null;
+    }
+    useCityStore.getState().setHovered(null);
+    document.body.style.cursor = 'auto';
+  };
+  const onClick = (e: ThreeEvent<MouseEvent>) => {
+    if (!hoverable) return;
+    e.stopPropagation();
+    useCityStore.getState().openBuilding(data.id);
+  };
 
   // Style proportions: nudge the canonical (wd, wd, h) shape.
   let w = width;
@@ -187,7 +228,7 @@ function Building({ data, geom, position, accentColor }: OneBuildingProps) {
   }
 
   return (
-    <group position={position}>
+    <group position={position} onPointerOver={onEnter} onPointerOut={onLeave} onClick={onClick}>
       {/* Base block — the visible mass. Color is BG_PANEL with an
           accent-color emissive scaled by window density. A true per-window
           grid would need a custom shader or instanced facade meshes; for
@@ -209,12 +250,11 @@ function Building({ data, geom, position, accentColor }: OneBuildingProps) {
       {/* Style-specific roof / accent */}
       <RoofAccent style={style} w={w} d={d} h={h} color={accentColor} />
 
-      {/* Hover-targetable invisible bounding box (Checkpoint C wires this).
-          For now it sits in the scene as a marker; raycast events come in C. */}
-      <mesh visible={false} userData={{ buildingId: data.id }}>
-        <boxGeometry args={[w * 1.1, h * 1.1, d * 1.1]} />
-        <meshBasicMaterial />
-      </mesh>
+      {showCallout && (
+        <Html position={[0, h + 1.5, 0]} center pointerEvents="none" transform={false}>
+          <span className={labelStyles.label}>{`// ${data.name}`}</span>
+        </Html>
+      )}
     </group>
   );
 }
@@ -372,13 +412,38 @@ export function Buildings() {
 }
 
 function DistrictLabels() {
+  const focus = useCityStore((s) => s.focus);
   return (
     <group>
       {(Object.keys(DISTRICT_DEFS) as District[]).map((d) => {
         const def = DISTRICT_DEFS[d];
+        // Spec §3.20: label opacity dims to 0.3 once a district is zoomed.
+        const dim =
+          focus.mode === 'district' && focus.district === d ? 0.3 : 0.8;
+        const onClick = (e: ThreeEvent<MouseEvent>) => {
+          e.stopPropagation();
+          if (focus.mode === 'overview') {
+            useCityStore.getState().zoomDistrict(d);
+          }
+        };
+        const onOver = () => {
+          if (focus.mode === 'overview') document.body.style.cursor = 'pointer';
+        };
+        const onOut = () => {
+          document.body.style.cursor = 'auto';
+        };
         return (
           <Billboard key={d} position={[def.center[0], 15, def.center[1]]}>
-            <Text fontSize={1.2} color={def.color} anchorX="center" anchorY="middle">
+            <Text
+              fontSize={1.2}
+              color={def.color}
+              anchorX="center"
+              anchorY="middle"
+              fillOpacity={dim}
+              onClick={onClick}
+              onPointerOver={onOver}
+              onPointerOut={onOut}
+            >
               {def.label}
             </Text>
           </Billboard>

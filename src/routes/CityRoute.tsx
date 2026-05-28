@@ -1,9 +1,12 @@
 import { Canvas } from '@react-three/fiber';
 import { CityScene } from '../scenes/city/CityScene';
+import { CityCameraRig } from '../scenes/city/CityCameraRig';
 import { DeskData } from '../scenes/desk/DeskData';
 import { AudioToggle } from '../overlay/AudioToggle';
 import { DeskAudio } from '../overlay/DeskAudio';
 import { FeedStatusBadge } from '../overlay/FeedStatusBadge';
+import { CityBack } from '../overlay/CityBack';
+import { CityBuildingPanel } from '../overlay/CityBuildingPanel';
 
 // Phase 3A — city overview camera at (0, 20, 35), lookAt (0, 0, 0), FOV 35°.
 // The narrower FOV (vs. desk's 50°) emphasizes scale: the city reads bigger.
@@ -27,8 +30,11 @@ export function CityRoute() {
         style={{ position: 'fixed', inset: 0, background: 'var(--bg-void)' }}
       >
         <CityScene />
+        <CityCameraRig />
       </Canvas>
       <FeedStatusBadge />
+      <CityBack />
+      <CityBuildingPanel />
       <AudioToggle />
       <DeskAudio />
       <DeskData />

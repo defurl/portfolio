@@ -5,6 +5,11 @@
 
 ---
 
+## 2026-05-27 (phase 3c)
+- Did: phase 3c — `cityStore` (3-mode focus: overview/district/building + hovered), `CityCameraRig` (overview pan-and-drift at 200ms time-constant + parallax trail + orbital drift; district zoom 2.5s ease-in-out cubic; building nudge), district label click handlers (only-active-in-overview, dim to 0.3 once zoomed), building hover+click (only-active-when-its-district-is-zoomed, 200ms debounce, +20% emissive on hover, drei `<Html>` callout), `CityBuildingPanel` reuses `ScenePanel` shell + `ProjectPanel.module.css` typography, lazy README fetch via marked, stats row, github link, `CityBack` affordance bottom-left.
+- Why: respect the spec's progressive disclosure — overview is the pannable atmospheric layer, district zoom is the lens, building click is the detail. Hover only at close range avoids overview-altitude finicky targeting (per §3.20 risk register).
+- Next: post checkpoint c gate → wait → checkpoint d (window glide, /city deep-link, OG image).
+
 ## 2026-05-26 (phase 3b)
 - Did: phase 3b — build-time fetch (`scripts/fetch-github-repos.mjs`) writes `src/generated/city-buildings.json` via paginated /users/$USER/repos + per-repo /languages + /commits last-page header for total + /readme for `district:` frontmatter, with 7-day per-repo cache and a 6h top-level cache + cache-rebuild fallback when API hits rate limit. 23 of 27 repos surface; map to 5 districts. Buildings.tsx with deterministic spiral layout (tallest at district center), per-style proportions (industrial/fortress/glass/asymmetric/brutalist/hexagonal/static/container/default), style-specific roof accents, district-tinted emissive on the base mass. PulseController + directionPulse module-level ref drives ±15% emissive modulation lerped over ~3s; per-building useFrame applies. District labels via drei Billboard + Text.
 - Why: voxel grammar = same blocks + lighting, distinguished by silhouette/density/roof. Per-building Zustand subscriptions would re-render storm; module-level ref readable from useFrame keeps the React tree static.
