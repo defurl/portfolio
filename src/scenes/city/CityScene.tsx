@@ -1,6 +1,8 @@
 import { BG_NIGHT, BG_VOID, VOXEL_GLOW_SOFT } from '../../lib/style/colors';
 import { SkyDome } from './SkyDome';
 import { River } from './River';
+import { Buildings } from './Buildings';
+import { PulseController } from './PulseController';
 import { CityBloom } from './postfx/CityBloom';
 import { CityCameraDev } from './CityCameraDev';
 
@@ -53,6 +55,9 @@ export function CityScene() {
       </mesh>
 
       <River />
+
+      <Buildings />
+      <PulseController />
 
       <CityBloom />
       <CityCameraDev />
