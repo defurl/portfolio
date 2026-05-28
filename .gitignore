@@ -15,3 +15,5 @@ coverage
 phase-*-prompt.md
 src/generated
 captures
+conversation.json
+conversation.md

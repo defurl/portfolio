@@ -5,6 +5,11 @@
 
 ---
 
+## 2026-05-26 (phase 3b)
+- Did: phase 3b — build-time fetch (`scripts/fetch-github-repos.mjs`) writes `src/generated/city-buildings.json` via paginated /users/$USER/repos + per-repo /languages + /commits last-page header for total + /readme for `district:` frontmatter, with 7-day per-repo cache and a 6h top-level cache + cache-rebuild fallback when API hits rate limit. 23 of 27 repos surface; map to 5 districts. Buildings.tsx with deterministic spiral layout (tallest at district center), per-style proportions (industrial/fortress/glass/asymmetric/brutalist/hexagonal/static/container/default), style-specific roof accents, district-tinted emissive on the base mass. PulseController + directionPulse module-level ref drives ±15% emissive modulation lerped over ~3s; per-building useFrame applies. District labels via drei Billboard + Text.
+- Why: voxel grammar = same blocks + lighting, distinguished by silhouette/density/roof. Per-building Zustand subscriptions would re-render storm; module-level ref readable from useFrame keeps the React tree static.
+- Next: post checkpoint b gate → wait → checkpoint c (camera + interaction).
+
 ## 2026-05-25 (phase 3a)
 - Did: phase 3a city foundation — sky dome (vertex-shader gradient, three-band fog→glow→top, horizon color tracks marketStore.session over 6s, snaps under reduced-motion), river (8×120m emissive strip on x=0, sine modulation 0.5–0.7 over 6s, holds at 0.6 reduced), ground plane (200×200, BG_NIGHT base + emissive 0.02), FogExp2 BG_NIGHT 0.012, HemisphereLight BG_NIGHT/VOXEL_GLOW_SOFT @ 0.35, DirectionalLight VOXEL_GLOW_SOFT @ 0.4 no-shadow, AmbientLight BG_VOID @ 0.05, CityBloom postfx (threshold 0.4, catches the river only), CityCameraDev (DEV-only `window.__city.setCamera` hook for verification captures since the spec overview camera doesn't show sky over an empty ground). DeskData reused as the market-data bridge in CityRoute. CityRoute lazy chunk: 3.9 KB.
 - Why: phase 1A discipline — lighting and atmosphere before geometry. The sky shader needs explicit linear→sRGB encoding because ShaderMaterial outputs raw linear and the canvas treats it as sRGB (otherwise BG_VOID renders as pure black).
