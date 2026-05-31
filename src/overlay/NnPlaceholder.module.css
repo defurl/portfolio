@@ -1,0 +1,62 @@
+/* Atmospheric fallback shown while NnRoute's chunk loads.
+   "A dark concrete corridor light slowly flickering on." Pure CSS — no JS,
+   no asset deps. */
+.shell {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-void);
+  overflow: hidden;
+  pointer-events: none;
+}
+.corridor {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 60vmin;
+  height: 90vh;
+  transform: translate(-50%, -50%) perspective(900px) rotateX(8deg);
+  background:
+    linear-gradient(180deg,
+      var(--bg-void) 0%,
+      color-mix(in srgb, var(--bg-night) 70%, var(--bg-void)) 50%,
+      var(--bg-void) 100%);
+  border-left: 1px solid color-mix(in srgb, var(--bg-panel) 60%, transparent);
+  border-right: 1px solid color-mix(in srgb, var(--bg-panel) 60%, transparent);
+}
+.shaft {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(115deg,
+      transparent 35%,
+      color-mix(in srgb, var(--voxel-glow-soft) 35%, transparent) 50%,
+      transparent 65%);
+  opacity: 0;
+  animation: nn-flicker 2.8s ease-in-out infinite;
+}
+.label {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  color: var(--ink-faint);
+  opacity: 0.6;
+}
+@keyframes nn-flicker {
+  0%, 5%   { opacity: 0; }
+  6%       { opacity: 0.6; }
+  7%       { opacity: 0; }
+  10%, 12% { opacity: 0.45; }
+  13%      { opacity: 0; }
+  30%      { opacity: 0; }
+  45%, 80% { opacity: 0.55; }
+  100%     { opacity: 0.4; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .shaft {
+    animation: none;
+    opacity: 0.45;
+  }
+}

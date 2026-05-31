@@ -5,6 +5,11 @@
 
 ---
 
+## 2026-05-29 (phase 4a)
+- Did: phase 4a nn scaffolding — `nnLighting.ts` canonical hall dims (6m wide × 10m high × 4×15m segments + 1.5m gaps), `NnHall` with continuous floor, per-layer wall+ceiling segments (gaps read as light slots), instancedMesh attention-head columns (4 heads × 2 walls × 4 layers = 32), `NnCameraControls` first-person locked y=1.65m with WASD + drag-look clamped to ±45° yaw / ±15° pitch, x clamped to corridor width, z clamped to hall length, no bobbing, reduced-motion snaps velocity. `NnScene` composition: FogExp2 BG_VOID 0.025, HemisphereLight 0.18, 4 directional shafts VOXEL_GLOW_SOFT @ 3.5 cast through ceiling gaps. `NnPlaceholder` css-only flickering-light suspense fallback. `scripts/prerender-nn-route.mjs` postbuild emits dist/nn/index.html with NN meta tags. Per-route Suspense in App.tsx so /nn gets its own placeholder. **Branch committed incrementally per owner feedback**: 7 commits on the branch (hall geom, scene, controls, placeholder, route, prerender, capture).
+- Why: phase 1A discipline — geometry + lighting first, no neuron lights or particles yet. Bumped concrete from BG_NIGHT → BG_PANEL because pure BG_NIGHT with intensity-0.15 ambient rendered as solid black; the spec's "rich deep shadows" intent requires lit areas to be visible, which means the concrete material itself can't be at floor brightness.
+- Next: capture three frames → 4a gate → wait → 4b (neuron lights + token splines).
+
 ## 2026-05-28 (phase 3 closed)
 - Did: phase 3 closed — owner approved 3d, merged to main with --no-ff. Roadmap updated to show all four checkpoints done (A foundation, B buildings, C interactions, D transitions) and phase 4 marked active.
 - Why: exit gate met — city renders, breathes with the market, reachable via both desk-window and /city, OG image committed.
