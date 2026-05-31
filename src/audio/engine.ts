@@ -99,6 +99,14 @@ let tickPanner: any = null;
 let chordLoop: any = null;
 let bassLoop: any = null;
 
+// Phase 4D NN bus nodes — sustained drone wash, traversal-modulated filter.
+let nnFilter: any = null;
+let nnOsc1: any = null;
+let nnOsc2: any = null;
+let nnOsc3: any = null;
+let nnLfo: any = null;
+let nnTraversal = 0; // [0, 1] — corridor depth fraction
+
 // Engine state.
 let enabled = false;
 let currentScene: SceneKey = 'desk';
@@ -163,6 +171,28 @@ async function build(): Promise<void> {
     envelope: { attack: 0.001, decay: 0.05, sustain: 0, release: 0.05 },
     volume: 20 * Math.log10(TICK_GAIN),
   }).connect(tickFilter);
+
+  // Phase 4D — Neural Network bus: three sustained drone oscillators in a
+  // wide low-density minor triad, fed through a slow-LFO-modulated lowpass.
+  // The filter cutoff is also gently lifted by `nnTraversal` (0..1) so the
+  // tone "opens up" as the visitor walks deeper into the corridor and past
+  // chambers. Reverence-coded: no rhythm, infinite sustain, slow drift.
+  const nnReverb = new tone.Reverb({ decay: 12, wet: 0.7 }).connect(sceneBus.nn);
+  nnFilter = new tone.Filter(380, 'lowpass').connect(nnReverb);
+  nnLfo = new tone.LFO({ frequency: 0.05, min: 0, max: 220, type: 'sine' }).start();
+  nnLfo.connect(nnFilter.frequency);
+  const nnFreqs: ReadonlyArray<number> = [55, 82.41, 123.47]; // A1, E2, B2 — open minor
+  const nnGains = [0.12, 0.09, 0.07];
+  nnOsc1 = new tone.Oscillator(nnFreqs[0], 'sine').start();
+  nnOsc2 = new tone.Oscillator(nnFreqs[1], 'triangle').start();
+  nnOsc3 = new tone.Oscillator(nnFreqs[2], 'sine').start();
+  // Each oscillator into a small fixed-gain node, all into the NN filter.
+  const g1 = new tone.Gain(nnGains[0]).connect(nnFilter);
+  const g2 = new tone.Gain(nnGains[1]).connect(nnFilter);
+  const g3 = new tone.Gain(nnGains[2]).connect(nnFilter);
+  nnOsc1.connect(g1);
+  nnOsc2.connect(g2);
+  nnOsc3.connect(g3);
 
   // Chord loop — fires a chord on every half note. Pad voice runs continuously
   // via the long attack/release; we re-trigger to advance the cycle.
@@ -256,6 +286,18 @@ export function setReducedMotion(next: boolean): void {
   if (!built) return;
   padSynth.set({ portamento: next ? PAD_GLIDE_REDUCED_S : PAD_GLIDE_S });
   if (next) tone.getTransport().bpm.rampTo(60, BPM_RAMP_S);
+}
+
+/** Phase 4D — set the NN traversal fraction (0 = corridor entry, 1 = back
+ *  wall). Lifts the NN bus filter cutoff so the tone "opens up" as the
+ *  visitor walks deeper. Smoothed via rampTo to avoid filter zipper noise. */
+export function setNnTraversal(progress: number): void {
+  nnTraversal = Math.max(0, Math.min(1, progress));
+  if (!built || !nnFilter) return;
+  // Base 380 Hz + up to +900 Hz of opening; the LFO still wobbles ±220 Hz
+  // around the new target.
+  const target = 380 + nnTraversal * 900;
+  nnFilter.frequency.rampTo(target, 0.6);
 }
 
 // Kept for the 1B import path — no behavioral change vs setEnabled.
