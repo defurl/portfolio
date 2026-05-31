@@ -37,6 +37,7 @@ import { InteractiveObject } from './InteractiveObject';
 import { CameraRig } from './CameraRig';
 import { useInteractionStore } from '../../lib/stores/interactionStore';
 import { useDeskToCity } from './useDeskToCity';
+import { useDeskToNn } from './useDeskToNn';
 import { useAudioStore } from '../../lib/stores/audioStore';
 
 // The Night Desk scene. All eleven objects (10 visible + door-spill light)
@@ -51,6 +52,7 @@ import { useAudioStore } from '../../lib/stores/audioStore';
 export function DeskScene() {
   const focusObject = useInteractionStore(s => s.focusObject);
   const enterCity = useDeskToCity();
+  const enterNn = useDeskToNn();
 
   // Directional rim light needs a Three.js Object3D as its `.target`.
   const rimTarget = useMemo(() => {
@@ -245,6 +247,22 @@ export function DeskScene() {
         onActivate={() => focusObject('phone', 'contact')}
       >
         <Phone position={[0.7, 0, -0.1]} />
+      </InteractiveObject>
+
+      {/* Door spill hit area — the warm light patch on the floor camera-left
+          is the "doorway" into Layer 3. Wrap a transparent floor disc in an
+          InteractiveObject so the existing hover/label/click grammar
+          applies and the camera glides to the door focus pose. */}
+      <InteractiveObject
+        id="door"
+        label="step through"
+        labelPosition={[-1.0, 0.05, 0.3]}
+        onActivate={enterNn}
+      >
+        <mesh position={[-1.0, -0.73, 0.3]} rotation={[-Math.PI / 2, 0, 0]}>
+          <circleGeometry args={[0.45, 24]} />
+          <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+        </mesh>
       </InteractiveObject>
 
       <BloomLayer />
