@@ -8,6 +8,7 @@ import { InferenceChamber } from './InferenceChamber';
 import { CHAMBERS } from './chambers';
 import { NnBloom } from './postfx/NnBloom';
 import { NnAudioBridge } from './NnAudioBridge';
+import { NnWaypoints } from './NnWaypoints';
 import { useNnSettingsStore } from '../../lib/stores/nnSettingsStore';
 import projectIndex from '../../../content/projects.json';
 
@@ -116,6 +117,7 @@ export function NnScene() {
 
       <NnBloom />
       <NnAudioBridge />
+      <NnWaypoints />
     </>
   );
 }
