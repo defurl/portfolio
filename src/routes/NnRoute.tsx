@@ -5,6 +5,7 @@ import { DeskData } from '../scenes/desk/DeskData';
 import { AudioToggle } from '../overlay/AudioToggle';
 import { DeskAudio } from '../overlay/DeskAudio';
 import { FeedStatusBadge } from '../overlay/FeedStatusBadge';
+import { NnFidelityToggle } from '../overlay/NnFidelityToggle';
 
 // Phase 4A — Neural Network scaffolding.
 // Eye-level first-person camera (y=1.65m, FOV 60°). Lighting + hall geometry
@@ -29,6 +30,7 @@ export function NnRoute() {
         <NnCameraControls />
       </Canvas>
       <FeedStatusBadge />
+      <NnFidelityToggle />
       <AudioToggle />
       <DeskAudio />
       <DeskData />
