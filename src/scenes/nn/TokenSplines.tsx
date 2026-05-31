@@ -33,8 +33,9 @@ import {
 const SPLINES_PER_LAYER = 2; // one curve per wall-row
 const POOL_PER_SPLINE_HIFI = 80;
 const POOL_PER_SPLINE_STANDARD = 20;
-const PARTICLE_RADIUS = 0.06;
+const PARTICLE_RADIUS = 0.1;
 const PARTICLE_SPEED = 6.5; // m/s along curve length (approx)
+const PARTICLE_BRIGHTNESS = 1.8; // multiplier on the base district color
 
 function buildCurves(): CatmullRomCurve3[] {
   const out: CatmullRomCurve3[] = [];
@@ -86,12 +87,16 @@ export function TokenSplines() {
   // Pre-cache curve lengths (rough — CatmullRomCurve3.getLength).
   const curveLengths = useMemo(() => curves.map((c) => c.getLength()), [curves]);
 
-  // Set base colors once on mount/highfi-change.
+  // Set base colors once on mount/highfi-change. Pre-multiply by the
+  // brightness factor so the particles read as glowing rather than dim
+  // matte spheres against the concrete.
+  const colorScratch = useRef(new Color());
   useEffect(() => {
     const mesh = meshRef.current;
     if (!mesh) return;
     for (let i = 0; i < particles.length; i++) {
-      mesh.setColorAt(i, particles[i]!.color);
+      colorScratch.current.copy(particles[i]!.color).multiplyScalar(PARTICLE_BRIGHTNESS);
+      mesh.setColorAt(i, colorScratch.current);
     }
     if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
   }, [particles]);

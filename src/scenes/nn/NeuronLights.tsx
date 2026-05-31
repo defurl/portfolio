@@ -23,16 +23,23 @@ import {
 // Each instance has a deterministic phase offset so they don't pulse in
 // lockstep. Honors prefers-reduced-motion: holds at 0.8.
 
-const NEURON_RADIUS = 0.15;
+const NEURON_RADIUS = 0.2;
 const PER_LAYER = 8; // 8 neurons per wall per layer
-const WALL_INSET = 0.21; // 1cm proud of the wall surface
+// Walls span x ∈ [-HALL_WIDTH/2 - 0.2, -HALL_WIDTH/2 + 0.2] (0.4m thick),
+// so the corridor-facing surface is at -HALL_WIDTH/2 + 0.2. Place sphere
+// centers 0.5m in (0.3m proud of the inside wall surface) so the whole orb
+// is in front of the wall and reads from down the corridor.
+const WALL_INSET = 0.5;
 const Y_MIN = 0.8;
 const Y_MAX = HALL_HEIGHT - 0.8;
 
-const BASE = 0.3;
-const PEAK = 1.5;
+// Pulse range — spec is 0.3..1.5 but at the corridor's natural distances the
+// trough reads as nothing. Lift floor + peak so the rhythm registers and the
+// bloom pass picks up the highlights when hi-fi is on.
+const BASE = 0.7;
+const PEAK = 2.4;
 const PERIOD_S = 4;
-const REDUCED_INTENSITY = 0.8;
+const REDUCED_INTENSITY = 1.2;
 
 // Hash → [0, 1)
 function hash01(i: number, salt = 0): number {
