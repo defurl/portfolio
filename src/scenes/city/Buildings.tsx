@@ -3,6 +3,8 @@ import { useFrame, type ThreeEvent } from '@react-three/fiber';
 import { Billboard, Html, Text } from '@react-three/drei';
 import { type MeshStandardMaterial } from 'three';
 import { useCityStore } from '../../lib/stores/cityStore';
+import { useCityToNn } from './useCityToNn';
+import { neuralGatewayId } from './nnGateway';
 import labelStyles from '../desk/HoverLabel.module.css';
 import { BG_PANEL } from '../../lib/style/colors';
 import {
@@ -37,6 +39,8 @@ function Building({ data, geom, position, accentColor }: OneBuildingProps) {
   const windowsRef = useRef<MeshStandardMaterial>(null);
   const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { width, depth, height, style, emissiveScale, windowDensity } = geom;
+  const enterNn = useCityToNn();
+  const isGateway = data.id === neuralGatewayId();
 
   // Hover targetability is gated by city focus mode — only at district zoom.
   const hovered = useCityStore((s) => s.hovered === data.id);
@@ -80,6 +84,10 @@ function Building({ data, geom, position, accentColor }: OneBuildingProps) {
   const onClick = (e: ThreeEvent<MouseEvent>) => {
     if (!hoverable) return;
     e.stopPropagation();
+    if (isGateway) {
+      enterNn(data.id);
+      return;
+    }
     useCityStore.getState().openBuilding(data.id);
   };
 
