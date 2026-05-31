@@ -1,5 +1,9 @@
 import { BG_NIGHT, BG_VOID, VOXEL_GLOW_SOFT } from '../../lib/style/colors';
 import { NnHall } from './NnHall';
+import { NeuronLights } from './NeuronLights';
+import { TokenSplines } from './TokenSplines';
+import { NnBloom } from './postfx/NnBloom';
+import { useNnSettingsStore } from '../../lib/stores/nnSettingsStore';
 import {
   HEMISPHERE_INTENSITY,
   SHAFT_INTENSITY,
@@ -15,6 +19,7 @@ import { Object3D } from 'three';
 // light coming through the ceiling gaps. No fill — the contrast IS the form.
 
 export function NnScene() {
+  const highFi = useNnSettingsStore((s) => s.highFi);
   // DirectionalLight targets must be Object3D instances added to the scene
   // for three.js to use them; instantiate once per shaft.
   const shaftTargets = useMemo(
@@ -39,7 +44,8 @@ export function NnScene() {
         intensity={HEMISPHERE_INTENSITY}
       />
 
-      {/* Diagonal shafts through ceiling gaps — Ando-coded raking light. */}
+      {/* Diagonal shafts through ceiling gaps — Ando-coded raking light.
+          Dynamic shadows only in hi-fi mode (per §4.10). */}
       {SHAFT_POSITIONS.map((pos, i) => (
         <group key={i}>
           <primitive object={shaftTargets[i]!} />
@@ -48,7 +54,7 @@ export function NnScene() {
             target={shaftTargets[i]}
             color={VOXEL_GLOW_SOFT}
             intensity={SHAFT_INTENSITY}
-            castShadow
+            castShadow={highFi}
             shadow-mapSize-width={1024}
             shadow-mapSize-height={1024}
             shadow-camera-near={1}
@@ -63,6 +69,9 @@ export function NnScene() {
       ))}
 
       <NnHall />
+      <NeuronLights />
+      <TokenSplines />
+      <NnBloom />
     </>
   );
 }
