@@ -1,0 +1,27 @@
+/* U20 fidelity toggle — bottom-right, near AudioToggle but offset above so
+   the two affordances stack cleanly. Minimal, monospace, consistent with
+   the rest of the corner-allocation grammar. No glass-morphism. */
+.toggle {
+  position: fixed;
+  bottom: 3rem;
+  right: 1.5rem;
+  background: transparent;
+  border: 1px solid var(--ink-ghost);
+  padding: 0.3rem 0.7rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: var(--ink-faint);
+  cursor: pointer;
+  z-index: 30;
+  transition: color var(--dur-ui) var(--ease-ui), border-color var(--dur-ui) var(--ease-ui);
+}
+.toggle:hover,
+.toggle:focus-visible {
+  color: var(--signal-amber);
+  border-color: var(--signal-amber);
+}
+.toggle[data-active='true'] {
+  color: var(--signal-amber);
+  border-color: var(--signal-amber);
+}
