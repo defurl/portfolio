@@ -88,23 +88,43 @@ All three checkpoints merged to `main`. The Night Desk renders, eleven hand-buil
 
 **Goal:** the city outside the window is a place, and it breathes with the market.
 
-- [ ] CityScene: orthographic-ish camera with slight perspective, mid-fog
-- [ ] District layout: ≥3 districts (research / trading / infrastructure) with sign decals
-- [ ] Building component: instanced mesh, per-instance height/color/light-density/pulse-phase
-- [ ] Symbol → building mapping committed in `content/symbols.json`
-- [ ] Live mapping wired (height, color tint, window density, pulse rate, sky color, skyline glow)
-- [ ] Window-from-desk now shows the actual city scene at reduced res (0.4×, fps-capped)
-- [ ] Camera enters via 2–3s glide from desk; deep-link `/city` plays 1.2s fade-in
-- [ ] Building hover → callout: symbol + live price (Departure Mono)
-- [ ] Building click → zoom into building → project list for that district
-- [ ] `audio/city.ts`: pad keyed to index direction, bass tempo from VIX, trade ticks
-- [ ] Reduced-motion: no drift, no pulse, no glide
-- [ ] Mobile: lower instance count, simplified pulse, no traffic streams
+### Checkpoint A — foundation ✅ *(merged 2026-05-25)*
+- [x] CityScene composition (sky dome shader, FogExp2, hemisphere ambient, moon directional, ambient)
+- [x] Session-driven sky horizon (6s lerp, ShaderMaterial with linear→sRGB encode)
+- [x] River (emissive strip at x=0, slow sine breath)
+- [x] CityBloom postfx (river only)
 
-**Exit gate:** During market hours, watching the city for 30s feels alive in a way that maps to the actual market.
+### Checkpoint B — buildings ✅ *(merged 2026-05-26)*
+- [x] Build-time GitHub fetch with per-repo + top-level cache + cache-rebuild fallback
+- [x] Buildings driven by real public repos (23 from `defurl`)
+- [x] District layout (spiral, tallest-center, deterministic jitter)
+- [x] Style → silhouette + roof variants (industrial / fortress / glass / etc.)
+- [x] Per-district color tint, archive dimming, runtime pulse from `index.direction`
+- [x] Drei Billboard + Text district labels
 
-**Phase 3 risk — window rim-light interplay shifts when the real city lands.**
-Checkpoint A ships a placeholder "city beyond" (two stacked emissive planes at `VOXEL_GLOW_SOFT`, intensity 1.4/0.55) visible through the right-wall window. When Phase 3 replaces it with the real voxel skyline — hundreds of individual building lights — the average luminance behind the glass will change, possibly significantly. The wall area around the window may suddenly read brighter (many lit windows) or dimmer (depending on the city's average luminance vs. the placeholder). The desk scene's rim-light balance (currently `VOXEL_GLOW_SOFT` DirectionalLight at intensity 1.2) will likely need a re-tune once the real city is in. Not a bug — a planned iteration. Budget a desk-scene lighting re-verification pass when the window-from-desk render goes live.
+### Checkpoint C — interactions ✅ *(merged 2026-05-27)*
+- [x] Hover-and-pan camera with parallax trail + orbital drift
+- [x] District label click → 2.5s ease-in-out glide (Y=18, Z+32, isometric)
+- [x] Building hover (gated to in-district close-range), +20% emissive lift, debounced 200ms, drei `<Html>` callout
+- [x] Building click → ProjectPanel reuse with lazy README fetch via marked
+- [x] Centralized layout in `lib/content/buildings.ts` (`getPlacedBuildings()`, `findPlaced`, `districtOf`)
+- [x] Collision-free dynamic building pose (`bH * 0.65 + 3` altitude, `bz + 10` z-offset)
+- [x] Context-aware back affordance: building → district → overview → desk
+
+### Checkpoint D — transitions ✅ *(merged 2026-05-28)*
+- [x] Desk window click → 1.5s glide + 300ms fade-to-black + navigate
+- [x] City entry from south pose, 2s glide to overview with 1.2s fade-in
+- [x] `/city` deep-link with 1.2s fade-in from BG_VOID
+- [x] Back-to-desk affordance (overview mode) with 300ms fade + navigate
+- [x] OG image rendered (1200×630) committed to `public/og-city.png`
+- [x] `dist/city/index.html` emitted with city-specific og:image/title/description
+- [x] Reduced-motion: all glides + fades skipped, immediate navigation
+
+**Phase 3 closure — 2026-05-28 ✅**
+
+All four checkpoints merged. The city renders, breathes with the market, and is reachable via both desk-window and `/city` URL. Carried forward to Phase 5 polish: desk-wake-up sequence on `/`-from-`/city` deep-link, OG image render with overlay affordances hidden, instanced per-window meshes (current build uses single emissive box per building), live-data adapter ladder, mobile city. **Phase 4 is now active.**
+
+**Phase 3 risk — window rim-light interplay shifts when the real city lands.** [original risk note retained] When the real voxel skyline replaces the desk window's placeholder, the desk's rim-light balance may need a re-tune. Budget a desk-scene lighting re-verification pass when window-shows-real-city ships (Phase 5 work).
 
 ## Phase 4 — Layer 3, the Neural Network *(week 6–7)*
 

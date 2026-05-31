@@ -5,6 +5,11 @@
 
 ---
 
+## 2026-05-28 (phase 3 closed)
+- Did: phase 3 closed — owner approved 3d, merged to main with --no-ff. Roadmap updated to show all four checkpoints done (A foundation, B buildings, C interactions, D transitions) and phase 4 marked active.
+- Why: exit gate met — city renders, breathes with the market, reachable via both desk-window and /city, OG image committed.
+- Next: phase 4 — inside the neural network. Awaiting phase-4-prompt.md from owner before branching.
+
 ## 2026-05-28 (phase 3d)
 - Did: phase 3d transitions — `transitionStore` + `SceneFade` overlay at App root; desk window click `useDeskToCity` orchestrates audio scene crossfade → existing window focus glide (1.5s) → 300ms fade-to-black → navigate('/city'). CityRoute mounts with `CityEntry` (deep-link: black → 1.2s fade-in; from-window: rig snaps to south-entry pose (0,32,95)→(0,6,0) then glides 2s to overview while fade-in plays). DeskRoute mount handles the inbound fade-out → fade-in if returning from /city. `CityBack` extended: 'overview' mode now reads "← back to desk" and triggers a 300ms fade-out + navigate('/'). Reduced-motion path skips all glides + fades. `scripts/prerender-city-route.mjs` postbuild emits `dist/city/index.html` with city-specific og:image/title/description (3/3 swaps). `scripts/generate-og-city.mjs` (manual-run) saved `public/og-city.png` 1200×630. New `pnpm og:city` script.
 - Why: phase 3 exit requires both entry paths working + an OG image. Single transitionStore keeps the timeline coherent across desk↔city and respects FR-26 reduced-motion at every step.
