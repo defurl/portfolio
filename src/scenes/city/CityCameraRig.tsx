@@ -1,8 +1,9 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Vector3 } from 'three';
 import { useCityStore, type CityFocus } from '../../lib/stores/cityStore';
 import { useSceneStore } from '../../lib/stores/sceneStore';
+import { useTransitionStore } from '../../lib/stores/transitionStore';
 import {
   DISTRICT_DEFS,
   findPlaced,
@@ -23,8 +24,14 @@ import {
 const OVERVIEW_POS: [number, number, number] = [0, 20, 35];
 const OVERVIEW_TARGET: [number, number, number] = [0, 0, 0];
 
+// Entry pose for the desk-window arrival. Further south and higher than
+// overview; rig glides from here to overview over ENTRY_GLIDE_DURATION_S.
+const ENTRY_POS: [number, number, number] = [0, 32, 95];
+const ENTRY_TARGET: [number, number, number] = [0, 6, 0];
+
 const PAN_LERP_K = 5;           // ≈ 200ms to settle
 const GLIDE_DURATION_S = 2.5;
+const ENTRY_GLIDE_DURATION_S = 2.0;
 const DRIFT_PERIOD_S = 6;
 const DRIFT_RADIUS = 0.6;
 
@@ -84,8 +91,33 @@ export function CityCameraRig() {
   const toTgt = useRef(new Vector3(...OVERVIEW_TARGET));
   const lookAt = useRef(new Vector3(...OVERVIEW_TARGET));
   const glideElapsedS = useRef(GLIDE_DURATION_S); // start "settled"
+  const glideTotalS = useRef(GLIDE_DURATION_S);
   const lastFocusKey = useRef<string>('overview');
   const driftT = useRef(0);
+
+  // Entry handling: on mount, if cityStore.entry === 'from-window', set up a
+  // glide from ENTRY_POS to OVERVIEW_POS over ENTRY_GLIDE_DURATION_S. The fade
+  // overlay is driven separately by CityEntry → transitionStore.
+  useEffect(() => {
+    const entry = useCityStore.getState().entry;
+    const reduced = useSceneStore.getState().prefersReducedMotion;
+    if (entry !== 'from-window' || reduced) return;
+    camera.position.set(...ENTRY_POS);
+    lookAt.current.set(...ENTRY_TARGET);
+    camera.lookAt(lookAt.current);
+    fromPos.current.set(...ENTRY_POS);
+    fromTgt.current.set(...ENTRY_TARGET);
+    toPos.current.set(...OVERVIEW_POS);
+    toTgt.current.set(...OVERVIEW_TARGET);
+    glideElapsedS.current = 0;
+    glideTotalS.current = ENTRY_GLIDE_DURATION_S;
+    // Pretend the focus key changed so the rig's glide branch runs.
+    lastFocusKey.current = 'entry';
+    // Kick the transition fade-in next frame.
+    requestAnimationFrame(() =>
+      useTransitionStore.getState().setPhase('fading-in'),
+    );
+  }, [camera]);
 
   // Cursor tracking — pointermove on the canvas element.
   useFrame((_, dt) => {
@@ -106,13 +138,15 @@ export function CityCameraRig() {
       fromTgt.current.copy(lookAt.current);
       toPos.current.set(...dest.pos);
       toTgt.current.set(...dest.target);
-      glideElapsedS.current = reduced ? GLIDE_DURATION_S : 0;
+      glideTotalS.current = GLIDE_DURATION_S;
+      glideElapsedS.current = reduced ? glideTotalS.current : 0;
     }
 
-    // Glide in progress: lerp toward dest.
-    if (glideElapsedS.current < GLIDE_DURATION_S) {
-      glideElapsedS.current = Math.min(glideElapsedS.current + dt, GLIDE_DURATION_S);
-      const t = easeInOutCubic(glideElapsedS.current / GLIDE_DURATION_S);
+    // Glide in progress: lerp toward dest using glideTotalS (varies between
+    // GLIDE_DURATION_S for focus changes and ENTRY_GLIDE_DURATION_S for entry).
+    if (glideElapsedS.current < glideTotalS.current) {
+      glideElapsedS.current = Math.min(glideElapsedS.current + dt, glideTotalS.current);
+      const t = easeInOutCubic(glideElapsedS.current / glideTotalS.current);
       camera.position.lerpVectors(fromPos.current, toPos.current, t);
       lookAt.current.lerpVectors(fromTgt.current, toTgt.current, t);
       camera.lookAt(lookAt.current);

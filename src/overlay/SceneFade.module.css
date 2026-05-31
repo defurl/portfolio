@@ -1,0 +1,27 @@
+/* Full-screen fade overlay used during scene transitions. Mounts at root
+   level so it can sit above both Canvas and DOM panels. opacity transitions
+   based on the data-state attr; pointer-events only block while opaque. */
+.fade {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-void);
+  pointer-events: none;
+  opacity: 0;
+  z-index: 100;
+  transition: opacity 300ms var(--ease-ui);
+}
+.fade[data-phase='fading-out'] {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 300ms var(--ease-ui);
+}
+.fade[data-phase='black'] {
+  opacity: 1;
+  pointer-events: auto;
+  transition: none;
+}
+.fade[data-phase='fading-in'] {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1200ms var(--ease-reveal, ease-out);
+}

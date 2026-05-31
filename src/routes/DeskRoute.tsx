@@ -1,5 +1,7 @@
+import { useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { DeskScene } from '../scenes/desk/DeskScene';
+import { useTransitionStore } from '../lib/stores/transitionStore';
 import { AudioToggle } from '../overlay/AudioToggle';
 import { ProjectPanel } from '../overlay/ProjectPanel';
 import { TerminalPanel } from '../overlay/TerminalPanel';
@@ -17,6 +19,22 @@ import { useSceneStore } from '../lib/stores/sceneStore';
 // derived from these initial Canvas params plus the lookAt invocation.
 export function DeskRoute() {
   const isMobile = useSceneStore(s => s.isMobile);
+
+  // If the transition fade is currently 'black' (came from /city) or
+  // 'fading-out' (interrupted), kick a fade-in next frame so the desk
+  // reveals smoothly rather than popping in.
+  useEffect(() => {
+    const phase = useTransitionStore.getState().phase;
+    if (phase === 'black' || phase === 'fading-out') {
+      requestAnimationFrame(() =>
+        useTransitionStore.getState().setPhase('fading-in'),
+      );
+      const t = setTimeout(() => {
+        useTransitionStore.getState().setPhase('idle');
+      }, 1300);
+      return () => clearTimeout(t);
+    }
+  }, []);
 
   const cameraProps = isMobile
     ? { position: [0, 1.6, 2.4] as [number, number, number], fov: 38 }

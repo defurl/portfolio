@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { TextRoute } from './routes/TextRoute';
 import { LampPlaceholder } from './overlay/LampPlaceholder';
+import { SceneFade } from './overlay/SceneFade';
 import { useReducedMotion } from './lib/motion/reducedMotion';
 import { useIsMobile } from './lib/motion/useMediaQuery';
 import { useSceneStore } from './lib/stores/sceneStore';
@@ -44,6 +45,7 @@ export function App() {
           <Route path="/debug/replay" element={<DebugReplayRoute />} />
         </Routes>
       </Suspense>
+      <SceneFade />
     </div>
   );
 }
