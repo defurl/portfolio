@@ -1,0 +1,54 @@
+/* Project wall-panel rendered inside an NN chamber via drei <Html>.
+   Solid concrete-slab aesthetic — high contrast, monospace + display
+   serif typography (matches the desk's ProjectPanel), no glass-morphism,
+   no rounded cards, hard-edge feel consistent with Tadao Ando grammar. */
+.slab {
+  width: 360px;
+  padding: 1.5rem 1.75rem;
+  background: var(--bg-panel-2);
+  border-left: 2px solid var(--signal-amber);
+  color: var(--ink-paper);
+  font-family: var(--font-body);
+  user-select: none;
+}
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  color: var(--ink-faint);
+  margin: 0 0 0.6rem 0;
+  text-transform: uppercase;
+}
+.title {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: var(--step-2);
+  margin: 0 0 0.8rem 0;
+  color: var(--ink-paper);
+  line-height: 1.15;
+}
+.thesis {
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--ink-muted);
+  margin: 0;
+}
+.links {
+  display: flex;
+  gap: 1rem;
+  margin: 1.2rem 0 0 0;
+  padding: 0;
+  list-style: none;
+}
+.links a {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--signal-amber);
+  text-decoration: none;
+  letter-spacing: 0.04em;
+}
+.links a:hover,
+.links a:focus-visible {
+  text-decoration: underline;
+}
