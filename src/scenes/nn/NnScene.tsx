@@ -2,8 +2,24 @@ import { BG_NIGHT, BG_VOID, VOXEL_GLOW_SOFT } from '../../lib/style/colors';
 import { NnHall } from './NnHall';
 import { NeuronLights } from './NeuronLights';
 import { TokenSplines } from './TokenSplines';
+import { NnChamber } from './NnChamber';
+import { ChamberPanel } from './ChamberPanel';
+import { InferenceChamber } from './InferenceChamber';
+import { CHAMBERS } from './chambers';
 import { NnBloom } from './postfx/NnBloom';
 import { useNnSettingsStore } from '../../lib/stores/nnSettingsStore';
+import projectIndex from '../../../content/projects.json';
+
+interface ProjectIndexEntry {
+  id: string;
+  title: string;
+  category: string;
+  district: string;
+  thesis: string;
+  links: Array<{ label: string; url: string }>;
+}
+const projects = (projectIndex as { projects: ProjectIndexEntry[] }).projects;
+const projectById = new Map(projects.map((p) => [p.id, p] as const));
 import {
   HEMISPHERE_INTENSITY,
   SHAFT_INTENSITY,
@@ -71,6 +87,32 @@ export function NnScene() {
       <NnHall />
       <NeuronLights />
       <TokenSplines />
+
+      {/* Chambers — project rooms branching off the layer gaps + the
+          inference chamber at the end of the hall. */}
+      {CHAMBERS.map((cfg) => {
+        if (cfg.projectId === null) {
+          return (
+            <NnChamber key={cfg.id} config={cfg}>
+              <InferenceChamber side={cfg.side} />
+            </NnChamber>
+          );
+        }
+        const p = projectById.get(cfg.projectId);
+        if (!p) return null;
+        return (
+          <NnChamber key={cfg.id} config={cfg}>
+            <ChamberPanel
+              side={cfg.side}
+              eyebrow={cfg.label}
+              title={p.title}
+              thesis={p.thesis}
+              links={p.links}
+            />
+          </NnChamber>
+        );
+      })}
+
       <NnBloom />
     </>
   );
