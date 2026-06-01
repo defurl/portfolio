@@ -3,6 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { Euler, MathUtils, Vector3 } from 'three';
 import { HALL_TOTAL_Z, HALL_WIDTH } from './nnLighting';
 import { useSceneStore } from '../../lib/stores/sceneStore';
+import { nnWalkTarget } from './nnWalkTarget';
 
 // First-person eye-level walk controls.
 //
@@ -142,11 +143,29 @@ export function NnCameraControls() {
       -X_CLAMP,
       X_CLAMP,
     );
-    camera.position.z = MathUtils.clamp(
-      camera.position.z + velocity.current.z * dt,
-      Z_BACK,
-      Z_FRONT,
-    );
+
+    // Mobile waypoint glide — if a target z is set (NnWaypoints tap) and the
+    // visitor isn't actively WASD-ing, lerp z toward it. Cancels naturally on
+    // any keyboard input by clearing the target.
+    const intendedWasdZ = velocity.current.z;
+    if (nnWalkTarget.z !== null && Math.abs(intendedWasdZ) < 0.05) {
+      const dz = nnWalkTarget.z - camera.position.z;
+      if (Math.abs(dz) < 0.3) {
+        camera.position.z = nnWalkTarget.z;
+        nnWalkTarget.z = null;
+      } else {
+        camera.position.z += dz * Math.min(1, 2.2 * dt);
+      }
+    } else {
+      if (nnWalkTarget.z !== null && Math.abs(intendedWasdZ) >= 0.05) {
+        nnWalkTarget.z = null;
+      }
+      camera.position.z = MathUtils.clamp(
+        camera.position.z + velocity.current.z * dt,
+        Z_BACK,
+        Z_FRONT,
+      );
+    }
     camera.position.y = EYE_HEIGHT; // no bobbing, no flight
 
     const e = new Euler(pitch.current, yaw.current, 0, 'YXZ');
