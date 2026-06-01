@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { Vector3 } from 'three';
+import { Vector3, MathUtils } from 'three';
 import { useCityStore, type CityFocus } from '../../lib/stores/cityStore';
 import { useSceneStore } from '../../lib/stores/sceneStore';
 import { useTransitionStore } from '../../lib/stores/transitionStore';
@@ -10,34 +10,28 @@ import {
   type District,
 } from '../../lib/content/buildings';
 
-// City camera state machine.
+// High-Fidelity City Camera Controller Overhaul (Phase 4D / Redesign)
 //
-// Three modes:
-//   - overview: pan with cursor (lookAt = (cursorX*15, 0, cursorY*10)),
-//     200ms lerp. Subtle orbital drift adds organic motion when the cursor
-//     is still. Camera position trails the target slightly for parallax.
-//   - district: glide to a fixed close-up pose over 2.5s.
-//   - building: small forward nudge toward the building's position.
+// Strips away passive cursor drift to give visitors absolute spatial agency.
+// Supports two primary modes governed by `cityStore.navigationMode`:
 //
-// Reduced motion: pan disabled, glides become snaps.
+// 1. orbit: Overview skyline perspective.
+//    - Left-click dragging rotates the camera orbit around center (0,0,0) in 360° spherical coords.
+//    - Pitch is clamped between 10° and 72° to preserve ground floor framing.
+//    - Distict/Building zooms trigger the classic smooth 2.5s glides.
+//
+// 2. street: Walk eye-level Street POV view (Y = 1.65m).
+//    - Mouse/touch dragging looks around in a 360-degree first-person view.
+//    - Tapping street path waypoints sets a target, gliding the camera smoothly at 15m/s to navigate.
+//
+// Prefers-reduced-motion: Disables all dragging movement, and snaps focus transitions instantly.
 
-const OVERVIEW_POS: [number, number, number] = [0, 20, 35];
-const OVERVIEW_TARGET: [number, number, number] = [0, 0, 0];
-
-// Entry pose for the desk-window arrival. Further south and higher than
-// overview; rig glides from here to overview over ENTRY_GLIDE_DURATION_S.
-const ENTRY_POS: [number, number, number] = [0, 32, 95];
-const ENTRY_TARGET: [number, number, number] = [0, 6, 0];
-
-const PAN_LERP_K = 5;           // ≈ 200ms to settle
+const ORBIT_RADIUS = 46;
+const STREET_EYE_HEIGHT = 1.65;
 const GLIDE_DURATION_S = 2.5;
 const ENTRY_GLIDE_DURATION_S = 2.0;
-const DRIFT_PERIOD_S = 6;
-const DRIFT_RADIUS = 0.6;
 
-// District zoom — high-altitude tilted isometric view that frames the whole
-// district without sitting nose-to-glass with the front-row buildings. Y=18
-// + Z+32 + lookAt y=1.5 yields a Ghibli-skyline composition under FOV 35°.
+// High altitude tilted district zoom pose
 function districtPose(d: District): {
   pos: [number, number, number];
   target: [number, number, number];
@@ -46,15 +40,13 @@ function districtPose(d: District): {
   return { pos: [cx, 18, cz + 32], target: [cx, 1.5, cz] };
 }
 
-// Building focus — camera lands in the row-gap *behind* the building (z+10),
-// at an isometric altitude derived from the building's own height so the
-// lens never sits inside the mesh and front-row neighbours don't occlude.
+// Building focus camera pose
 function buildingPose(buildingId: string): {
   pos: [number, number, number];
   target: [number, number, number];
 } {
   const pb = findPlaced(buildingId);
-  if (!pb) return { pos: OVERVIEW_POS, target: OVERVIEW_TARGET };
+  if (!pb) return { pos: [0, 20, 35], target: [0, 0, 0] };
   const [bx, , bz] = pb.position;
   const bH = pb.geom.height;
   return {
@@ -69,7 +61,7 @@ function targetFor(focus: CityFocus): {
 } {
   switch (focus.mode) {
     case 'overview':
-      return { pos: OVERVIEW_POS, target: OVERVIEW_TARGET };
+      return { pos: [0, 20, 35], target: [0, 0, 0] };
     case 'district':
       return districtPose(focus.district);
     case 'building':
@@ -81,135 +73,226 @@ export function CityCameraRig() {
   const camera = useThree((s) => s.camera);
   const gl = useThree((s) => s.gl);
 
-  // Cursor in normalized [-1, 1] coordinates.
-  const cursor = useRef<[number, number]>([0, 0]);
+  // 1. Store subscriptions
+  const navigationMode = useCityStore((s) => s.navigationMode);
+  const streetWalkTarget = useCityStore((s) => s.streetWalkTarget);
 
-  // Glide state — animates camera pose toward the focus-mode target.
-  const fromPos = useRef(new Vector3(...OVERVIEW_POS));
-  const fromTgt = useRef(new Vector3(...OVERVIEW_TARGET));
-  const toPos = useRef(new Vector3(...OVERVIEW_POS));
-  const toTgt = useRef(new Vector3(...OVERVIEW_TARGET));
-  const lookAt = useRef(new Vector3(...OVERVIEW_TARGET));
-  const glideElapsedS = useRef(GLIDE_DURATION_S); // start "settled"
+  // 2. Camera Drag & Rotation state
+  const dragging = useRef(false);
+
+  // Orbit spherical coordinate refs
+  const orbitYaw = useRef(0.2); // slight default angle
+  const orbitPitch = useRef(0.5); // tilted looking down
+  const orbitTargetPos = useRef(new Vector3());
+
+  // Street First-Person Look refs
+  const streetYaw = useRef(Math.PI); // face down Z (down the main avenue)
+  const streetPitch = useRef(0.0);
+  const streetTargetLook = useRef(new Vector3());
+
+  // Glide / Transition refs
+  const fromPos = useRef(new Vector3());
+  const fromTgt = useRef(new Vector3());
+  const toPos = useRef(new Vector3());
+  const toTgt = useRef(new Vector3());
+  const lookAt = useRef(new Vector3());
+  const glideElapsedS = useRef(GLIDE_DURATION_S);
   const glideTotalS = useRef(GLIDE_DURATION_S);
   const lastFocusKey = useRef<string>('overview');
-  const driftT = useRef(0);
 
-  // Entry handling: on mount, if cityStore.entry === 'from-window', set up a
-  // glide from ENTRY_POS to OVERVIEW_POS over ENTRY_GLIDE_DURATION_S. The fade
-  // overlay is driven separately by CityEntry → transitionStore.
+  // Entry handling: glide down from southern sky on Desk arrival
   useEffect(() => {
     const entry = useCityStore.getState().entry;
     const reduced = useSceneStore.getState().prefersReducedMotion;
-    if (entry !== 'from-window' || reduced) return;
-    camera.position.set(...ENTRY_POS);
-    lookAt.current.set(...ENTRY_TARGET);
+    const initialPos: [number, number, number] = [0, 32, 95];
+    const initialTgt: [number, number, number] = [0, 6, 0];
+
+    if (entry !== 'from-window' || reduced) {
+      // Direct positioning
+      if (navigationMode === 'orbit') {
+        const dest = targetFor(useCityStore.getState().focus);
+        camera.position.set(...dest.pos);
+        lookAt.current.set(...dest.target);
+        camera.lookAt(lookAt.current);
+      } else {
+        camera.position.set(0, STREET_EYE_HEIGHT, 30);
+        streetTargetLook.current.set(0, STREET_EYE_HEIGHT, 0);
+        camera.lookAt(streetTargetLook.current);
+      }
+      return;
+    }
+
+    camera.position.set(...initialPos);
+    lookAt.current.set(...initialTgt);
     camera.lookAt(lookAt.current);
-    fromPos.current.set(...ENTRY_POS);
-    fromTgt.current.set(...ENTRY_TARGET);
-    toPos.current.set(...OVERVIEW_POS);
-    toTgt.current.set(...OVERVIEW_TARGET);
+    fromPos.current.set(...initialPos);
+    fromTgt.current.set(...initialTgt);
+    toPos.current.set(0, 20, 35);
+    toTgt.current.set(0, 0, 0);
     glideElapsedS.current = 0;
     glideTotalS.current = ENTRY_GLIDE_DURATION_S;
-    // Pretend the focus key changed so the rig's glide branch runs.
     lastFocusKey.current = 'entry';
-    // Kick the transition fade-in next frame.
+
     requestAnimationFrame(() =>
       useTransitionStore.getState().setPhase('fading-in'),
     );
-  }, [camera]);
+  }, [camera, navigationMode]);
 
-  // Cursor tracking — pointermove on the canvas element.
+  // Pointer drag listener setup
+  useEffect(() => {
+    const el = gl.domElement;
+
+    const onPointerDown = (e: PointerEvent) => {
+      if (e.button !== 0) return; // only left click drags
+      dragging.current = true;
+      el.setPointerCapture(e.pointerId);
+    };
+
+    const onPointerUp = (e: PointerEvent) => {
+      dragging.current = false;
+      el.releasePointerCapture(e.pointerId);
+    };
+
+    const onPointerMove = (e: PointerEvent) => {
+      const reduced = useSceneStore.getState().prefersReducedMotion;
+      if (!dragging.current || reduced) return;
+
+      const sensitivity = 0.0035;
+
+      if (navigationMode === 'orbit') {
+        // Orbit: drag rotates camera around the city center
+        orbitYaw.current -= e.movementX * sensitivity;
+        orbitPitch.current += e.movementY * sensitivity;
+        // Clamp pitch to prevent going completely under ground or straight overhead
+        orbitPitch.current = MathUtils.clamp(
+          orbitPitch.current,
+          MathUtils.degToRad(8),
+          MathUtils.degToRad(70)
+        );
+      } else {
+        // Street POV: drag rotates first-person look direction
+        streetYaw.current -= e.movementX * sensitivity;
+        streetPitch.current -= e.movementY * sensitivity;
+        // Clamp pitch to prevent looking straight up/down
+        streetPitch.current = MathUtils.clamp(streetPitch.current, -0.6, 0.65);
+      }
+    };
+
+    el.addEventListener('pointerdown', onPointerDown);
+    el.addEventListener('pointerup', onPointerUp);
+    el.addEventListener('pointermove', onPointerMove);
+
+    return () => {
+      el.removeEventListener('pointerdown', onPointerDown);
+      el.removeEventListener('pointerup', onPointerUp);
+      el.removeEventListener('pointermove', onPointerMove);
+    };
+  }, [gl, navigationMode]);
+
   useFrame((_, dt) => {
     const focus = useCityStore.getState().focus;
     const reduced = useSceneStore.getState().prefersReducedMotion;
 
-    // Detect focus change → kick off a new glide.
-    const key =
-      focus.mode === 'overview'
-        ? 'overview'
-        : focus.mode === 'district'
-          ? `district:${focus.district}`
-          : `building:${focus.buildingId}`;
-    if (key !== lastFocusKey.current) {
-      lastFocusKey.current = key;
-      const dest = targetFor(focus);
-      fromPos.current.copy(camera.position);
-      fromTgt.current.copy(lookAt.current);
-      toPos.current.set(...dest.pos);
-      toTgt.current.set(...dest.target);
-      glideTotalS.current = GLIDE_DURATION_S;
-      glideElapsedS.current = reduced ? glideTotalS.current : 0;
+    // --- 1. HANDLE DISTRICT/BUILDING GLIDES (Orbit Mode only) ---
+    if (navigationMode === 'orbit') {
+      const key =
+        focus.mode === 'overview'
+          ? 'overview'
+          : focus.mode === 'district'
+            ? `district:${focus.district}`
+            : `building:${focus.buildingId}`;
+
+      if (key !== lastFocusKey.current) {
+        lastFocusKey.current = key;
+        const dest = targetFor(focus);
+        fromPos.current.copy(camera.position);
+        fromTgt.current.copy(lookAt.current);
+        toPos.current.set(...dest.pos);
+        toTgt.current.set(...dest.target);
+        glideTotalS.current = GLIDE_DURATION_S;
+        glideElapsedS.current = reduced ? glideTotalS.current : 0;
+      }
+
+      if (glideElapsedS.current < glideTotalS.current) {
+        glideElapsedS.current = Math.min(glideElapsedS.current + dt, glideTotalS.current);
+        const t = easeInOutCubic(glideElapsedS.current / glideTotalS.current);
+        camera.position.lerpVectors(fromPos.current, toPos.current, t);
+        lookAt.current.lerpVectors(fromTgt.current, toTgt.current, t);
+        camera.lookAt(lookAt.current);
+        return;
+      }
     }
 
-    // Glide in progress: lerp toward dest using glideTotalS (varies between
-    // GLIDE_DURATION_S for focus changes and ENTRY_GLIDE_DURATION_S for entry).
-    if (glideElapsedS.current < glideTotalS.current) {
-      glideElapsedS.current = Math.min(glideElapsedS.current + dt, glideTotalS.current);
-      const t = easeInOutCubic(glideElapsedS.current / glideTotalS.current);
-      camera.position.lerpVectors(fromPos.current, toPos.current, t);
-      lookAt.current.lerpVectors(fromTgt.current, toTgt.current, t);
-      camera.lookAt(lookAt.current);
-      return;
-    }
+    // --- 2. ACTIVE NAVIGATION MODES ---
+    if (navigationMode === 'orbit') {
+      // --- ORBIT MODE OVERVIEW ACTIVE ROTATION ---
+      if (focus.mode === 'overview') {
+        const radius = ORBIT_RADIUS;
+        const cosP = Math.cos(orbitPitch.current);
+        const sinP = Math.sin(orbitPitch.current);
+        const cosY = Math.cos(orbitYaw.current);
+        const sinY = Math.sin(orbitYaw.current);
 
-    // Glide settled. Per-mode behaviour:
-    if (focus.mode !== 'overview') {
-      camera.position.copy(toPos.current);
-      lookAt.current.copy(toTgt.current);
-      camera.lookAt(lookAt.current);
-      return;
-    }
+        // Spherical coordinate position
+        orbitTargetPos.current.set(
+          radius * cosP * sinY,
+          radius * sinP,
+          radius * cosP * cosY
+        );
 
-    // Overview: cursor pan + drift.
-    if (reduced) {
-      camera.position.set(...OVERVIEW_POS);
-      lookAt.current.set(...OVERVIEW_TARGET);
-      camera.lookAt(lookAt.current);
-      return;
-    }
-    driftT.current += dt;
-    const driftPhase = (driftT.current / DRIFT_PERIOD_S) * Math.PI * 2;
-    const driftX = Math.cos(driftPhase) * DRIFT_RADIUS;
-    const driftZ = Math.sin(driftPhase) * DRIFT_RADIUS * 0.4;
+        if (reduced) {
+          camera.position.copy(orbitTargetPos.current);
+          lookAt.current.set(0, 0, 0);
+        } else {
+          // Smoothly lerp to orbit target position for organic lag feeling
+          camera.position.lerp(orbitTargetPos.current, Math.min(1, 4 * dt));
+          lookAt.current.lerp(new Vector3(0, 0, 0), Math.min(1, 4 * dt));
+        }
+        camera.lookAt(lookAt.current);
+      } else {
+        // District / Building focus mode settled
+        const dest = targetFor(focus);
+        camera.position.set(...dest.pos);
+        lookAt.current.set(...dest.target);
+        camera.lookAt(lookAt.current);
+      }
+    } else {
+      // --- STREET POV Eye-Level Traversal ---
+      // A. Glide target navigation (tapped waypoints)
+      if (streetWalkTarget) {
+        const targetVec = new Vector3(...streetWalkTarget);
+        targetVec.y = STREET_EYE_HEIGHT; // Lock walking height
 
-    const [cx, cy] = cursor.current;
-    const targetX = cx * 15 + driftX;
-    const targetZ = cy * 10 + driftZ;
+        const dist = camera.position.distanceTo(targetVec);
+        if (dist < 0.15) {
+          camera.position.copy(targetVec);
+          useCityStore.getState().setStreetWalkTarget(null);
+        } else {
+          // Smooth glide down paved streets at 12m/s
+          const speed = reduced ? dist : Math.min(1, 4.5 * dt);
+          camera.position.lerp(targetVec, speed);
+        }
+      }
 
-    // Lerp lookAt + camera position with 200ms time-constant.
-    const k = Math.min(1, PAN_LERP_K * dt);
-    lookAt.current.x += (targetX - lookAt.current.x) * k;
-    lookAt.current.z += (targetZ - lookAt.current.z) * k;
-    lookAt.current.y += (0 - lookAt.current.y) * k;
-    // Camera trails the target slightly — parallax.
-    const pTargetX = cx * 2 + driftX * 0.3;
-    const pTargetZ = 35 + driftZ * 0.3;
-    camera.position.x += (pTargetX - camera.position.x) * k;
-    camera.position.z += (pTargetZ - camera.position.z) * k;
-    camera.position.y += (20 - camera.position.y) * k;
-    camera.lookAt(lookAt.current);
-  });
+      // B. Drag-to-Look 360° directional projection
+      const cosP = Math.cos(streetPitch.current);
+      const sinP = Math.sin(streetPitch.current);
+      const cosY = Math.cos(streetYaw.current);
+      const sinY = Math.sin(streetYaw.current);
 
-  // Pointer tracking on the canvas DOM element.
-  useFrame(() => {
-    // (set up once)
-    if (!(gl.domElement as HTMLCanvasElement & { __cityCursorBound?: boolean }).__cityCursorBound) {
-      const el = gl.domElement;
-      const onMove = (e: PointerEvent) => {
-        const rect = el.getBoundingClientRect();
-        const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-        const y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
-        cursor.current = [x, y];
-      };
-      el.addEventListener('pointermove', onMove);
-      (el as HTMLCanvasElement & { __cityCursorBound?: boolean }).__cityCursorBound = true;
+      streetTargetLook.current.set(
+        camera.position.x + cosP * sinY,
+        camera.position.y + sinP,
+        camera.position.z + cosP * cosY
+      );
+
+      camera.lookAt(streetTargetLook.current);
     }
   });
 
   return null;
 }
-
 function easeInOutCubic(t: number): number {
   return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
+

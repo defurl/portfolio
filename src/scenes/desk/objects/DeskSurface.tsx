@@ -54,6 +54,64 @@ export function DeskSurface() {
           <meshStandardMaterial color={INK_GHOST} roughness={0.4} metalness={0.7} />
         </mesh>
       ))}
+
+      {/* --- High-Fidelity Wood Drawer Cabinet Undercut ---
+          Adds two dark walnut drawer cabinet boxes under the desk surface,
+          complete with face panels, inset borders, and brass cylinder handles. */}
+      {[-0.55, 0.55].map((xOffset, i) => (
+        <group key={`drawer-${i}`}>
+          {/* Main drawer cabinet box (Walnut wood texture-coded) */}
+          <mesh
+            castShadow
+            receiveShadow
+            position={[xOffset, -0.04 - 0.075, TOP_Z]}
+          >
+            <boxGeometry args={[0.42, 0.15, DEPTH - 0.06]} />
+            <meshStandardMaterial
+              color="#221811" // Dark warm walnut wood
+              roughness={0.9}
+              metalness={0.05}
+            />
+          </mesh>
+
+          {/* Drawer front face panel (slightly proud in Z for depth) */}
+          <mesh
+            castShadow
+            position={[xOffset, -0.04 - 0.075, TOP_Z + (DEPTH - 0.06) / 2 + 0.005]}
+          >
+            <boxGeometry args={[0.40, 0.13, 0.015]} />
+            <meshStandardMaterial
+              color="#2C1F17" // Rich grain walnut face
+              roughness={0.85}
+              metalness={0.05}
+            />
+          </mesh>
+
+          {/* Metallic brass cylinder drawer handle */}
+          <group position={[xOffset, -0.04 - 0.075, TOP_Z + (DEPTH - 0.06) / 2 + 0.015]}>
+            <mesh rotation={[0, 0, Math.PI / 2]} castShadow>
+              <cylinderGeometry args={[0.008, 0.008, 0.12, 12]} />
+              <meshStandardMaterial
+                color="#B8860B" // Brass
+                roughness={0.25}
+                metalness={0.9}
+              />
+            </mesh>
+            {/* Small cylinder pegs holding the handle */}
+            {[-0.045, 0.045].map((pegoff, p) => (
+              <mesh
+                key={`peg-${p}`}
+                position={[pegoff, 0, -0.006]}
+                rotation={[Math.PI / 2, 0, 0]}
+              >
+                <cylinderGeometry args={[0.005, 0.005, 0.012, 8]} />
+                <meshStandardMaterial color="#B8860B" roughness={0.3} metalness={0.8} />
+              </mesh>
+            ))}
+          </group>
+        </group>
+      ))}
     </group>
   );
 }
+

@@ -8,6 +8,7 @@ import { DeskAudio } from '../overlay/DeskAudio';
 import { FeedStatusBadge } from '../overlay/FeedStatusBadge';
 import { CityBack } from '../overlay/CityBack';
 import { CityBuildingPanel } from '../overlay/CityBuildingPanel';
+import { CityNavOverlay } from '../overlay/CityNavOverlay';
 
 // Phase 3A — city overview camera at (0, 20, 35), lookAt (0, 0, 0), FOV 35°.
 // The narrower FOV (vs. desk's 50°) emphasizes scale: the city reads bigger.
@@ -35,6 +36,7 @@ export function CityRoute() {
       </Canvas>
       <FeedStatusBadge />
       <CityBack />
+      <CityNavOverlay />
       <CityBuildingPanel />
       <CityEntry />
       <AudioToggle />
@@ -43,3 +45,4 @@ export function CityRoute() {
     </>
   );
 }
+
