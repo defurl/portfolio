@@ -32,6 +32,8 @@ import { Plant } from './objects/Plant';
 import { Headphones } from './objects/Headphones';
 import { Notebook } from './objects/Notebook';
 import { Phone } from './objects/Phone';
+import { AndoWallDetails } from './objects/AndoWallDetails';
+import { DustMotes } from './objects/DustMotes';
 import { BloomLayer } from './postfx/BloomLayer';
 import { InteractiveObject } from './InteractiveObject';
 import { CameraRig } from './CameraRig';
@@ -39,6 +41,7 @@ import { useInteractionStore } from '../../lib/stores/interactionStore';
 import { useDeskToCity } from './useDeskToCity';
 import { useDeskToNn } from './useDeskToNn';
 import { useAudioStore } from '../../lib/stores/audioStore';
+
 
 // The Night Desk scene. All eleven objects (10 visible + door-spill light)
 // per the revision prompt order-of-operations §3–§7.
@@ -265,8 +268,11 @@ export function DeskScene() {
         </mesh>
       </InteractiveObject>
 
+      <AndoWallDetails />
+      <DustMotes />
       <BloomLayer />
       <CameraRig />
     </>
+
   );
 }

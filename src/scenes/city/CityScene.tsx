@@ -2,24 +2,27 @@ import { BG_NIGHT, BG_VOID, VOXEL_GLOW_SOFT } from '../../lib/style/colors';
 import { SkyDome } from './SkyDome';
 import { River } from './River';
 import { Buildings } from './Buildings';
+import { CityStreetscape } from './CityStreetscape';
+import { CityWaypoints } from './CityWaypoints';
+import { Stars } from './Stars';
 import { PulseController } from './PulseController';
 import { CityBloom } from './postfx/CityBloom';
 import { CityCameraDev } from './CityCameraDev';
 
-// Phase 3 Checkpoint A — city foundation. No buildings yet; this is the
-// lighting + atmosphere pass. The discipline mirrors Phase 1A: get the
-// volumetric depth, the moonlight balance, and the river glow right before
-// any geometry lands.
+
+// Phase 3 Checkpoint A — city foundation (High-Fidelity Visual Detailing Overhaul).
 //
 // Composition (top → bottom):
-//   - SkyDome: large inverted sphere, vertex-position-driven gradient,
-//     horizon color tracks marketStore.session, 6s lerp
-//   - FogExp2: BG_NIGHT, density 0.012 — fades distant buildings into sky
-//   - HemisphereLight: BG_NIGHT top, VOXEL_GLOW_SOFT bottom — ambient haze
-//   - DirectionalLight: top-down moonlight, no shadow (geometry cost)
-//   - Ground plane: 200×200, BG_NIGHT base, tiny emissive so it's not black
-//   - River: thin emissive strip at x=0, z=[-60..+60]
-//   - CityBloom postfx: catches river only
+//   - SkyDome: large inverted sphere, vertex gradient
+//   - Stars: Twinkling stellar field over upper hemisphere
+//   - FogExp2: BG_NIGHT, density 0.012
+//   - HemisphereLight: ambient haze
+//   - DirectionalLight: top-down moonlight
+//   - Ground plane: 200×200
+//   - CityStreetscape: Roads, elevated sidewalks, voxel trees, lanterns, traffic loop
+//   - River: elevated emissive strip at x=0
+//   - Buildings: procedural Concrete Grid Skyscraper facades & roof assets
+//   - CityBloom postfx: catches glow elements
 
 export function CityScene() {
   return (
@@ -27,6 +30,7 @@ export function CityScene() {
       <fog attach="fog" args={[BG_NIGHT, 0.012]} />
 
       <SkyDome />
+      <Stars />
 
       <hemisphereLight
         color={BG_NIGHT}
@@ -41,8 +45,7 @@ export function CityScene() {
         castShadow={false}
       />
 
-      {/* Ground plane — 200×200, near-black with a sliver of emissive so it
-          never reads as pure black even outside the moonlight cone. */}
+      {/* Ground plane — 200×200, near-black with a sliver of emissive */}
       <mesh position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[200, 200]} />
         <meshStandardMaterial
@@ -54,7 +57,10 @@ export function CityScene() {
         />
       </mesh>
 
+      <CityStreetscape />
+      <CityWaypoints />
       <River />
+
 
       <Buildings />
       <PulseController />
@@ -64,3 +70,4 @@ export function CityScene() {
     </>
   );
 }
+
