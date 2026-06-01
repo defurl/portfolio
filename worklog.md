@@ -5,6 +5,11 @@
 
 ---
 
+## 2026-06-01 (phase 4 closed)
+- Did: phase 4 closed — owner approved 4d, merged to main with --no-ff. Roadmap updated to show all four checkpoints done (A scaffolding, B activations, C chambers, D transitions+audio+mobile) and phase 5 marked active.
+- Why: exit gate met — full walkthrough Desk → City → NN → Project Chamber → back works end-to-end with audio scene crossfades, reduced-motion fallbacks, and mobile tap-to-walk.
+- Next: phase 5 — content + a11y + perf pass. Awaiting phase-5 prompt and content from owner.
+
 ## 2026-06-01 (phase 4d)
 - Did: phase 4d transitions/audio/mobile — `NnBack` overlay (bottom-left "back to desk" with 300ms fade-out + navigate). `NnRoute` mount-effect: audioStore.setScene('nn') + inbound fade-in handling mirroring DeskRoute. `useDeskToNn` (focusObject('door') glide + audio cross + 300ms fade + navigate) + an invisible `circleGeometry` hit area at the door-spill position wrapped in `InteractiveObject id='door' label='step through'`. `useCityToNn` + `neuralGatewayId()` picks the deepest-ML repo (Intel-TradingAgent fallback to most-committed ml) as the gateway building; Buildings.tsx click handler routes that one to `enterNn(id)` instead of opening the project panel. **Audio**: extended `engine.ts` with a 3-oscillator drone (A1 sine + E2 triangle + B2 sine through tone.Gain mixers into a slow-LFO-modulated lowpass + long reverb wet=0.7) connected to the existing `sceneBus.nn`; `setNnTraversal(progress)` opens filter cutoff from 380 Hz to 1280 Hz over the corridor length; `NnAudioBridge` reads camera.z each frame and forwards a quantized (>=0.02 step) progress. **Mobile**: `NnWaypoints` renders one ring per layer center on the floor (mobile only); tap sets `nnWalkTarget.z` (module-level ref); `NnCameraControls` glides camera.z toward that target at 2.2/s, cancelling on any WASD input. Reduced-motion: all glides/fades skip per existing patterns. 5 incremental commits on the branch.
 - Why: phase 4 exit — visitor reaches /nn from either / (desk doorway) or /city (gateway building), and back to /. Audio respects FR-25 1.5s scene crossfade. Mobile gets a sim-sickness-safe nav model via discrete tap points.

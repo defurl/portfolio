@@ -130,18 +130,41 @@ All four checkpoints merged. The city renders, breathes with the market, and is 
 
 **Goal:** the deep-dive reads as architectural and reverent, not gamey.
 
-- [ ] NnScene: long parallel halls, FOV 60°, first-person walk
-- [ ] Resolve D1 (transformer vs MLP) — recommend a 4-layer transformer encoder for geometric variety + recognizability
-- [ ] Hall geometry: instanced columns for attention heads
-- [ ] Neuron wall-lights with subtle pulse on entry
-- [ ] Token-path streams as glowing splines flowing through the hall
-- [ ] Chamber prefab: side room, single firing neuron on entry
-- [ ] Chamber content: project markdown rendered onto a wall panel (CSS HTML in a Drei `<Html>` works for v1)
-- [ ] Door entry from desk + designated building entry from city
-- [ ] `audio/nn.ts`: long sustained tones, no rhythm
-- [ ] Mobile: simplified geometry, reduced lights, walk-via-tap-waypoints
+### Checkpoint A — hall architecture & scene foundation ✅ *(merged 2026-05-29)*
+- [x] Lazy /nn route + CSS-only flickering-corridor fallback
+- [x] Tadao Ando concrete corridors (4 layer segments + 1.5m light-shaft gaps)
+- [x] Instanced attention-head columns along walls
+- [x] First-person eye-level walk (y=1.65m, FOV 60°, WASD + drag-look, clamped)
+- [x] FogExp2 + hemisphere + 4 directional shafts
+- [x] Prerender dist/nn/index.html with nn-specific meta
 
-**Exit gate:** Walking the NN doesn't feel like a video-game level; it feels like a building.
+### Checkpoint B — activations & token splines ✅ *(merged 2026-05-30)*
+- [x] Wall-embedded neuron lights (instancedMesh, alternating amber/cool, breathing pulse)
+- [x] Token-path particle splines along CatmullRomCurve3 paths
+- [x] U20 hi-fi toggle (gates bloom, particle density, dynamic shadows)
+- [x] `NnFidelityToggle` overlay
+- [x] Reduced-motion: lights lock, particles freeze
+
+### Checkpoint C — project chambers & live inference ✅ *(merged 2026-05-31)*
+- [x] Gap-placed concrete chambers (3 projects + 1 inference room)
+- [x] Entry-trigger neuron activation flash (emissive 8.0 → 1.0 over 0.8s)
+- [x] Drei `<Html>` project wall-panels with ProjectPanel-coded typography
+- [x] U24 live transformer attention-head visualizer (typed prompt → 4-layer forward pass over SVG attention grid)
+
+### Checkpoint D — transitions, audio & mobile ✅ *(merged 2026-06-01)*
+- [x] Desk → /nn doorway click (transparent hit area at door-spill position)
+- [x] City → /nn neural gateway building (Intel-TradingAgent)
+- [x] `NnBack` overlay (back-to-desk with fade + navigate)
+- [x] NN drone bus (A1/E2/B2 oscillators, LFO-modulated lowpass, long reverb)
+- [x] Traversal-modulated filter cutoff (`NnAudioBridge` reads camera.z, ramps 380→1280 Hz)
+- [x] 1.5s scene crossfade reused from engine `setScene()` path
+- [x] Mobile tap-to-walk waypoints (floor rings, per-layer, glide via nnWalkTarget ref)
+
+**Phase 4 closure — 2026-06-01 ✅**
+
+All four checkpoints merged. The full walkthrough (Desk → Voxel City → Neural Network → Project Chamber → back) runs end-to-end with audio scene crossfades, reduced-motion fallbacks, and a mobile tap-to-walk model. Carried forward to Phase 5 polish: distinct visual treatment for the neural gateway building, NN ear-test tuning, instanced per-window meshes in city, content authoring.
+
+**Exit gate (met):** Walking the NN doesn't feel like a video-game level; it feels like a building.
 
 ## Phase 5 — Content + a11y + perf pass *(week 7–8)*
 
