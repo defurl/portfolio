@@ -1,4 +1,4 @@
-<!-- worklog-sync: lastCommitSha=bb4d7967536f574b6bcf95155401a3728df62ae7 -->
+<!-- worklog-sync: lastCommitSha=df377e200efe5ea0281fdb85964a7cc41f560199 -->
 # worklog.md
 
 > One-line-per-line decision log. Append after every meaningful change.
@@ -472,3 +472,7 @@ Detailed iteration history is below for reference.
 ## 2026-06-02 — auto-synced from git log
 - chore(ci): sync roadmap metadata [skip ci] (`a186ab9`)
 - feat(city): reorganize voxel city into four custom themed districts (`bb4d796`)
+
+## 2026-06-02 — auto-synced from git log
+- chore(ci): sync roadmap metadata [skip ci] (`d58d066`)
+- fix(city): fix building culling and integrate dynamic roblox-style zoom (`df377e2`)
