@@ -1,4 +1,4 @@
-<!-- worklog-sync: lastCommitSha=df61ecd58bfad52931d6fd4160fc169007c62edf -->
+<!-- worklog-sync: lastCommitSha=bb4d7967536f574b6bcf95155401a3728df62ae7 -->
 # worklog.md
 
 > One-line-per-line decision log. Append after every meaningful change.
@@ -468,3 +468,7 @@ Detailed iteration history is below for reference.
 ## 2026-06-02 — auto-synced from git log
 - chore(ci): sync roadmap metadata [skip ci] (`389e110`)
 - feat(city): add curated district and premium description overrides (`df61ecd`)
+
+## 2026-06-02 — auto-synced from git log
+- chore(ci): sync roadmap metadata [skip ci] (`a186ab9`)
+- feat(city): reorganize voxel city into four custom themed districts (`bb4d796`)
