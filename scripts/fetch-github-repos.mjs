@@ -39,6 +39,27 @@ const LANGUAGE_TO_DISTRICT = {
 };
 const VALID_DISTRICTS = new Set(['trading', 'research', 'infrastructure', 'ml', 'lab']);
 
+// Local curation overrides for perfect thematic district and premium description mapping
+const REPO_DISTRICT_OVERRIDES = {
+  'defurl/portfolio': 'lab',
+  'defurl/studentLMS': 'lab',
+  'defurl/Intel-TradingAgent': 'trading',
+  'defurl/Turnaround-AMS': 'infrastructure',
+  'defurl/CLOUD-WEAVERS-Hackathon': 'lab',
+  'defurl/conversation-fetcher': 'lab',
+};
+
+const REPO_DESCRIPTION_OVERRIDES = {
+  'defurl/portfolio': 'A cinematic, high-fidelity 3D developer portfolio featuring an interactive Tadao Ando concrete desk, a real-time sonified Voxel City, and a live WebGL neural network corridor.',
+  'defurl/Intel-TradingAgent': 'An intelligent quantitative algorithmic trading platform and agent leveraging machine learning and data pipelines to optimize active asset trading models.',
+  'defurl/Turnaround-AMS': 'A collaborative React Native and Firebase airline operations application streamlining real-time flight turnaround metrics for airline ground crews.',
+  'defurl/studentLMS': 'A structured typescript learning management system (LMS) coordinating student enrollment, coursework pipelines, and grading operations.',
+  'defurl/memory-tree': 'A cognitive memory hierarchical data mapping utility written in Python for intelligent classification and structural indexing.',
+  'defurl/Facial-Recognition-with-Emotion-Liveness-Detection': 'A deep-learning-driven real-time facial recognition pipeline featuring convolutional neural networks for liveness and emotion detection.',
+  'defurl/CLOUD-WEAVERS-Hackathon': 'An experimental multi-tier serverless cloud orchestration system built during the Cloud Weavers hackathon event.',
+  'defurl/COS30008---DataStructure-Algorithm': 'A comprehensive structural repository containing premium object-oriented C++ implementations of advanced sorting, trees, and graphs.',
+};
+
 const headers = { Accept: 'application/vnd.github+json' };
 if (process.env.GITHUB_TOKEN) {
   headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
@@ -125,14 +146,17 @@ async function enrichRepo(repo) {
   const primaryLanguage = entries[0]?.[0] ?? repo.language ?? 'Other';
   const additions = entries.reduce((s, [, b]) => s + b, 0);
 
+  const districtFromOverride = REPO_DISTRICT_OVERRIDES[repo.full_name];
   const districtFromReadme = parseDistrictFromReadme(readme);
   const district =
-    districtFromReadme ?? LANGUAGE_TO_DISTRICT[primaryLanguage] ?? 'lab';
+    districtFromOverride ?? districtFromReadme ?? LANGUAGE_TO_DISTRICT[primaryLanguage] ?? 'lab';
+
+  const description = REPO_DESCRIPTION_OVERRIDES[repo.full_name] ?? repo.description;
 
   const data = {
     id: repo.full_name,
     name: repo.name,
-    description: repo.description,
+    description,
     url: repo.html_url,
     district,
     primaryLanguage,
