@@ -166,7 +166,7 @@ function Building({ data, geom, position, accentColor }: OneBuildingProps) {
 
     for (let y = 0; y <= h; y += slabSpacing) {
       elems.push(
-        <mesh key={`slab-${y}`} position={[0, y, 0]} castShadow receiveShadow>
+        <mesh key={`slab-${y}`} position={[0, y, 0]} castShadow receiveShadow frustumCulled={false}>
           <boxGeometry args={[w + slabMargin, slabThickness, d + slabMargin]} />
           <meshStandardMaterial color={concreteColor} roughness={0.8} metalness={0.05} />
         </mesh>
@@ -187,7 +187,7 @@ function Building({ data, geom, position, accentColor }: OneBuildingProps) {
 
     corners.forEach(([cx, cz], idx) => {
       elems.push(
-        <mesh key={`column-${idx}`} position={[cx, h / 2, cz]} castShadow receiveShadow>
+        <mesh key={`column-${idx}`} position={[cx, h / 2, cz]} castShadow receiveShadow frustumCulled={false}>
           <boxGeometry args={[colSize, h, colSize]} />
           <meshStandardMaterial color={concreteColor} roughness={0.8} metalness={0.05} />
         </mesh>
@@ -200,7 +200,7 @@ function Building({ data, geom, position, accentColor }: OneBuildingProps) {
   return (
     <group position={position} onPointerOver={onEnter} onPointerOut={onLeave} onClick={onClick}>
       {/* Base block — the glowing interior core representing lit offices */}
-      <mesh position={[0, h / 2, 0]} castShadow receiveShadow>
+      <mesh position={[0, h / 2, 0]} castShadow receiveShadow frustumCulled={false}>
         <boxGeometry args={[w, h, d]} />
         <meshStandardMaterial
           ref={windowsRef}

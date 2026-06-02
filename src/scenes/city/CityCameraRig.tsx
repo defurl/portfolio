@@ -83,6 +83,7 @@ export function CityCameraRig() {
   // Orbit spherical coordinate refs
   const orbitYaw = useRef(0.2); // slight default angle
   const orbitPitch = useRef(0.5); // tilted looking down
+  const orbitRadius = useRef(ORBIT_RADIUS); // dynamic zoom radius
   const orbitTargetPos = useRef(new Vector3());
 
   // Street First-Person Look refs
@@ -138,7 +139,7 @@ export function CityCameraRig() {
     );
   }, [camera, navigationMode]);
 
-  // Pointer drag listener setup
+  // Pointer drag & wheel zoom listener setup
   useEffect(() => {
     const el = gl.domElement;
 
@@ -178,14 +179,45 @@ export function CityCameraRig() {
       }
     };
 
+    const onWheel = (e: WheelEvent) => {
+      const reduced = useSceneStore.getState().prefersReducedMotion;
+      if (reduced) return;
+
+      // Prevent page body scrolling when hovering canvas
+      e.preventDefault();
+
+      if (navigationMode === 'orbit') {
+        const zoomSpeed = 0.03;
+        orbitRadius.current += e.deltaY * zoomSpeed;
+        // Clamp radius between 16 (close overview) and 70 (far overview)
+        orbitRadius.current = MathUtils.clamp(orbitRadius.current, 16, 70);
+
+        // Seamless transition to Street POV if zoomed in extremely close:
+        if (orbitRadius.current < 20) {
+          // Reset overview radius for when they pull back out later
+          orbitRadius.current = 46;
+          useCityStore.getState().setNavigationMode('street');
+        }
+      } else {
+        // Zooming out in Street POV pops the camera back up into Orbit Overview:
+        if (e.deltaY > 0) {
+          useCityStore.getState().setNavigationMode('orbit');
+          // Start overview close to ground for seamless zoom-out feel
+          orbitRadius.current = 24;
+        }
+      }
+    };
+
     el.addEventListener('pointerdown', onPointerDown);
     el.addEventListener('pointerup', onPointerUp);
     el.addEventListener('pointermove', onPointerMove);
+    el.addEventListener('wheel', onWheel, { passive: false });
 
     return () => {
       el.removeEventListener('pointerdown', onPointerDown);
       el.removeEventListener('pointerup', onPointerUp);
       el.removeEventListener('pointermove', onPointerMove);
+      el.removeEventListener('wheel', onWheel);
     };
   }, [gl, navigationMode]);
 
