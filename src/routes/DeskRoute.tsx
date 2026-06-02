@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { DeskScene } from '../scenes/desk/DeskScene';
 import { useTransitionStore } from '../lib/stores/transitionStore';
+import { useInteractionStore } from '../lib/stores/interactionStore';
 import { AudioToggle } from '../overlay/AudioToggle';
 import { ProjectPanel } from '../overlay/ProjectPanel';
 import { TerminalPanel } from '../overlay/TerminalPanel';
@@ -11,6 +12,7 @@ import { DeskAudio } from '../overlay/DeskAudio';
 import { FeedStatusBadge } from '../overlay/FeedStatusBadge';
 import { DeskData } from '../scenes/desk/DeskData';
 import { useSceneStore } from '../lib/stores/sceneStore';
+
 
 // Desktop camera: seated first-person at z=2.2 / lookAt y=0.4, FOV 50°.
 // Mobile camera (1.21): slightly raised, ~45° looking down at the desk,
@@ -24,6 +26,9 @@ export function DeskRoute() {
   // 'fading-out' (interrupted), kick a fade-in next frame so the desk
   // reveals smoothly rather than popping in.
   useEffect(() => {
+    // Reset camera focus and open panel state so we return cleanly to the actual desk rest pose
+    useInteractionStore.getState().returnToDesk();
+
     const phase = useTransitionStore.getState().phase;
     if (phase === 'black' || phase === 'fading-out') {
       requestAnimationFrame(() =>
@@ -34,6 +39,7 @@ export function DeskRoute() {
       }, 1300);
       return () => clearTimeout(t);
     }
+
   }, []);
 
   const cameraProps = isMobile

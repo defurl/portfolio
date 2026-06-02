@@ -11,7 +11,7 @@ import { useSceneStore } from '../../../lib/stores/sceneStore';
 //
 // Confined to the lamp's warm light cone area: x: [-1.3 .. -0.1], y: [-0.7 .. 0.35], z: [-0.6 .. 0.3].
 
-const MOTE_COUNT = 50;
+const MOTE_COUNT = 25;
 
 export function DustMotes() {
   const pointsRef = useRef<ThreePoints>(null);
@@ -30,17 +30,17 @@ export function DustMotes() {
 
     for (let i = 0; i < MOTE_COUNT; i++) {
       // Spawn within the lamp light cone bounds
-      pos[i * 3 + 0] = MathUtils.randFloat(-1.3, -0.1); // x
+      pos[i * 3 + 0] = MathUtils.randFloat(-1.1, -0.3); // x
       pos[i * 3 + 1] = MathUtils.randFloat(-0.7, 0.35); // y
-      pos[i * 3 + 2] = MathUtils.randFloat(-0.6, 0.3);  // z
+      pos[i * 3 + 2] = MathUtils.randFloat(-0.5, 0.2);  // z
 
       meta.push({
-        speedY: MathUtils.randFloat(0.015, 0.035), // slow upward drift
-        speedX: MathUtils.randFloat(0.01, 0.02),
-        speedZ: MathUtils.randFloat(0.01, 0.02),
+        speedY: MathUtils.randFloat(0.01, 0.02), // slow upward drift
+        speedX: MathUtils.randFloat(0.005, 0.01),
+        speedZ: MathUtils.randFloat(0.005, 0.01),
         phaseX: Math.random() * Math.PI * 2,
         phaseZ: Math.random() * Math.PI * 2,
-        scale: MathUtils.randFloat(0.3, 1.2),
+        scale: MathUtils.randFloat(0.2, 0.8),
       });
     }
 
@@ -63,27 +63,27 @@ export function DustMotes() {
       const m = data[i]!;
 
       // Drift upward
-      pos[idx + 1] += m.speedY * dt * 2.0;
+      pos[idx + 1] += m.speedY * dt * 1.5;
 
       // Wrap-around Y if they float past the lamp shade
       if (pos[idx + 1] > 0.35) {
         pos[idx + 1] = -0.7;
-        pos[idx + 0] = MathUtils.randFloat(-1.3, -0.1);
-        pos[idx + 2] = MathUtils.randFloat(-0.6, 0.3);
+        pos[idx + 0] = MathUtils.randFloat(-1.1, -0.3);
+        pos[idx + 2] = MathUtils.randFloat(-0.5, 0.2);
       }
 
       // Sine-wave horizontal drift (gentle sway)
-      pos[idx + 0] += Math.sin(time * 0.8 + m.phaseX) * m.speedX * dt;
-      pos[idx + 2] += Math.cos(time * 0.6 + m.phaseZ) * m.speedZ * dt;
+      pos[idx + 0] += Math.sin(time * 0.6 + m.phaseX) * m.speedX * dt;
+      pos[idx + 2] += Math.cos(time * 0.4 + m.phaseZ) * m.speedZ * dt;
 
       // Keep clamped to radius of lamp pool
       const dx = pos[idx + 0] - (-0.95);
       const dz = pos[idx + 2] - (-0.2);
       const dist = Math.hypot(dx, dz);
-      if (dist > 1.2) {
+      if (dist > 1.0) {
         // Gently pull back toward lamp center
-        pos[idx + 0] -= (dx / dist) * 0.05 * dt;
-        pos[idx + 2] -= (dz / dist) * 0.05 * dt;
+        pos[idx + 0] -= (dx / dist) * 0.02 * dt;
+        pos[idx + 2] -= (dz / dist) * 0.02 * dt;
       }
     }
 
@@ -100,13 +100,14 @@ export function DustMotes() {
       </bufferGeometry>
       <pointsMaterial
         color={LAMP_WARM}
-        size={0.018}
+        size={0.005} // extremely fine dust
         sizeAttenuation
         transparent
-        opacity={0.35}
+        opacity={0.08} // barely visible cinematic texture
         depthWrite={false}
         toneMapped={false}
       />
     </points>
   );
 }
+

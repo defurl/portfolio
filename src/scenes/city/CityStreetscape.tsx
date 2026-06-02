@@ -177,6 +177,7 @@ export function CityStreetscape() {
       {lanterns.map((l, i) => {
         const [x, y, z, left] = l;
         const armX = left ? 0.25 : -0.25;
+        const bulbX = armX * 1.6;
         return (
           <group key={`lantern-${i}`} position={[x, y, z]}>
             {/* Slim Concrete post */}
@@ -190,7 +191,7 @@ export function CityStreetscape() {
               <meshStandardMaterial color={INK_GHOST} />
             </mesh>
             {/* Glowing amber bulb */}
-            <mesh position={[armX * 1.6, 2.25, 0]}>
+            <mesh position={[bulbX, 2.25, 0]}>
               <boxGeometry args={[0.2, 0.2, 0.2]} />
               <meshStandardMaterial
                 color={LAMP_WARM}
@@ -199,9 +200,22 @@ export function CityStreetscape() {
                 toneMapped={false}
               />
             </mesh>
+
+            {/* Volumetric Streetlight Light Beam Cone (Ghibli / Architectural Render style) */}
+            <mesh position={[bulbX, 1.085, 0]}>
+              <cylinderGeometry args={[0.04, 0.9, 2.33, 16, 1, true]} />
+              <meshBasicMaterial
+                color={LAMP_WARM}
+                transparent
+                opacity={0.065} // extremely soft glow
+                depthWrite={false}
+                blending={2} // AdditiveBlending
+              />
+            </mesh>
           </group>
         );
       })}
+
 
       {/* Vehicle Headlights and Taillights looping */}
       <points ref={trafficRef}>
