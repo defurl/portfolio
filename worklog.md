@@ -1,4 +1,4 @@
-<!-- worklog-sync: lastCommitSha=df377e200efe5ea0281fdb85964a7cc41f560199 -->
+<!-- worklog-sync: lastCommitSha=06c4d07068898c0f87e5fea2a4918c7adeffa3d7 -->
 # worklog.md
 
 > One-line-per-line decision log. Append after every meaningful change.
@@ -476,3 +476,7 @@ Detailed iteration history is below for reference.
 ## 2026-06-02 — auto-synced from git log
 - chore(ci): sync roadmap metadata [skip ci] (`d58d066`)
 - fix(city): fix building culling and integrate dynamic roblox-style zoom (`df377e2`)
+
+## 2026-06-02 — auto-synced from git log
+- chore(ci): sync roadmap metadata [skip ci] (`c8d3f22`)
+- fix(city): implement smooth roblox-style zoom and brighten streetscape (`06c4d07`)
