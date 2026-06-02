@@ -48,21 +48,43 @@ for (const p of phases) {
   }
 }
 
-const out = firstIncomplete
-  ? {
-      phase: firstIncomplete.phase,
-      status: 'in-progress',
-      remaining: firstIncomplete.remaining,
-      total: firstIncomplete.total,
-      updatedAt: new Date().toISOString(),
-    }
-  : {
-      phase: phases.at(-1)?.title ?? 'unknown',
-      status: 'complete',
-      remaining: 0,
-      total: 0,
-      updatedAt: new Date().toISOString(),
-    };
+let existing = null;
+try {
+  if (existsSync('phase-status.json')) {
+    existing = JSON.parse(readFileSync('phase-status.json', 'utf8'));
+  }
+} catch {
+  // ignore
+}
 
-writeFileSync('phase-status.json', JSON.stringify(out, null, 2) + '\n');
-console.log(`phase-status: ${out.phase} (${out.status})`);
+const nextPhase = firstIncomplete ? firstIncomplete.phase : (phases.at(-1)?.title ?? 'unknown');
+const nextStatus = firstIncomplete ? 'in-progress' : 'complete';
+const nextRemaining = firstIncomplete ? firstIncomplete.remaining : 0;
+const nextTotal = firstIncomplete ? firstIncomplete.total : 0;
+
+const isUnchanged = existing &&
+  existing.phase === nextPhase &&
+  existing.status === nextStatus &&
+  existing.remaining === nextRemaining &&
+  existing.total === nextTotal;
+
+const updatedAt = isUnchanged && existing.updatedAt ? existing.updatedAt : new Date().toISOString();
+
+const out = {
+  phase: nextPhase,
+  status: nextStatus,
+  remaining: nextRemaining,
+  total: nextTotal,
+  updatedAt,
+};
+
+// Only write to file if there are actual modifications or if file doesn't exist
+const newContent = JSON.stringify(out, null, 2) + '\n';
+const shouldWrite = !isUnchanged || !existsSync('phase-status.json') || readFileSync('phase-status.json', 'utf8') !== newContent;
+
+if (shouldWrite) {
+  writeFileSync('phase-status.json', newContent);
+  console.log(`phase-status: updated ${out.phase} (${out.status}), remaining: ${out.remaining}`);
+} else {
+  console.log(`phase-status: unchanged ${out.phase} (${out.status})`);
+}

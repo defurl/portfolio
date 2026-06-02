@@ -1,0 +1,45 @@
+name: metadata-sync
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '17 6 * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: compute phase status
+        run: node scripts/update-phase-status.mjs
+
+      - name: sync worklog
+        run: node scripts/sync-worklog.mjs
+
+      - name: commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          
+          # Stage files if they changed
+          git add phase-status.json || true
+          git add worklog.md || true
+          
+          if [[ -n "$(git status --porcelain phase-status.json worklog.md)" ]]; then
+            git commit -m "chore(ci): sync roadmap metadata [skip ci]"
+            git push
+          else
+            echo "roadmap metadata already in sync"
+          fi
