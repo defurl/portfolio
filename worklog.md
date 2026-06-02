@@ -1,4 +1,4 @@
-<!-- worklog-sync: lastCommitSha=037c30cc7c442bb88a90a7b3e1c2967a84493c84 -->
+<!-- worklog-sync: lastCommitSha=df61ecd58bfad52931d6fd4160fc169007c62edf -->
 # worklog.md
 
 > One-line-per-line decision log. Append after every meaningful change.
@@ -464,3 +464,7 @@ Detailed iteration history is below for reference.
 - fix(city): fix street lamp visibility and increase ground contrast (`f065592`)
 - chore(ci): refresh phase status [skip ci] (`104b3e5`)
 - chore(ci): unify roadmap metadata sync and fix push race conditions (`037c30c`)
+
+## 2026-06-02 — auto-synced from git log
+- chore(ci): sync roadmap metadata [skip ci] (`389e110`)
+- feat(city): add curated district and premium description overrides (`df61ecd`)
