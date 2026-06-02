@@ -1,4 +1,4 @@
-<!-- worklog-sync: lastCommitSha=ce3533c98ed08120d3d0ff0f8fad2798938c0468 -->
+<!-- worklog-sync: lastCommitSha=037c30cc7c442bb88a90a7b3e1c2967a84493c84 -->
 # worklog.md
 
 > One-line-per-line decision log. Append after every meaningful change.
@@ -329,3 +329,138 @@ Detailed iteration history is below for reference.
 ---
 
 *Earlier Phase 0 entries (docs bootstrap, scaffold, 0.5 fixes A1–C5, 0.6 workflow infrastructure, 0.7 tool-use hooks, auto-sync entries) removed for readability. Full history retrievable via `git log -- worklog.md` if needed.*
+
+## 2026-05-17 — auto-synced from git log
+- chore(ci): refresh phase status [skip ci] (`6af30fb`)
+
+## 2026-05-18 — auto-synced from git log
+- chore(infra): add tool-use hooks and tooling rules (`34a80c7`)
+- chore(infra): untrack transient phase prompt files (`7f33b59`)
+- chore(ci): refresh phase status [skip ci] (`aabc3e9`)
+- chore(deps): add @react-three/postprocessing for desk bloom (`18dc1cf`)
+- feat(desk): cinematic seated camera and key/fill/rim lighting (`cf0da66`)
+- feat(desk): build desk surface and eleven hand-built objects (`a8730fa`)
+- feat(desk): add adaptive bloom on lamp and monitor emissives (`2061cc3`)
+- style(desk): animate film grain at 24fps when motion allowed (`2adde85`)
+- fix(infra): drop vite-plugin-glsl to unblock dev server (`96e300b`)
+
+## 2026-05-19 — auto-synced from git log
+- chore(ci): refresh phase status [skip ci] (`f0ef9ee`)
+
+## 2026-05-20 — auto-synced from git log
+- chore(ci): refresh phase status [skip ci] (`8ea5ca7`)
+
+## 2026-05-21 — auto-synced from git log
+- chore(ci): refresh phase status [skip ci] (`a5c012c`)
+
+## 2026-05-22 — auto-synced from git log
+- chore(ci): refresh phase status [skip ci] (`a9f35da`)
+- feat(desk): phase 1a — night desk scene with lighting and shadows (`e9f873e`)
+- chore(ci): refresh phase status [skip ci] (`9e35c35`)
+- feat(content): interaction store, lazy project loader, 3 projects (`14ce23e`)
+- feat(desk): hover labels, emissive lift, camera glide rig (`d023196`)
+- feat(overlay): scene panel, project panel, back-to-desk affordance (`c28fc2e`)
+- fix(desk): suppress hover label while a panel is focused (`63860e0`)
+- feat(content): build-time github activity fetch and typed loader (`de6f50e`)
+- feat(overlay): terminal panel driven by github activity (`8dda2d2`)
+- feat(content): notebook panel with two writing pieces (`b76793e`)
+- feat(desk): phone flip-to-reveal contact email (`6b2973f`)
+- feat(audio): tone.js lo-fi loop on the headphones toggle (`b83332e`)
+- feat(desk): wire monitor2, notebook, phone, headphones, window (`1d92e0c`)
+
+## 2026-05-23 — auto-synced from git log
+- style(desk): flip mug handle to the camera-facing side (`c055eea`)
+- fix(desk): pull phone onto desk and lift it during the flip arc (`61ca673`)
+- fix(desk): mug handle attaches to body, phone clearly on desk (`e10b550`)
+- chore(ci): refresh phase status [skip ci] (`23bf52a`)
+- feat(motion): add usemediaquery + ismobile in scenestore (`12a258b`)
+- feat(desk): mobile scene variant — camera, bloom off, simpler kb (`c6cdee9`)
+- feat(overlay): mobile tap-to-arm + full-screen panel + swipe close (`05e4816`)
+- style(a11y): mobile audio toggle top-right + stepped typography (`1d23eb3`)
+- chore(ci): playwright state-capture script for visual evidence (`5577ca5`)
+- docs: close phase 1b, mark checkpoint c active (`6ef5005`)
+- chore(ci): refresh phase status [skip ci] (`d9dcf50`)
+- chore(ci): refresh phase status [skip ci] (`5a3a202`)
+
+## 2026-05-24 — auto-synced from git log
+- fix(infra): prerender /text shell so lhci static server can serve it (`6960a53`)
+- fix(a11y): bump eyebrow contrast past wcag aa on /text (`8b54515`)
+- perf(desk): modulepreload deskroute chunk for / lcp (`ad3aec1`)
+- docs(infra): relax nfr-4 perf bar to 70 with documented rationale (`6f641b4`)
+- docs: close phase 1, mark phase 2 active (`95ef128`)
+- chore(ci): refresh phase status [skip ci] (`7cd3517`)
+- feat(data): phase 2a replay-first spine (`619197c`)
+- feat(data): phase 2b orchestrator, marketstore, window indicator (`91da288`)
+
+## 2026-05-25 — auto-synced from git log
+- chore(ci): refresh phase status [skip ci] (`6fbfd3b`)
+- refactor(data): namespace dev hooks under __market + orch docs link (`e4a5789`)
+- feat(audio): phase 2c sonification engine + marketstore tick bus (`aca9250`)
+- docs(roadmap): close phase 2 — all three checkpoints done (`2692f88`)
+- chore(ci): refresh phase status [skip ci] (`5248cc5`)
+- feat(city): phase 3a city foundation — sky dome, river, fog, lighting (`3df8600`)
+
+## 2026-05-26 — auto-synced from git log
+- chore(ci): refresh phase status [skip ci] (`dfffd92`)
+
+## 2026-05-27 — auto-synced from git log
+- chore(ci): refresh phase status [skip ci] (`dea889f`)
+
+## 2026-05-28 — auto-synced from git log
+- feat(city): phase 3b buildings — github fetch, layout, style variants (`fdd0525`)
+- feat(city): phase 3c interactions — camera rig, hover, click, panel (`b23d880`)
+- fix(city): 3c review — centralize layout, fix poses, contextual back (`2301259`)
+- feat(city): phase 3d transitions — window glide, deep-link, og image (`fc5c0e4`)
+- chore(ci): refresh phase status [skip ci] (`dfa56e0`)
+
+## 2026-05-29 — auto-synced from git log
+- chore(ci): refresh phase status [skip ci] (`a8155b0`)
+
+## 2026-05-30 — auto-synced from git log
+- chore(ci): refresh phase status [skip ci] (`7742557`)
+
+## 2026-05-31 — auto-synced from git log
+- docs(roadmap): close phase 3 — all four checkpoints done (`adb6044`)
+- chore: update phase status to phase 4 in-progress (`51e94fb`)
+- feat(nn): concrete hall geometry + instanced attention-head columns (`afb4e99`)
+- feat(nn): scene composition — fog, hemisphere, directional shafts (`230c193`)
+- feat(nn): first-person walk controls (wasd, drag-look, clamped) (`17cd206`)
+- feat(overlay): nn placeholder, css-only flickering concrete fallback (`8687f87`)
+- feat(nn): route — canvas, scene, controls, shared data spine (`f384fc0`)
+- feat(infra): prerender /nn route with nn-specific meta tags (`4954b0c`)
+- chore(infra): playwright capture script for 4a verification (`19f7038`)
+- docs(nn): worklog entry for phase 4a scaffolding (`5d73069`)
+- feat(nn): nn settings store — high-fi toggle for u20 (`371cbba`)
+- feat(nn): wall-embedded neuron lights with breathing pulse (`5084d6d`)
+- feat(nn): token-path particle splines, gated by hi-fi setting (`4035dae`)
+- feat(nn): bloom postfx layer, hi-fi gated (`ee142bd`)
+- feat(overlay): hi-fi toggle (u20) (`05a065d`)
+- feat(nn): wire neuron lights, splines, bloom, fidelity toggle (`f33d089`)
+- fix(nn): brighten neurons + splines, fix wall-inset clipping (`9cd91ce`)
+- chore(infra): playwright capture for 4b activations (`aa5cbee`)
+- docs(nn): worklog entry for phase 4b activations (`273eea9`)
+- chore(ci): refresh phase status [skip ci] (`054f9bd`)
+- feat(nn): chamber configuration — gap-placed side rooms + inference room (`94db62f`)
+- feat(nn): chamber prefab with entry-trigger activation flash (`889bff1`)
+- feat(nn): drei html chamber wall-panel with project content typography (`593e63f`)
+- feat(nn): u24 inference chamber — typed prompt, 4-layer attention viz (`c5efaf4`)
+- feat(nn): wire chambers + inference chamber into the scene (`648c0ed`)
+- chore(infra): 4c playwright capture + worklog entry (`051700f`)
+- feat(nn): back-to-desk affordance + inbound fade-in + audio scene (`d537262`)
+- feat(desk): door-spill hit area + transition to /nn (`913c846`)
+- feat(city): neural gateway building → transition to /nn (`eb3d002`)
+- feat(audio): nn drone bus with traversal-modulated filter cutoff (`1d5e762`)
+- feat(nn): mobile tap-to-walk waypoints + camera glide (`e052a88`)
+- docs(nn): worklog entry for phase 4d close (`da914d0`)
+
+## 2026-06-01 — auto-synced from git log
+- chore(ci): refresh phase status [skip ci] (`9e9418e`)
+- docs(roadmap): close phase 4 — all four checkpoints done (`57f4f15`)
+- feat(city): overhaul ui/ux visual density and camera controls (`f0f3e78`)
+- chore(ci): refresh phase status [skip ci] (`226b5e8`)
+
+## 2026-06-02 — auto-synced from git log
+- fix(city): add streetlight cones and polish desk/routing ux (`3e22b04`)
+- fix(city): fix street lamp visibility and increase ground contrast (`f065592`)
+- chore(ci): refresh phase status [skip ci] (`104b3e5`)
+- chore(ci): unify roadmap metadata sync and fix push race conditions (`037c30c`)
