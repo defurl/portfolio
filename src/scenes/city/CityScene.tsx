@@ -1,4 +1,4 @@
-import { BG_NIGHT, BG_VOID, VOXEL_GLOW_SOFT } from '../../lib/style/colors';
+import { BG_NIGHT, VOXEL_GLOW, VOXEL_GLOW_SOFT } from '../../lib/style/colors';
 import { SkyDome } from './SkyDome';
 import { River } from './River';
 import { Buildings } from './Buildings';
@@ -35,13 +35,13 @@ export function CityScene() {
       <hemisphereLight
         color={BG_NIGHT}
         groundColor={VOXEL_GLOW_SOFT}
-        intensity={0.35}
+        intensity={0.55}
       />
-      <ambientLight color={BG_VOID} intensity={0.05} />
+      <ambientLight color={VOXEL_GLOW_SOFT} intensity={0.18} />
       <directionalLight
         position={[10, 30, 5]}
-        color={VOXEL_GLOW_SOFT}
-        intensity={0.4}
+        color={VOXEL_GLOW}
+        intensity={0.65}
         castShadow={false}
       />
 

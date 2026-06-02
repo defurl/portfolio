@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Vector3, MathUtils } from 'three';
-import { useCityStore, type CityFocus } from '../../lib/stores/cityStore';
+import { useCityStore, type CityFocus, type NavigationMode } from '../../lib/stores/cityStore';
 import { useSceneStore } from '../../lib/stores/sceneStore';
 import { useTransitionStore } from '../../lib/stores/transitionStore';
 import {
@@ -69,6 +69,38 @@ function targetFor(focus: CityFocus): {
   }
 }
 
+const WAYPOINTS: ReadonlyArray<[number, number, number]> = [
+  [-7.0, 0.06, -38.0],
+  [-7.0, 0.06, -22.5],
+  [-7.0, 0.06, 0.0],
+  [-7.0, 0.06, 22.5],
+  [-7.0, 0.06, 38.0],
+  [7.0, 0.06, -38.0],
+  [7.0, 0.06, -22.5],
+  [7.0, 0.06, 0.0],
+  [7.0, 0.06, 22.5],
+  [7.0, 0.06, 38.0],
+  [0.0, 0.06, -22.5],
+  [0.0, 0.06, 0.0],
+  [0.0, 0.06, 22.5],
+  [0.0, 0.06, 30.0],
+];
+
+function findClosestWaypoint(point: Vector3): [number, number, number] {
+  let closest: [number, number, number] = [0.0, 0.06, 30.0];
+  let minDist = Infinity;
+  for (const wp of WAYPOINTS) {
+    const dx = wp[0] - point.x;
+    const dz = wp[2] - point.z;
+    const distSq = dx * dx + dz * dz;
+    if (distSq < minDist) {
+      minDist = distSq;
+      closest = wp as [number, number, number];
+    }
+  }
+  return closest;
+}
+
 export function CityCameraRig() {
   const camera = useThree((s) => s.camera);
   const gl = useThree((s) => s.gl);
@@ -101,42 +133,132 @@ export function CityCameraRig() {
   const glideTotalS = useRef(GLIDE_DURATION_S);
   const lastFocusKey = useRef<string>('overview');
 
-  // Entry handling: glide down from southern sky on Desk arrival
+  // Mode Switch Transition refs
+  const isTransitioning = useRef(false);
+  const transitionElapsedS = useRef(0);
+  const transitionTotalS = useRef(1.4);
+  const transitionFromPos = useRef(new Vector3());
+  const transitionToPos = useRef(new Vector3());
+  const transitionFromLook = useRef(new Vector3());
+  const transitionToLook = useRef(new Vector3());
+
+  const prevNavigationMode = useRef<NavigationMode>('orbit');
+  const isFirstMount = useRef(true);
+
+  // Entry handling: glide down from southern sky on Desk arrival & Switch mode transitions
   useEffect(() => {
     const entry = useCityStore.getState().entry;
     const reduced = useSceneStore.getState().prefersReducedMotion;
     const initialPos: [number, number, number] = [0, 32, 95];
     const initialTgt: [number, number, number] = [0, 6, 0];
 
-    if (entry !== 'from-window' || reduced) {
-      // Direct positioning
-      if (navigationMode === 'orbit') {
-        const dest = targetFor(useCityStore.getState().focus);
-        camera.position.set(...dest.pos);
-        lookAt.current.set(...dest.target);
-        camera.lookAt(lookAt.current);
-      } else {
-        camera.position.set(0, STREET_EYE_HEIGHT, 30);
-        streetTargetLook.current.set(0, STREET_EYE_HEIGHT, 0);
-        camera.lookAt(streetTargetLook.current);
+    if (isFirstMount.current) {
+      isFirstMount.current = false;
+      prevNavigationMode.current = navigationMode;
+
+      if (entry !== 'from-window' || reduced) {
+        // Direct positioning
+        if (navigationMode === 'orbit') {
+          const dest = targetFor(useCityStore.getState().focus);
+          camera.position.set(...dest.pos);
+          lookAt.current.set(...dest.target);
+          camera.lookAt(lookAt.current);
+        } else {
+          camera.position.set(0, STREET_EYE_HEIGHT, 30);
+          streetTargetLook.current.set(0, STREET_EYE_HEIGHT, 0);
+          camera.lookAt(streetTargetLook.current);
+        }
+        return;
       }
+
+      camera.position.set(...initialPos);
+      lookAt.current.set(...initialTgt);
+      camera.lookAt(lookAt.current);
+      fromPos.current.set(...initialPos);
+      fromTgt.current.set(...initialTgt);
+      toPos.current.set(0, 20, 35);
+      toTgt.current.set(0, 0, 0);
+      glideElapsedS.current = 0;
+      glideTotalS.current = ENTRY_GLIDE_DURATION_S;
+      lastFocusKey.current = 'entry';
+
+      requestAnimationFrame(() =>
+        useTransitionStore.getState().setPhase('fading-in'),
+      );
       return;
     }
 
-    camera.position.set(...initialPos);
-    lookAt.current.set(...initialTgt);
-    camera.lookAt(lookAt.current);
-    fromPos.current.set(...initialPos);
-    fromTgt.current.set(...initialTgt);
-    toPos.current.set(0, 20, 35);
-    toTgt.current.set(0, 0, 0);
-    glideElapsedS.current = 0;
-    glideTotalS.current = ENTRY_GLIDE_DURATION_S;
-    lastFocusKey.current = 'entry';
+    // Subsequent navigation mode changes:
+    if (navigationMode !== prevNavigationMode.current) {
+      prevNavigationMode.current = navigationMode;
 
-    requestAnimationFrame(() =>
-      useTransitionStore.getState().setPhase('fading-in'),
-    );
+      if (reduced) {
+        // Snap immediately under prefers-reduced-motion
+        if (navigationMode === 'orbit') {
+          const dest = targetFor(useCityStore.getState().focus);
+          camera.position.set(...dest.pos);
+          lookAt.current.set(...dest.target);
+          camera.lookAt(lookAt.current);
+        } else {
+          const closestWp = findClosestWaypoint(lookAt.current);
+          camera.position.set(closestWp[0], STREET_EYE_HEIGHT, closestWp[2]);
+          const dir = new Vector3(0, STREET_EYE_HEIGHT, 0).sub(camera.position).normalize();
+          streetYaw.current = Math.atan2(dir.x, dir.z);
+          streetPitch.current = Math.asin(dir.y);
+          streetTargetLook.current.set(
+            camera.position.x + dir.x,
+            camera.position.y + dir.y,
+            camera.position.z + dir.z
+          );
+          camera.lookAt(streetTargetLook.current);
+        }
+        return;
+      }
+
+      // Trigger smooth Ease-In-Out Mode glide
+      isTransitioning.current = true;
+      transitionElapsedS.current = 0;
+      transitionTotalS.current = 1.4;
+
+      if (navigationMode === 'street') {
+        // Orbit -> Street POV transition
+        const closestWp = findClosestWaypoint(lookAt.current);
+        transitionFromPos.current.copy(camera.position);
+        transitionToPos.current.set(closestWp[0], STREET_EYE_HEIGHT, closestWp[2]);
+
+        // Current camera looking point
+        const currentDir = new Vector3();
+        camera.getWorldDirection(currentDir);
+        transitionFromLook.current.copy(camera.position).add(currentDir);
+
+        // Target looking point (pointing towards the center of the city)
+        const targetDir = new Vector3(0, STREET_EYE_HEIGHT, 0).sub(transitionToPos.current).normalize();
+        transitionToLook.current.copy(transitionToPos.current).add(targetDir);
+
+        // Pre-align the first person yaw and pitch refs
+        streetYaw.current = Math.atan2(targetDir.x, targetDir.z);
+        streetPitch.current = Math.asin(targetDir.y);
+      } else {
+        // Street -> Orbit transition
+        transitionFromPos.current.copy(camera.position);
+
+        // Calculate target spherical orbit position
+        const radius = orbitRadius.current;
+        const cosP = Math.cos(orbitPitch.current);
+        const sinP = Math.sin(orbitPitch.current);
+        const cosY = Math.cos(orbitYaw.current);
+        const sinY = Math.sin(orbitYaw.current);
+
+        transitionToPos.current.set(
+          radius * cosP * sinY,
+          radius * sinP,
+          radius * cosP * cosY
+        );
+
+        transitionFromLook.current.copy(streetTargetLook.current);
+        transitionToLook.current.set(0, 0, 0); // Focus back on orbit center
+      }
+    }
   }, [camera, navigationMode]);
 
   // Pointer drag & wheel zoom listener setup
@@ -188,6 +310,25 @@ export function CityCameraRig() {
 
       if (navigationMode === 'orbit') {
         const zoomSpeed = 0.03;
+        const focus = useCityStore.getState().focus;
+
+        if (focus.mode !== 'overview') {
+          // If focused on a building or district
+          if (e.deltaY > 0) {
+            // Scroll down (zoom out) -> go back to overview
+            useCityStore.getState().backToOverview();
+            orbitRadius.current = 46;
+          } else if (e.deltaY < 0) {
+            // Scroll up (zoom in) -> transition to street POV near that focus target!
+            orbitRadius.current -= 5.0;
+            if (orbitRadius.current < 25) {
+              orbitRadius.current = 46;
+              useCityStore.getState().setNavigationMode('street');
+            }
+          }
+          return;
+        }
+
         orbitRadius.current += e.deltaY * zoomSpeed;
         // Clamp radius between 16 (close overview) and 70 (far overview)
         orbitRadius.current = MathUtils.clamp(orbitRadius.current, 16, 70);
@@ -211,19 +352,44 @@ export function CityCameraRig() {
     el.addEventListener('pointerdown', onPointerDown);
     el.addEventListener('pointerup', onPointerUp);
     el.addEventListener('pointermove', onPointerMove);
-    el.addEventListener('wheel', onWheel, { passive: false });
+    window.addEventListener('wheel', onWheel, { passive: false });
 
     return () => {
       el.removeEventListener('pointerdown', onPointerDown);
       el.removeEventListener('pointerup', onPointerUp);
       el.removeEventListener('pointermove', onPointerMove);
-      el.removeEventListener('wheel', onWheel);
+      window.removeEventListener('wheel', onWheel);
     };
   }, [gl, navigationMode]);
 
   useFrame((_, dt) => {
     const focus = useCityStore.getState().focus;
     const reduced = useSceneStore.getState().prefersReducedMotion;
+
+    // --- 0. ACTIVE MODE TRANSITION GLIDES ---
+    if (isTransitioning.current) {
+      transitionElapsedS.current = Math.min(
+        transitionElapsedS.current + dt,
+        transitionTotalS.current
+      );
+      const t = easeInOutCubic(transitionElapsedS.current / transitionTotalS.current);
+
+      camera.position.lerpVectors(transitionFromPos.current, transitionToPos.current, t);
+      lookAt.current.lerpVectors(transitionFromLook.current, transitionToLook.current, t);
+      camera.lookAt(lookAt.current);
+
+      if (transitionElapsedS.current >= transitionTotalS.current) {
+        isTransitioning.current = false;
+
+        // Sync final values on completion
+        if (navigationMode === 'street') {
+          streetTargetLook.current.copy(transitionToLook.current);
+        } else {
+          lookAt.current.set(0, 0, 0);
+        }
+      }
+      return;
+    }
 
     // --- 1. HANDLE DISTRICT/BUILDING GLIDES (Orbit Mode only) ---
     if (navigationMode === 'orbit') {
@@ -259,7 +425,7 @@ export function CityCameraRig() {
     if (navigationMode === 'orbit') {
       // --- ORBIT MODE OVERVIEW ACTIVE ROTATION ---
       if (focus.mode === 'overview') {
-        const radius = ORBIT_RADIUS;
+        const radius = orbitRadius.current;
         const cosP = Math.cos(orbitPitch.current);
         const sinP = Math.sin(orbitPitch.current);
         const cosY = Math.cos(orbitYaw.current);

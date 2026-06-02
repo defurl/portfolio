@@ -2,6 +2,7 @@ import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { type Points as ThreePoints } from 'three';
 import {
+  BG_PANEL,
   BG_PANEL_2,
   INK_GHOST,
   LAMP_WARM,
@@ -134,7 +135,7 @@ export function CityStreetscape() {
         <mesh key={`road-${i}`} position={r.pos} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
           <planeGeometry args={r.size} />
           <meshStandardMaterial
-            color="#080B12" // Dark asphalt charcoal
+            color={BG_PANEL} // Concrete slate charcoal
             roughness={0.9}
             metalness={0.0}
           />
@@ -205,9 +206,9 @@ export function CityStreetscape() {
             <pointLight
               position={[bulbX, 2.2, 0]}
               color={LAMP_WARM}
-              intensity={1.8}
-              distance={7.5}
-              decay={2.0}
+              intensity={4.5}
+              distance={14.0}
+              decay={1.8}
             />
           </group>
         );
