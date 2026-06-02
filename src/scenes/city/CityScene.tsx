@@ -51,7 +51,7 @@ export function CityScene() {
         <meshStandardMaterial
           color={BG_NIGHT}
           emissive={BG_NIGHT}
-          emissiveIntensity={0.02}
+          emissiveIntensity={0.08}
           roughness={1}
           metalness={0}
         />

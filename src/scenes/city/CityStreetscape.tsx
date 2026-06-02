@@ -201,17 +201,14 @@ export function CityStreetscape() {
               />
             </mesh>
 
-            {/* Volumetric Streetlight Light Beam Cone (Ghibli / Architectural Render style) */}
-            <mesh position={[bulbX, 1.085, 0]}>
-              <cylinderGeometry args={[0.04, 0.9, 2.33, 16, 1, true]} />
-              <meshBasicMaterial
-                color={LAMP_WARM}
-                transparent
-                opacity={0.065} // extremely soft glow
-                depthWrite={false}
-                blending={2} // AdditiveBlending
-              />
-            </mesh>
+            {/* Real pointLight at the bulb position to illuminate concrete post, trees, and ground */}
+            <pointLight
+              position={[bulbX, 2.2, 0]}
+              color={LAMP_WARM}
+              intensity={1.8}
+              distance={7.5}
+              decay={2.0}
+            />
           </group>
         );
       })}
