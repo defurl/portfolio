@@ -33,29 +33,29 @@ function gapZ(layerIndex: number): number {
 }
 
 export const CHAMBERS: ReadonlyArray<ChamberConfig> = [
-  // Gap 1 (after layer 0) — research project on the left
+  // Gap 1 (after layer 0) — ML project on the left
   {
-    id: 'chamber-research',
+    id: 'chamber-ml',
     projectId: 'svi-vol-surface',
     z: gapZ(0),
     side: 'left',
-    label: '// research',
+    label: '// ml',
   },
-  // Gap 2 (after layer 1) — trading project on the right
+  // Gap 2 (after layer 1) — software project on the right
   {
-    id: 'chamber-trading',
+    id: 'chamber-softwares',
     projectId: 'execution-sim',
     z: gapZ(1),
     side: 'right',
-    label: '// trading',
+    label: '// softwares',
   },
-  // Gap 3 (after layer 2) — infrastructure project on the left
+  // Gap 3 (after layer 2) — coursework project on the left
   {
-    id: 'chamber-infrastructure',
+    id: 'chamber-coursework',
     projectId: 'feature-store',
     z: gapZ(2),
     side: 'left',
-    label: '// infra',
+    label: '// coursework',
   },
   // End of hall — inference chamber, centered behind the back wall
   {

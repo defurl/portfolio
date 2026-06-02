@@ -24,29 +24,34 @@ const MIN_REPO_SIZE_KB = 50;
 
 const LANGUAGE_TO_DISTRICT = {
   Python: 'ml',
-  'Jupyter Notebook': 'research',
-  Rust: 'infrastructure',
-  Go: 'infrastructure',
-  TypeScript: 'trading',
-  JavaScript: 'trading',
-  C: 'infrastructure',
-  'C++': 'infrastructure',
-  Solidity: 'trading',
-  Shell: 'infrastructure',
-  Dockerfile: 'infrastructure',
-  HTML: 'lab',
-  CSS: 'lab',
+  'Jupyter Notebook': 'ml',
+  Rust: 'others',
+  Go: 'others',
+  TypeScript: 'softwares',
+  JavaScript: 'softwares',
+  C: 'others',
+  'C++': 'others',
+  Solidity: 'softwares',
+  Shell: 'others',
+  Dockerfile: 'others',
+  HTML: 'softwares',
+  CSS: 'softwares',
+  Vue: 'softwares',
+  Kotlin: 'softwares',
+  Swift: 'softwares',
+  'C#': 'softwares',
+  PHP: 'softwares',
 };
-const VALID_DISTRICTS = new Set(['trading', 'research', 'infrastructure', 'ml', 'lab']);
+const VALID_DISTRICTS = new Set(['softwares', 'coursework', 'ml', 'others']);
 
 // Local curation overrides for perfect thematic district and premium description mapping
 const REPO_DISTRICT_OVERRIDES = {
-  'defurl/portfolio': 'lab',
-  'defurl/studentLMS': 'lab',
-  'defurl/Intel-TradingAgent': 'trading',
-  'defurl/Turnaround-AMS': 'infrastructure',
-  'defurl/CLOUD-WEAVERS-Hackathon': 'lab',
-  'defurl/conversation-fetcher': 'lab',
+  'defurl/portfolio': 'softwares',
+  'defurl/studentLMS': 'softwares',
+  'defurl/Intel-TradingAgent': 'ml',
+  'defurl/Turnaround-AMS': 'softwares',
+  'defurl/CLOUD-WEAVERS-Hackathon': 'others',
+  'defurl/conversation-fetcher': 'others',
 };
 
 const REPO_DESCRIPTION_OVERRIDES = {
@@ -147,9 +152,14 @@ async function enrichRepo(repo) {
   const additions = entries.reduce((s, [, b]) => s + b, 0);
 
   const districtFromOverride = REPO_DISTRICT_OVERRIDES[repo.full_name];
+  const isCoursework = /^(cos|swe)\d+/i.test(repo.name);
   const districtFromReadme = parseDistrictFromReadme(readme);
   const district =
-    districtFromOverride ?? districtFromReadme ?? LANGUAGE_TO_DISTRICT[primaryLanguage] ?? 'lab';
+    districtFromOverride ??
+    (isCoursework ? 'coursework' : null) ??
+    districtFromReadme ??
+    LANGUAGE_TO_DISTRICT[primaryLanguage] ??
+    'others';
 
   const description = REPO_DESCRIPTION_OVERRIDES[repo.full_name] ?? repo.description;
 

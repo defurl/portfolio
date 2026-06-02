@@ -8,14 +8,13 @@
 import manifest from '../../generated/city-buildings.json';
 import {
   DATA_GREEN,
-  INK_MUTED,
   LAMP_WARM,
   SIGNAL_AMBER,
   SIGNAL_AMBER_HOT,
   VOXEL_GLOW,
 } from '../style/colors';
 
-export type District = 'trading' | 'research' | 'infrastructure' | 'ml' | 'lab';
+export type District = 'softwares' | 'coursework' | 'ml' | 'others';
 export type BuildingStyle =
   | 'industrial'
   | 'fortress'
@@ -83,26 +82,19 @@ export interface DistrictDef {
 }
 
 export const DISTRICT_DEFS: Record<District, DistrictDef> = {
-  trading: {
+  softwares: {
     center: [-22.5, -22.5],
     size: [30, 30],
     color: SIGNAL_AMBER,
     accent: SIGNAL_AMBER,
-    label: '// trading',
+    label: '// softwares',
   },
-  research: {
+  coursework: {
     center: [22.5, -22.5],
     size: [30, 30],
     color: VOXEL_GLOW,
     accent: VOXEL_GLOW,
-    label: '// research',
-  },
-  infrastructure: {
-    center: [-22.5, 22.5],
-    size: [30, 30],
-    color: DATA_GREEN,
-    accent: DATA_GREEN,
-    label: '// infrastructure',
+    label: '// coursework',
   },
   ml: {
     center: [22.5, 22.5],
@@ -111,12 +103,12 @@ export const DISTRICT_DEFS: Record<District, DistrictDef> = {
     accent: LAMP_WARM,
     label: '// ml',
   },
-  lab: {
-    center: [0, 45],
-    size: [30, 15],
-    color: INK_MUTED,
-    accent: INK_MUTED,
-    label: '// lab',
+  others: {
+    center: [-22.5, 22.5],
+    size: [30, 30],
+    color: DATA_GREEN,
+    accent: DATA_GREEN,
+    label: '// others',
   },
 };
 
@@ -221,13 +213,16 @@ export function getPlacedBuildings(): ReadonlyArray<PlacedBuilding> {
   if (placedCache) return placedCache;
   const manifest = getCityBuildings();
   const byDistrict: Record<District, BuildingData[]> = {
-    trading: [],
-    research: [],
-    infrastructure: [],
+    softwares: [],
+    coursework: [],
     ml: [],
-    lab: [],
+    others: [],
   };
-  for (const b of manifest.buildings) byDistrict[b.district].push(b);
+  for (const b of manifest.buildings) {
+    if (byDistrict[b.district as District]) {
+      byDistrict[b.district as District].push(b as unknown as BuildingData);
+    }
+  }
   placedCache = (Object.keys(byDistrict) as District[]).flatMap((d) =>
     layoutDistrict(d, byDistrict[d]),
   );
