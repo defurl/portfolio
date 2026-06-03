@@ -69,37 +69,6 @@ function targetFor(focus: CityFocus): {
   }
 }
 
-const WAYPOINTS: ReadonlyArray<[number, number, number]> = [
-  [-7.0, 0.06, -38.0],
-  [-7.0, 0.06, -22.5],
-  [-7.0, 0.06, 0.0],
-  [-7.0, 0.06, 22.5],
-  [-7.0, 0.06, 38.0],
-  [7.0, 0.06, -38.0],
-  [7.0, 0.06, -22.5],
-  [7.0, 0.06, 0.0],
-  [7.0, 0.06, 22.5],
-  [7.0, 0.06, 38.0],
-  [0.0, 0.06, -22.5],
-  [0.0, 0.06, 0.0],
-  [0.0, 0.06, 22.5],
-  [0.0, 0.06, 30.0],
-];
-
-function findClosestWaypoint(point: Vector3): [number, number, number] {
-  let closest: [number, number, number] = [0.0, 0.06, 0.0];
-  let minDist = Infinity;
-  for (const wp of WAYPOINTS) {
-    const dx = wp[0] - point.x;
-    const dz = wp[2] - point.z;
-    const distSq = dx * dx + dz * dz;
-    if (distSq < minDist) {
-      minDist = distSq;
-      closest = wp as [number, number, number];
-    }
-  }
-  return closest;
-}
 
 export function CityCameraRig() {
   const camera = useThree((s) => s.camera);
@@ -218,10 +187,7 @@ export function CityCameraRig() {
             camera.lookAt(lookAt.current);
           }
         } else {
-          const focus = useCityStore.getState().focus;
-          const lookupPoint = focus.mode === 'overview' ? camera.position : lookAt.current;
-          const closestWp = findClosestWaypoint(lookupPoint);
-          camera.position.set(closestWp[0], STREET_EYE_HEIGHT, closestWp[2]);
+          camera.position.set(0, STREET_EYE_HEIGHT, 0);
 
           const currentDir = new Vector3();
           camera.getWorldDirection(currentDir);
@@ -246,11 +212,8 @@ export function CityCameraRig() {
 
       if (navigationMode === 'street') {
         // Orbit -> Street POV transition
-        const focus = useCityStore.getState().focus;
-        const lookupPoint = focus.mode === 'overview' ? camera.position : lookAt.current;
-        const closestWp = findClosestWaypoint(lookupPoint);
         transitionFromPos.current.copy(camera.position);
-        transitionToPos.current.set(closestWp[0], STREET_EYE_HEIGHT, closestWp[2]);
+        transitionToPos.current.set(0, STREET_EYE_HEIGHT, 0);
 
         // Current camera looking point
         const currentDir = new Vector3();
