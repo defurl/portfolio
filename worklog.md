@@ -1,4 +1,4 @@
-<!-- worklog-sync: lastCommitSha=5f42820c11b285ff178c2ebd41a211a95d70e4bc -->
+<!-- worklog-sync: lastCommitSha=4b38ce21dbb34a527e791a2759a4a7735fcdcfaa -->
 # worklog.md
 
 > One-line-per-line decision log. Append after every meaningful change.
@@ -498,3 +498,7 @@ Detailed iteration history is below for reference.
 ## 2026-06-03 — auto-synced from git log
 - chore(ci): sync roadmap metadata [skip ci] (`834e50e`)
 - fix(city): prevent camera auto-glide to center on street pov entry (`5f42820`)
+
+## 2026-06-03 — auto-synced from git log
+- chore(ci): sync roadmap metadata [skip ci] (`fb161b4`)
+- fix(city): glide directly to center street spawn (`4b38ce2`)
