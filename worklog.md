@@ -1,4 +1,4 @@
-<!-- worklog-sync: lastCommitSha=4b38ce21dbb34a527e791a2759a4a7735fcdcfaa -->
+<!-- worklog-sync: lastCommitSha=8d477acc6688e98d5be4c5f1067a338fb9d8e4a0 -->
 # worklog.md
 
 > One-line-per-line decision log. Append after every meaningful change.
@@ -502,3 +502,7 @@ Detailed iteration history is below for reference.
 ## 2026-06-03 — auto-synced from git log
 - chore(ci): sync roadmap metadata [skip ci] (`fb161b4`)
 - fix(city): glide directly to center street spawn (`4b38ce2`)
+
+## 2026-06-03 — auto-synced from git log
+- chore(ci): sync roadmap metadata [skip ci] (`798d620`)
+- fix(a11y): add focus tabindex to scrollable main container (`8d477ac`)
