@@ -8,7 +8,7 @@ const aboutHtml = marked.parse(about) as string;
 // Proof-of-pipeline: renders content/about.md at build time.
 export function TextRoute() {
   return (
-    <main className={styles.main}>
+    <main className={styles.main} tabIndex={0}>
       <header className={styles.header}>
         <h1 className={styles.title}>3am — a quant&rsquo;s workstation</h1>
         <p className={styles.eyebrow}>plain-text version</p>
