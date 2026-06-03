@@ -196,10 +196,6 @@ export function CityCameraRig() {
         // Snap immediately under prefers-reduced-motion
         if (navigationMode === 'orbit') {
           const focus = useCityStore.getState().focus;
-          const distSq = camera.position.x * camera.position.x + camera.position.z * camera.position.z;
-          if (distSq > 1.0) {
-            orbitYaw.current = Math.atan2(camera.position.x, camera.position.z);
-          }
 
           if (focus.mode === 'overview') {
             const radius = orbitRadius.current;
@@ -275,13 +271,6 @@ export function CityCameraRig() {
       } else {
         // Street -> Orbit transition
         transitionFromPos.current.copy(camera.position);
-
-        // Update orbitYaw to match camera's horizontal angle relative to the center (0,0,0)
-        // to prevent perspective snapping
-        const distSq = camera.position.x * camera.position.x + camera.position.z * camera.position.z;
-        if (distSq > 1.0) {
-          orbitYaw.current = Math.atan2(camera.position.x, camera.position.z);
-        }
 
         // Calculate target spherical orbit position
         const radius = orbitRadius.current;
@@ -526,6 +515,9 @@ export function CityCameraRig() {
       );
 
       camera.lookAt(streetTargetLook.current);
+
+      // Dynamically sync orbitYaw with streetYaw (offset by Math.PI so it looks back in the same direction)
+      orbitYaw.current = streetYaw.current + Math.PI;
     }
   });
 
