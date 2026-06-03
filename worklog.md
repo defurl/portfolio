@@ -1,4 +1,4 @@
-<!-- worklog-sync: lastCommitSha=b9ce79d56341f97de883c2d156ae1713ec00cc2e -->
+<!-- worklog-sync: lastCommitSha=ea04b5d88dceb875507122a9905fa8d21827ecab -->
 # worklog.md
 
 > One-line-per-line decision log. Append after every meaningful change.
@@ -490,3 +490,7 @@ Detailed iteration history is below for reference.
 ## 2026-06-03 — auto-synced from git log
 - chore(ci): sync roadmap metadata [skip ci] (`9ea78cb`)
 - fix(city): maintain consistent perspective during camera switches (`b9ce79d`)
+
+## 2026-06-03 — auto-synced from git log
+- chore(ci): sync roadmap metadata [skip ci] (`e167da2`)
+- fix(city): sync orbit yaw dynamically in street view to match street yaw (`ea04b5d`)
