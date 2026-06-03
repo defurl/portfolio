@@ -46,7 +46,7 @@ export const useCityStore = create<CityState>((set, get) => ({
       set({ focus: { mode: 'overview' }, hovered: null, streetWalkTarget: null });
     } else {
       // Placing user on the center avenue street-intersection on entry
-      set({ hovered: null, streetWalkTarget: [0, 1.65, 0] });
+      set({ hovered: null, streetWalkTarget: null });
     }
     set({ navigationMode });
   },
