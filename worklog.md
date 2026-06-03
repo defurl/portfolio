@@ -1,4 +1,4 @@
-<!-- worklog-sync: lastCommitSha=8d477acc6688e98d5be4c5f1067a338fb9d8e4a0 -->
+<!-- worklog-sync: lastCommitSha=23f4a58ad75f17af2413ee4c41be53ae12dd3ad3 -->
 # worklog.md
 
 > One-line-per-line decision log. Append after every meaningful change.
@@ -506,3 +506,7 @@ Detailed iteration history is below for reference.
 ## 2026-06-03 — auto-synced from git log
 - chore(ci): sync roadmap metadata [skip ci] (`798d620`)
 - fix(a11y): add focus tabindex to scrollable main container (`8d477ac`)
+
+## 2026-06-03 — auto-synced from git log
+- chore(ci): sync roadmap metadata [skip ci] (`8a87f7f`)
+- chore(ci): trigger metadata sync on cron and manual only (`23f4a58`)
