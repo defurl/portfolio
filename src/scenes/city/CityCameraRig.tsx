@@ -195,21 +195,49 @@ export function CityCameraRig() {
       if (reduced) {
         // Snap immediately under prefers-reduced-motion
         if (navigationMode === 'orbit') {
-          const dest = targetFor(useCityStore.getState().focus);
-          camera.position.set(...dest.pos);
-          lookAt.current.set(...dest.target);
-          camera.lookAt(lookAt.current);
+          const focus = useCityStore.getState().focus;
+          const distSq = camera.position.x * camera.position.x + camera.position.z * camera.position.z;
+          if (distSq > 1.0) {
+            orbitYaw.current = Math.atan2(camera.position.x, camera.position.z);
+          }
+
+          if (focus.mode === 'overview') {
+            const radius = orbitRadius.current;
+            const cosP = Math.cos(orbitPitch.current);
+            const sinP = Math.sin(orbitPitch.current);
+            const cosY = Math.cos(orbitYaw.current);
+            const sinY = Math.sin(orbitYaw.current);
+
+            camera.position.set(
+              radius * cosP * sinY,
+              radius * sinP,
+              radius * cosP * cosY
+            );
+            lookAt.current.set(0, 0, 0);
+            camera.lookAt(lookAt.current);
+          } else {
+            const dest = targetFor(focus);
+            camera.position.set(...dest.pos);
+            lookAt.current.set(...dest.target);
+            camera.lookAt(lookAt.current);
+          }
         } else {
-          const closestWp = findClosestWaypoint(lookAt.current);
+          const focus = useCityStore.getState().focus;
+          const lookupPoint = focus.mode === 'overview' ? camera.position : lookAt.current;
+          const closestWp = findClosestWaypoint(lookupPoint);
           camera.position.set(closestWp[0], STREET_EYE_HEIGHT, closestWp[2]);
-          const dir = new Vector3(0, STREET_EYE_HEIGHT, 0).sub(camera.position).normalize();
-          streetYaw.current = Math.atan2(dir.x, dir.z);
-          streetPitch.current = Math.asin(dir.y);
-          streetTargetLook.current.set(
-            camera.position.x + dir.x,
-            camera.position.y + dir.y,
-            camera.position.z + dir.z
-          );
+
+          const currentDir = new Vector3();
+          camera.getWorldDirection(currentDir);
+          const horizDir = new Vector3(currentDir.x, 0, currentDir.z).normalize();
+          if (horizDir.lengthSq() === 0) {
+            horizDir.set(0, 0, -1);
+          }
+
+          streetYaw.current = Math.atan2(horizDir.x, horizDir.z);
+          streetPitch.current = 0.0;
+
+          streetTargetLook.current.copy(camera.position).add(horizDir);
           camera.lookAt(streetTargetLook.current);
         }
         return;
@@ -222,7 +250,9 @@ export function CityCameraRig() {
 
       if (navigationMode === 'street') {
         // Orbit -> Street POV transition
-        const closestWp = findClosestWaypoint(lookAt.current);
+        const focus = useCityStore.getState().focus;
+        const lookupPoint = focus.mode === 'overview' ? camera.position : lookAt.current;
+        const closestWp = findClosestWaypoint(lookupPoint);
         transitionFromPos.current.copy(camera.position);
         transitionToPos.current.set(closestWp[0], STREET_EYE_HEIGHT, closestWp[2]);
 
@@ -231,16 +261,27 @@ export function CityCameraRig() {
         camera.getWorldDirection(currentDir);
         transitionFromLook.current.copy(camera.position).add(currentDir);
 
-        // Target looking point (pointing towards the center of the city)
-        const targetDir = new Vector3(0, STREET_EYE_HEIGHT, 0).sub(transitionToPos.current).normalize();
-        transitionToLook.current.copy(transitionToPos.current).add(targetDir);
+        // Project the current looking direction horizontally on the street plane
+        const horizDir = new Vector3(currentDir.x, 0, currentDir.z).normalize();
+        if (horizDir.lengthSq() === 0) {
+          horizDir.set(0, 0, -1);
+        }
+
+        transitionToLook.current.copy(transitionToPos.current).add(horizDir);
 
         // Pre-align the first person yaw and pitch refs
-        streetYaw.current = Math.atan2(targetDir.x, targetDir.z);
-        streetPitch.current = Math.asin(targetDir.y);
+        streetYaw.current = Math.atan2(horizDir.x, horizDir.z);
+        streetPitch.current = 0.0; // level horizontal look on landing
       } else {
         // Street -> Orbit transition
         transitionFromPos.current.copy(camera.position);
+
+        // Update orbitYaw to match camera's horizontal angle relative to the center (0,0,0)
+        // to prevent perspective snapping
+        const distSq = camera.position.x * camera.position.x + camera.position.z * camera.position.z;
+        if (distSq > 1.0) {
+          orbitYaw.current = Math.atan2(camera.position.x, camera.position.z);
+        }
 
         // Calculate target spherical orbit position
         const radius = orbitRadius.current;
