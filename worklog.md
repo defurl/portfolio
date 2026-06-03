@@ -1,4 +1,4 @@
-<!-- worklog-sync: lastCommitSha=dfad6383cf7eca2531c75c661a2823ddfd497a57 -->
+<!-- worklog-sync: lastCommitSha=b9ce79d56341f97de883c2d156ae1713ec00cc2e -->
 # worklog.md
 
 > One-line-per-line decision log. Append after every meaningful change.
@@ -486,3 +486,7 @@ Detailed iteration history is below for reference.
 
 ## 2026-06-03 — auto-synced from git log
 - fix(city): set first-person spawn to center and make z=0 street blue (`dfad638`)
+
+## 2026-06-03 — auto-synced from git log
+- chore(ci): sync roadmap metadata [skip ci] (`9ea78cb`)
+- fix(city): maintain consistent perspective during camera switches (`b9ce79d`)
