@@ -87,7 +87,7 @@ const WAYPOINTS: ReadonlyArray<[number, number, number]> = [
 ];
 
 function findClosestWaypoint(point: Vector3): [number, number, number] {
-  let closest: [number, number, number] = [0.0, 0.06, 30.0];
+  let closest: [number, number, number] = [0.0, 0.06, 0.0];
   let minDist = Infinity;
   for (const wp of WAYPOINTS) {
     const dx = wp[0] - point.x;
@@ -164,8 +164,8 @@ export function CityCameraRig() {
           lookAt.current.set(...dest.target);
           camera.lookAt(lookAt.current);
         } else {
-          camera.position.set(0, STREET_EYE_HEIGHT, 30);
-          streetTargetLook.current.set(0, STREET_EYE_HEIGHT, 0);
+          camera.position.set(0, STREET_EYE_HEIGHT, 0);
+          streetTargetLook.current.set(0, STREET_EYE_HEIGHT, -1.0);
           camera.lookAt(streetTargetLook.current);
         }
         return;

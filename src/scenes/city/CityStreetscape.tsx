@@ -1,11 +1,12 @@
 import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { type Points as ThreePoints } from 'three';
+import { type Points as ThreePoints, type MeshStandardMaterial } from 'three';
 import {
   BG_PANEL,
   BG_PANEL_2,
   INK_GHOST,
   LAMP_WARM,
+  VOXEL_GLOW_SOFT,
 } from '../../lib/style/colors';
 import { useSceneStore } from '../../lib/stores/sceneStore';
 import { DISTRICT_DEFS, type District } from '../../lib/content/buildings';
@@ -19,6 +20,7 @@ const TRAFFIC_COUNT = 48;
 
 export function CityStreetscape() {
   const trafficRef = useRef<ThreePoints>(null);
+  const blueRoadMatRef = useRef<MeshStandardMaterial>(null);
 
   // 1. Sidewalk and Road Coordinates
   const { roads, sidewalks, trees, lanterns } = useMemo(() => {
@@ -100,47 +102,74 @@ export function CityStreetscape() {
   }, []);
 
   // 3. Traffic animation loop
-  useFrame((_, dt) => {
+  useFrame((state, dt) => {
     const traffic = trafficRef.current;
-    if (!traffic) return;
+    if (traffic) {
+      const reduced = useSceneStore.getState().prefersReducedMotion;
+      if (!reduced) {
+        const pos = traffic.geometry.attributes.position.array as Float32Array;
 
-    const reduced = useSceneStore.getState().prefersReducedMotion;
-    if (reduced) return;
+        for (let i = 0; i < TRAFFIC_COUNT; i++) {
+          const idx = i * 3;
+          const isRight = i % 2 === 0;
 
-    const pos = traffic.geometry.attributes.position.array as Float32Array;
+          // Flowing speed
+          const speed = isRight ? 12.0 : -12.0; // m/s
+          pos[idx + 2] += speed * dt;
 
-    for (let i = 0; i < TRAFFIC_COUNT; i++) {
-      const idx = i * 3;
-      const isRight = i % 2 === 0;
-
-      // Flowing speed
-      const speed = isRight ? 12.0 : -12.0; // m/s
-      pos[idx + 2] += speed * dt;
-
-      // Wrap around roads bounds (120m length)
-      if (pos[idx + 2] > 60) {
-        pos[idx + 2] = -60;
-      } else if (pos[idx + 2] < -60) {
-        pos[idx + 2] = 60;
+          // Wrap around roads bounds (120m length)
+          if (pos[idx + 2] > 60) {
+            pos[idx + 2] = -60;
+          } else if (pos[idx + 2] < -60) {
+            pos[idx + 2] = 60;
+          }
+        }
+        traffic.geometry.attributes.position.needsUpdate = true;
       }
     }
 
-    traffic.geometry.attributes.position.needsUpdate = true;
+    // Animate horizontal blue road emissive
+    const blueMat = blueRoadMatRef.current;
+    if (blueMat) {
+      const reduced = useSceneStore.getState().prefersReducedMotion;
+      if (reduced) {
+        blueMat.emissiveIntensity = 0.6;
+      } else {
+        const elapsed = state.clock.getElapsedTime();
+        const phase = (elapsed / 6) * Math.PI * 2;
+        blueMat.emissiveIntensity = 0.6 + Math.sin(phase) * 0.1;
+      }
+    }
   });
 
   return (
     <group>
       {/* Concrete Road Network */}
-      {roads.map((r, i) => (
-        <mesh key={`road-${i}`} position={r.pos} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-          <planeGeometry args={r.size} />
-          <meshStandardMaterial
-            color={BG_PANEL} // Concrete slate charcoal
-            roughness={0.9}
-            metalness={0.0}
-          />
-        </mesh>
-      ))}
+      {roads.map((r, i) => {
+        const isCenterEastWest = r.pos[0] === 0 && r.pos[2] === 0;
+        return (
+          <mesh key={`road-${i}`} position={r.pos} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+            <planeGeometry args={r.size} />
+            {isCenterEastWest ? (
+              <meshStandardMaterial
+                ref={blueRoadMatRef}
+                color={VOXEL_GLOW_SOFT}
+                emissive={VOXEL_GLOW_SOFT}
+                emissiveIntensity={0.6}
+                roughness={0.9}
+                metalness={0.0}
+                toneMapped={false}
+              />
+            ) : (
+              <meshStandardMaterial
+                color={BG_PANEL} // Concrete slate charcoal
+                roughness={0.9}
+                metalness={0.0}
+              />
+            )}
+          </mesh>
+        );
+      })}
 
       {/* Elevated District Sidewalks */}
       {sidewalks.map((s, i) => (
