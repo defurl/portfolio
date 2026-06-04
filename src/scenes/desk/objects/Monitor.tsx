@@ -1,5 +1,5 @@
 import { GradientTexture } from '@react-three/drei';
-import { BG_PANEL_2, BG_VOID, INK_GHOST, SIGNAL_AMBER_DIM, VOXEL_GLOW_SOFT } from '../../../lib/style/colors';
+import { BG_PANEL_2, BG_VOID, INK_FAINT, INK_GHOST, INK_MUTED, INK_PAPER, SIGNAL_AMBER_DIM, VOXEL_GLOW_SOFT } from '../../../lib/style/colors';
 import { useInteractionStore } from '../../../lib/stores/interactionStore';
 
 // Phase 1.6/1.7 — desk monitors. Hand-built primitives only.
@@ -65,7 +65,7 @@ export function Monitor({ position, variant, width = 0.62, height = 0.36, hoverI
           <GradientTexture
             attach="emissiveMap"
             stops={[0, 0.5, 1]}
-            colors={['#fefefe', '#bbbbbb', '#444444']}
+            colors={[INK_PAPER, INK_MUTED, INK_FAINT]}
           />
         </meshStandardMaterial>
       </mesh>
