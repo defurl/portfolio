@@ -5,6 +5,30 @@
 
 ---
 
+## 2026-06-04 (phase 5 execution completed)
+- Did: Checkpoints 5A, 5B, and 5C completed:
+  1. Authored 3 new quantitative/systems engineering projects and fully populated the plain-text /text alternate route with eager build-time imports of biography, all 6 projects, and writing pieces.
+  2. Added keyboard accessibility (tab tabbing) to 3d desk scene using hidden button triggers inside Drei Html overlays, showing orange outline + mono text label on focus.
+  3. Upgraded desk monitors from flat emissive colors to linear vertical gradients (GradientTexture on emissiveMap).
+  4. Implemented animated WindowRain component (18 vertical drop meshes) and adjusted window transmission to 0.55.
+  5. Enhanced neural gateway building with a pulsating neon orange vertical column beam.
+  6. Configured localStorage audio store persistence.
+  7. Ran typecheck, bundle-budget (69.4KB / 200KB), lint:colors, build, and axe-core accessibility checks (0 violations found on / and /text).
+- Why: Complete production verification — ensure all content is fully populated, the plain-text version is 100% functional, full keyboard and movement navigation parity is achieved, visual aesthetics match the premium vibe, and performance/bundle ceilings are strictly respected.
+- Next: Final user deployment and Phase 5.5 Soak.
+
+## 2026-06-03 (phase 5 ui/ux polish)
+- Did: Phase 5 UI/UX & Quality-of-life adjustments —
+  1. Reorganized Voxel City into four custom themed districts (Capital, Market, Factory, Nexus) with curated colors, descriptions, and height/shape proportions.
+  2. Implemented smooth Roblox-style dynamic zoom controls with scroll wheel, replacing discrete steps.
+  3. Reset the first-person street spawn position to the exact center `[0, 1.65, 0]` looking north, framing all 4 districts symmetrically.
+  4. Styled the East-West street at `z=0` as a glowing blue crossroad, animating its emissive intensity dynamically in sync with the river pulse.
+  5. Solved view snapping by dynamically tracking orbit and street yaws in real-time (`orbitYaw = streetYaw + Math.PI`). Zooming out now glides seamlessly along the current line of sight.
+  6. Fixed scrollable layout `tabIndex={0}` key focus a11y failure on `/text` route, resolving local `axe-core` CI checks.
+  7. Automated Commit Prevention: configured `.github/workflows/metadata-sync.yml` to trigger only on cron schedule and manual workflow dispatch, stopping bot commits on push.
+- Why: UX continuity — camera transitioning feels completely natural and non-disorienting; the visual aesthetics of the city are more premium with thematic districts, street lighting, and a glowing center cross. CI/CD runs are clean and do not pollute the developer's commit history.
+- Next: Phase 5 content population and accessibility pass.
+
 ## 2026-06-01 (phase 4 closed)
 - Did: phase 4 closed — owner approved 4d, merged to main with --no-ff. Roadmap updated to show all four checkpoints done (A scaffolding, B activations, C chambers, D transitions+audio+mobile) and phase 5 marked active.
 - Why: exit gate met — full walkthrough Desk → City → NN → Project Chamber → back works end-to-end with audio scene crossfades, reduced-motion fallbacks, and mobile tap-to-walk.

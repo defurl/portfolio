@@ -1,13 +1,13 @@
 import { useMemo, useRef, useEffect } from 'react';
 import { useFrame, type ThreeEvent } from '@react-three/fiber';
 import { Billboard, Html, Text } from '@react-three/drei';
-import { type MeshStandardMaterial, type Mesh } from 'three';
+import { type MeshStandardMaterial, type Mesh, type MeshBasicMaterial } from 'three';
 import { useCityStore } from '../../lib/stores/cityStore';
 import { useSceneStore } from '../../lib/stores/sceneStore';
 import { useCityToNn } from './useCityToNn';
 import { neuralGatewayId } from './nnGateway';
 import labelStyles from '../desk/HoverLabel.module.css';
-import { BG_PANEL_2, INK_GHOST } from '../../lib/style/colors';
+import { BG_PANEL_2, INK_GHOST, SIGNAL_AMBER } from '../../lib/style/colors';
 
 import {
   DISTRICT_DEFS,
@@ -68,6 +68,7 @@ function FlashingLight({ position }: { position: [number, number, number] }) {
 
 function Building({ data, geom, position, accentColor }: OneBuildingProps) {
   const windowsRef = useRef<MeshStandardMaterial>(null);
+  const beamMatRef = useRef<MeshBasicMaterial>(null);
   const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { width, depth, height, style, emissiveScale, windowDensity } = geom;
   const enterNn = useCityToNn();
@@ -81,11 +82,15 @@ function Building({ data, geom, position, accentColor }: OneBuildingProps) {
 
   // Pulse: window emissive intensity tracks directionPulse.value × scale.
   // Hover lift adds +20% emissive while hovered (per §3.21).
-  useFrame(() => {
+  useFrame((state) => {
     const m = windowsRef.current;
-    if (!m) return;
-    const base = windowDensity * emissiveScale * directionPulse.value * 1.4;
-    m.emissiveIntensity = showCallout ? base * 1.25 : base;
+    if (m) {
+      const base = windowDensity * emissiveScale * directionPulse.value * 1.4;
+      m.emissiveIntensity = showCallout ? base * 1.25 : base;
+    }
+    if (beamMatRef.current) {
+      beamMatRef.current.opacity = Math.sin(state.clock.getElapsedTime() * 4) * 0.15 + 0.35;
+    }
   });
 
   useEffect(() => () => {
@@ -211,6 +216,21 @@ function Building({ data, geom, position, accentColor }: OneBuildingProps) {
           metalness={0.8}
         />
       </mesh>
+
+      {/* Neural Gateway Beam (if this building is the NN entrance) */}
+      {isGateway && (
+        <mesh position={[0, h + 2.5, 0]}>
+          <cylinderGeometry args={[0.04, 0.08, 5.0, 8, 1, true]} />
+          <meshBasicMaterial
+            ref={beamMatRef}
+            color={SIGNAL_AMBER}
+            transparent
+            opacity={0.4}
+            depthWrite={false}
+            toneMapped={false}
+          />
+        </mesh>
+      )}
 
       {/* Procedural structural concrete columns and slab grid overlay */}
       {gridElements}

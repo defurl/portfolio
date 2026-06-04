@@ -49,3 +49,78 @@
 .prose :global(a) {
   color: var(--signal-amber);
 }
+
+.backLink {
+  display: inline-block;
+  margin-top: 1rem;
+  font-family: var(--font-mono);
+  color: var(--signal-amber);
+  text-decoration: none;
+}
+
+.backLink:hover,
+.backLink:focus {
+  text-decoration: underline;
+}
+
+.section {
+  margin-top: 4rem;
+  border-top: 1px solid var(--ink-ghost);
+  padding-top: 2rem;
+}
+
+.sectionTitle {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: var(--step-4);
+  color: var(--ink-paper);
+  margin: 0 0 2rem 0;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.item {
+  border-left: 2px solid var(--ink-ghost);
+  padding-left: 1.5rem;
+}
+
+.date {
+  font-family: var(--font-mono);
+  font-size: var(--step-0);
+  color: var(--ink-muted);
+  margin: 0 0 0.5rem 0;
+}
+
+.links {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1.5rem;
+}
+
+.link {
+  font-family: var(--font-mono);
+  font-size: var(--step-0);
+  color: var(--signal-amber);
+  text-decoration: none;
+}
+
+.link:hover,
+.link:focus {
+  text-decoration: underline;
+}
+
+.footer {
+  margin-top: 6rem;
+  border-top: 1px solid var(--ink-ghost);
+  padding: 2rem 0;
+  font-family: var(--font-mono);
+  font-size: var(--step-0);
+  color: var(--ink-muted);
+  text-align: center;
+}
+

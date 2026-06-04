@@ -1,6 +1,6 @@
-import { useRef } from 'react';
+import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Color, type MeshStandardMaterial } from 'three';
+import { Color, type MeshStandardMaterial, type Group } from 'three';
 import {
   BG_NIGHT,
   BG_PANEL,
@@ -8,6 +8,7 @@ import {
   LAMP_WARM,
   VOXEL_GLOW,
   VOXEL_GLOW_SOFT,
+  RAIN_STREAK,
 } from '../../../lib/style/colors';
 import { useMarketStore } from '../../../lib/stores/marketStore';
 import { useSceneStore } from '../../../lib/stores/sceneStore';
@@ -64,6 +65,64 @@ const SKY_TABLE: Record<MarketSession, SkyState> = {
 
 // Lerp speed: roughly 1 second to ~95% of target. dt is per-frame seconds.
 const LERP_K = 0.05;
+
+function WindowRain() {
+  const reduced = useSceneStore((s) => s.prefersReducedMotion);
+  const count = 18;
+
+  // Generate random initial positions, speeds, and heights for the drops
+  const drops = useMemo(() => {
+    const arr = [];
+    for (let i = 0; i < count; i++) {
+      arr.push({
+        x: (Math.random() - 0.5) * (W - FRAME_T * 2.2),
+        y: (Math.random() - 0.5) * (H - FRAME_T * 2.2),
+        speed: 0.25 + Math.random() * 0.45,
+        length: 0.015 + Math.random() * 0.025,
+      });
+    }
+    return arr;
+  }, []);
+
+  const groupRef = useRef<Group>(null);
+
+  useFrame((_, dt) => {
+    if (reduced || !groupRef.current) return;
+
+    // Animate each droplet down the window
+    groupRef.current.children.forEach((child, i) => {
+      const drop = drops[i];
+      if (!drop) return;
+      child.position.y -= drop.speed * dt;
+
+      // If it goes past the bottom frame, reset to top
+      const bottomLimit = -H / 2 + FRAME_T;
+      const topLimit = H / 2 - FRAME_T;
+      if (child.position.y < bottomLimit) {
+        child.position.y = topLimit;
+        child.position.x = (Math.random() - 0.5) * (W - FRAME_T * 2.2);
+        drop.speed = 0.25 + Math.random() * 0.45;
+      }
+    });
+  });
+
+  if (reduced) return null;
+
+  return (
+    <group ref={groupRef}>
+      {drops.map((drop, i) => (
+        <mesh key={i} position={[drop.x, drop.y, GLASS_THICKNESS / 2 + 0.001]}>
+          <planeGeometry args={[0.0018, drop.length]} />
+          <meshBasicMaterial
+            color={RAIN_STREAK}
+            transparent
+            opacity={0.3 + Math.random() * 0.3}
+          />
+        </mesh>
+      ))}
+    </group>
+  );
+}
 
 export function Window({ position, rotation = [0, 0, 0] }: WindowProps) {
   const skyRef = useRef<MeshStandardMaterial>(null);
@@ -125,13 +184,16 @@ export function Window({ position, rotation = [0, 0, 0] }: WindowProps) {
         <boxGeometry args={[W - FRAME_T * 2, H - FRAME_T * 2, GLASS_THICKNESS]} />
         <meshPhysicalMaterial
           color={BG_NIGHT}
-          transmission={0.3}
-          roughness={0.05}
-          metalness={0}
+          transmission={0.55}
+          roughness={0.12}
+          metalness={0.05}
           ior={1.45}
           thickness={0.05}
         />
       </mesh>
+
+      {/* Rain droplets overlay */}
+      <WindowRain />
 
       {/* Sky beyond — upper plane, tracks session. */}
       <mesh position={[0, 0.25, -0.3]}>

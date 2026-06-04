@@ -12,3 +12,25 @@
   white-space: nowrap;
   user-select: none;
 }
+
+.focusableButton {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  pointer-events: auto;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.focusableButton:focus-visible {
+  opacity: 1;
+  outline: 2px solid var(--signal-amber);
+  outline-offset: 4px;
+  border-radius: 4px;
+  background: rgba(10, 15, 26, 0.4);
+}
+

@@ -1,3 +1,4 @@
+import { GradientTexture } from '@react-three/drei';
 import { BG_PANEL_2, BG_VOID, INK_GHOST, SIGNAL_AMBER_DIM, VOXEL_GLOW_SOFT } from '../../../lib/style/colors';
 import { useInteractionStore } from '../../../lib/stores/interactionStore';
 
@@ -11,6 +12,9 @@ import { useInteractionStore } from '../../../lib/stores/interactionStore';
 // `color` is set to BG_VOID so the unlit base reads dark — the emissive layer
 // is what makes the screen "glow." `toneMapped: false` keeps the emissive
 // values raw so the bloom layer can catch the luminance.
+//
+// GradientTexture is attached to emissiveMap to produce a rich vertical
+// linear-gradient glow fading toward the bottom of the screen.
 //
 // Contact shadows (no-contact-shadow fix): bezel + stand both castShadow.
 
@@ -54,10 +58,16 @@ export function Monitor({ position, variant, width = 0.62, height = 0.36, hoverI
           color={BG_VOID}
           emissive={emissiveTint}
           emissiveIntensity={emissiveIntensity}
-          roughness={1}
-          metalness={0}
+          roughness={0.9}
+          metalness={0.05}
           toneMapped={false}
-        />
+        >
+          <GradientTexture
+            attach="emissiveMap"
+            stops={[0, 0.5, 1]}
+            colors={['#fefefe', '#bbbbbb', '#444444']}
+          />
+        </meshStandardMaterial>
       </mesh>
 
       {/* Stand neck */}

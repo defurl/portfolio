@@ -24,6 +24,30 @@
       "district": "infrastructure",
       "thesis": "A feature store that guarantees point-in-time correctness for model training — no lookahead leakage from sloppy time-series joins.",
       "links": [{ "label": "repo", "url": "https://github.com/defurl" }]
+    },
+    {
+      "id": "limit-order-sim",
+      "title": "Limit Order Book Simulator",
+      "category": "trading",
+      "district": "softwares",
+      "thesis": "Microsecond-resolution simulation of Level 2 order-book dynamics tracking individual queue positions, cancellations, and venue latency.",
+      "links": [{ "label": "repo", "url": "https://github.com/defurl" }]
+    },
+    {
+      "id": "model-inference-api",
+      "title": "Ultra-Low-Latency Inference",
+      "category": "ml",
+      "district": "ml",
+      "thesis": "Sub-microsecond deep learning forward passes in C++ using memory-mapped tensor storage, vectorization, and zero-allocation execution paths.",
+      "links": [{ "label": "repo", "url": "https://github.com/defurl" }]
+    },
+    {
+      "id": "feature-pipeline",
+      "title": "Real-Time Feature Pipeline",
+      "category": "infrastructure",
+      "district": "coursework",
+      "thesis": "Stateful event-driven calculation of moving statistics and market imbalances over 500k events/sec with sub-millisecond execution jitter.",
+      "links": [{ "label": "repo", "url": "https://github.com/defurl" }]
     }
   ]
 }

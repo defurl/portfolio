@@ -3,19 +3,20 @@ import { type ThreeEvent } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import { useInteractionStore, type ObjectId } from '../../lib/stores/interactionStore';
 import { useSceneStore } from '../../lib/stores/sceneStore';
-import { useAudioStore } from '../../lib/stores/audioStore';
 import labelStyles from './HoverLabel.module.css';
 
-// Wraps a desk object with the Checkpoint B/C interaction grammar.
+// Wraps a desk object with the Checkpoint B/C interaction grammar + a11y focus hooks.
 //
 // Desktop: pointer-over shows the label, pointer-out hides it, click runs
 // `onActivate`. Cursor pointer only when clickable.
 //
+// Keyboard/A11y: renders a hidden button that allows tabbing to the 3D element,
+// triggering hover state and activation on Space/Enter keys.
+//
 // Mobile (1.22): touch has no hover — first tap "arms" the object (label
 // shows for ~3s with a glow), second tap on the SAME object within that
 // window activates. A tap on a different (armed) object disarms the old
-// one and arms the new. Tapping the empty desk dismisses any armed label
-// (handled by the panel/canvas — see DeskScene/DeskRoute).
+// one and arms the new. Tapping the empty desk dismisses any armed label.
 
 interface InteractiveObjectProps {
   id: ObjectId;
@@ -58,9 +59,6 @@ export function InteractiveObject({
     setHovered(true);
     setHoveredStore(id);
     document.body.style.cursor = onActivate ? 'pointer' : 'auto';
-    if (useAudioStore.getState().enabled) {
-      // TODO: hover tick at ~0.02 gain — Phase 2 audio palette.
-    }
   };
 
   const leave = (e: ThreeEvent<PointerEvent>) => {
@@ -90,6 +88,26 @@ export function InteractiveObject({
     }
   };
 
+  // Keyboard/A11y focus event handlers
+  const handleFocus = () => {
+    if (isMobile) return;
+    setHovered(true);
+    setHoveredStore(id);
+  };
+
+  const handleBlur = () => {
+    if (isMobile) return;
+    setHovered(false);
+    setHoveredStore(null);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      if (onActivate) onActivate();
+    }
+  };
+
   // The label shows on hover (desktop) or when armed (mobile), suppressed
   // whenever a panel is open so it doesn't float over the open content.
   const showLabel = label && !focused && (hovered || armed);
@@ -97,6 +115,22 @@ export function InteractiveObject({
   return (
     <group onPointerOver={enter} onPointerOut={leave} onClick={click}>
       {children}
+      
+      {/* Hidden button for keyboard navigation (focusable via Tab) */}
+      {onActivate && !focused && (
+        <Html position={labelPosition} transform={false} prepend center style={{ pointerEvents: 'none' }}>
+          <button
+            type="button"
+            className={labelStyles.focusableButton}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            onKeyDown={handleKeyDown}
+            aria-label={label || id}
+            style={{ pointerEvents: 'auto' }}
+          />
+        </Html>
+      )}
+
       {showLabel && (
         <Html position={labelPosition} transform={false} prepend center pointerEvents="none">
           <span className={labelStyles.label}>{label}</span>
@@ -105,3 +139,4 @@ export function InteractiveObject({
     </group>
   );
 }
+
