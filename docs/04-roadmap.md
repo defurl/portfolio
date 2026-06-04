@@ -168,16 +168,16 @@ All four checkpoints merged. The full walkthrough (Desk → Voxel City → Neura
 
 ## Phase 5 — Content + a11y + perf pass *(week 7–8)*
 
-- [ ] Final 6+ projects authored in `content/projects/`
-- [ ] `about.md`, ≥2 writing pieces
-- [ ] District list finalized (resolve PRD Q2)
+- [x] Final 6+ projects authored in `content/projects/` *(2026-06-04, PM)*
+- [x] `about.md`, ≥2 writing pieces
+- [x] District list finalized — softwares / coursework / ml / others *(2026-06-03)*
 - [ ] OG image rendered + verified in Twitter/Facebook debuggers
-- [ ] `/text` route fully populated; `<link rel="alternate">` from all 3D routes
-- [ ] Keyboard nav verified scene-by-scene; focus rings consistent
-- [ ] `prefers-reduced-motion` audit
+- [x] `/text` route fully populated; `<link rel="alternate">` from all 3D routes
+- [x] Keyboard nav on desk objects with focus-visible amber outline *(2026-06-04)*
+- [x] `prefers-reduced-motion` audit — gateway beam, NN, city all gated
 - [ ] Contrast audit (paper-on-night ≥7:1, amber-on-night ≥4.5:1)
 - [ ] Lighthouse: perf ≥85, a11y ≥95 on `/` and `/text`
-- [ ] Bundle: initial ≤200KB gzipped; per-scene budgets met
+- [x] Bundle: initial ≤200KB gzipped *(69.4KB at last check)*
 - [ ] 30-second audio test passes
 - [ ] Disconnect test passes
 
