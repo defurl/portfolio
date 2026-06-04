@@ -1,4 +1,4 @@
-<!-- worklog-sync: lastCommitSha=23f4a58ad75f17af2413ee4c41be53ae12dd3ad3 -->
+<!-- worklog-sync: lastCommitSha=c416290c76577106031fb271e0f5df89541e7b94 -->
 # worklog.md
 
 > One-line-per-line decision log. Append after every meaningful change.
@@ -534,3 +534,9 @@ Detailed iteration history is below for reference.
 ## 2026-06-03 — auto-synced from git log
 - chore(ci): sync roadmap metadata [skip ci] (`8a87f7f`)
 - chore(ci): trigger metadata sync on cron and manual only (`23f4a58`)
+
+## 2026-06-03 — auto-synced from git log
+- chore(ci): sync roadmap metadata [skip ci] (`6fa2e2b`)
+
+## 2026-06-04 — auto-synced from git log
+- feat(desk): implement keyboard focus, rain overlay & monitor gradients (`c416290`)
