@@ -89,7 +89,10 @@ function Building({ data, geom, position, accentColor }: OneBuildingProps) {
       m.emissiveIntensity = showCallout ? base * 1.25 : base;
     }
     if (beamMatRef.current) {
-      beamMatRef.current.opacity = Math.sin(state.clock.getElapsedTime() * 4) * 0.15 + 0.35;
+      const reduced = useSceneStore.getState().prefersReducedMotion;
+      beamMatRef.current.opacity = reduced
+        ? 0.35
+        : Math.sin(state.clock.getElapsedTime() * 4) * 0.15 + 0.35;
     }
   });
 
