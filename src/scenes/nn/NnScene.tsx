@@ -6,7 +6,7 @@ import { NnChamber } from './NnChamber';
 import { ChamberPanel } from './ChamberPanel';
 import { InferenceChamber } from './InferenceChamber';
 import { CHAMBERS } from './chambers';
-import { NnBloom } from './postfx/NnBloom';
+import { NnPostFx } from './postfx/NnPostFx';
 import { NnAudioBridge } from './NnAudioBridge';
 import { NnWaypoints } from './NnWaypoints';
 import { useNnSettingsStore } from '../../lib/stores/nnSettingsStore';
@@ -115,7 +115,7 @@ export function NnScene() {
         );
       })}
 
-      <NnBloom />
+      <NnPostFx />
       <NnAudioBridge />
       <NnWaypoints />
     </>
