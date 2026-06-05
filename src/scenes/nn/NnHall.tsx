@@ -2,6 +2,7 @@ import { useMemo, useRef, useEffect } from 'react';
 import { Matrix4 } from 'three';
 import type { InstancedMesh } from 'three';
 import { BG_PANEL, BG_PANEL_2 } from '../../lib/style/colors';
+import { ConcreteSurface } from './ConcreteSurface';
 import {
   GAP_LENGTH,
   HALL_HEIGHT,
@@ -84,7 +85,12 @@ export function NnHall() {
         receiveShadow
       >
         <planeGeometry args={[HALL_WIDTH, HALL_TOTAL_Z]} />
-        <meshStandardMaterial color={CONCRETE_COLOR} roughness={0.95} metalness={0.02} />
+        <ConcreteSurface
+          color={CONCRETE_COLOR}
+          uRepeat={3}
+          vRepeat={32}
+          roughness={0.95}
+        />
       </mesh>
 
       {/* Per-layer wall + ceiling segments (ceiling segmented so the
@@ -94,17 +100,32 @@ export function NnHall() {
           {/* Left wall */}
           <mesh position={[-HALL_WIDTH / 2, HALL_HEIGHT / 2, 0]} castShadow receiveShadow>
             <boxGeometry args={[0.4, HALL_HEIGHT, s.len]} />
-            <meshStandardMaterial color={CONCRETE_COLOR} roughness={0.9} metalness={0.02} />
+            <ConcreteSurface
+              color={CONCRETE_COLOR}
+              uRepeat={Math.round(s.len / 2)}
+              vRepeat={5}
+              roughness={0.9}
+            />
           </mesh>
           {/* Right wall */}
           <mesh position={[HALL_WIDTH / 2, HALL_HEIGHT / 2, 0]} castShadow receiveShadow>
             <boxGeometry args={[0.4, HALL_HEIGHT, s.len]} />
-            <meshStandardMaterial color={CONCRETE_COLOR} roughness={0.9} metalness={0.02} />
+            <ConcreteSurface
+              color={CONCRETE_COLOR}
+              uRepeat={Math.round(s.len / 2)}
+              vRepeat={5}
+              roughness={0.9}
+            />
           </mesh>
           {/* Ceiling */}
           <mesh position={[0, HALL_HEIGHT, 0]} receiveShadow>
             <boxGeometry args={[HALL_WIDTH + 0.8, 0.3, s.len]} />
-            <meshStandardMaterial color={CONCRETE_COLOR} roughness={0.95} metalness={0.02} />
+            <ConcreteSurface
+              color={CONCRETE_COLOR}
+              uRepeat={3}
+              vRepeat={Math.round(s.len / 2)}
+              roughness={0.95}
+            />
           </mesh>
         </group>
       ))}
@@ -118,7 +139,13 @@ export function NnHall() {
         receiveShadow
       >
         <boxGeometry args={[COLUMN_DEPTH, HALL_HEIGHT - 0.6, COLUMN_RADIUS * 4]} />
-        <meshStandardMaterial color={COLUMN_ACCENT} roughness={0.92} metalness={0.04} />
+        <ConcreteSurface
+          color={COLUMN_ACCENT}
+          uRepeat={1}
+          vRepeat={5}
+          roughness={0.92}
+          metalness={0.04}
+        />
       </instancedMesh>
     </group>
   );
