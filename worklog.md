@@ -1,4 +1,4 @@
-<!-- worklog-sync: lastCommitSha=c416290c76577106031fb271e0f5df89541e7b94 -->
+<!-- worklog-sync: lastCommitSha=2d8a54eebd89f56e960500e9f8721611b5311447 -->
 # worklog.md
 
 > One-line-per-line decision log. Append after every meaningful change.
@@ -540,3 +540,6 @@ Detailed iteration history is below for reference.
 
 ## 2026-06-04 — auto-synced from git log
 - feat(desk): implement keyboard focus, rain overlay & monitor gradients (`c416290`)
+
+## 2026-06-04 — auto-synced from git log
+- chore(ci): sync roadmap metadata [skip ci] (`2d8a54e`)
