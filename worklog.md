@@ -5,6 +5,11 @@
 
 ---
 
+## 2026-06-09 (visual upgrade — nn pbr + ssao)
+- Did: Strategy C visual elevation pass on the NN corridor. (1) Merged NnBloom into a unified NnPostFx that stacks N8AO (aoRadius 1.5, intensity 2.2, medium quality) + Bloom in a single EffectComposer — AO darkens wall/floor seams and column-base contacts that the flat directional shafts can't produce. (2) Sourced Concrete033 CC0 PBR pack; committed NormalGL + Roughness maps; built ConcreteSurface component (PBR on desktop, flat fallback on mobile) with repeat-aware tile config per surface type; applied to floor, walls, ceiling, and instanced columns in NnHall. Diffuse map intentionally excluded — BG_PANEL tint from design tokens stays the palette authority. (3) Phase 5 code review fixes: monitor gradient hex literals → INK_PAPER/INK_MUTED/INK_FAINT tokens; gateway beam frozen at rest opacity under prefers-reduced-motion; projects.json district fields aligned to softwares/coursework/ml/others taxonomy; roadmap phase 5 checkboxes updated.
+- Why: "boxes → real image" lift — normal-mapped concrete surface under the diagonal shaft light is the single biggest perceptual upgrade before Blender lightmap baking.
+- Next: Blender lightmap bake for desk scene (Strategy B); or Lighthouse/contrast audit to close phase 5 remaining gates.
+
 ## 2026-06-04 (phase 5 execution completed)
 - Did: Checkpoints 5A, 5B, and 5C completed:
   1. Authored 3 new quantitative/systems engineering projects and fully populated the plain-text /text alternate route with eager build-time imports of biography, all 6 projects, and writing pieces.
