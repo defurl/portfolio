@@ -1,4 +1,4 @@
-<!-- worklog-sync: lastCommitSha=2e6f3ad36c4fd5b524f855ba11f476ff78e35bf0 -->
+<!-- worklog-sync: lastCommitSha=decefdfbd0016a5f0537ab28e2f56062739fb95c -->
 # worklog.md
 
 > One-line-per-line decision log. Append after every meaningful change.
@@ -557,3 +557,19 @@ Detailed iteration history is below for reference.
 
 ## 2026-06-07 — auto-synced from git log
 - chore(ci): sync roadmap metadata [skip ci] (`2e6f3ad`)
+
+## 2026-06-04 — auto-synced from git log
+- refactor(desk): swap monitor gradient hex literals for design tokens (`846e77a`)
+- fix(city): freeze gateway beam pulse under prefers-reduced-motion (`d6cac85`)
+- fix(content): align project district fields with city taxonomy (`914f78c`)
+- docs(roadmap): mark phase 5 content + a11y items completed (`c841535`)
+
+## 2026-06-05 — auto-synced from git log
+- feat(nn): add n8ao ambient occlusion to nn postfx pipeline (`b7b9273`)
+- feat(nn): apply concrete033 pbr maps to hall surfaces (`a788aa5`)
+
+## 2026-06-08 — auto-synced from git log
+- chore(ci): sync roadmap metadata [skip ci] (`36e52ce`)
+
+## 2026-06-09 — auto-synced from git log
+- docs(nn): worklog entry for concrete pbr + ssao visual upgrade (`decefdf`)
