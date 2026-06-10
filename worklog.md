@@ -1,4 +1,4 @@
-<!-- worklog-sync: lastCommitSha=decefdfbd0016a5f0537ab28e2f56062739fb95c -->
+<!-- worklog-sync: lastCommitSha=275a4a4cf66befea78b07f817e8cb6b7e088a94f -->
 # worklog.md
 
 > One-line-per-line decision log. Append after every meaningful change.
@@ -573,3 +573,21 @@ Detailed iteration history is below for reference.
 
 ## 2026-06-09 — auto-synced from git log
 - docs(nn): worklog entry for concrete pbr + ssao visual upgrade (`decefdf`)
+
+## 2026-06-04 — auto-synced from git log
+- chore(ci): sync roadmap metadata [skip ci] (`2d8a54e`)
+
+## 2026-06-05 — auto-synced from git log
+- chore(ci): sync roadmap metadata [skip ci] (`004e253`)
+
+## 2026-06-06 — auto-synced from git log
+- chore(ci): sync roadmap metadata [skip ci] (`2041744`)
+
+## 2026-06-07 — auto-synced from git log
+- chore(ci): sync roadmap metadata [skip ci] (`2e6f3ad`)
+
+## 2026-06-08 — auto-synced from git log
+- chore(ci): sync roadmap metadata [skip ci] (`36e52ce`)
+
+## 2026-06-09 — auto-synced from git log
+- chore(ci): sync roadmap metadata [skip ci] (`275a4a4`)
