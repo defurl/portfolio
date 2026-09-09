@@ -1,4 +1,4 @@
-<!-- worklog-sync: lastCommitSha=16d9b30973d245c8bb8e20852d88d7852b3a395d -->
+<!-- worklog-sync: lastCommitSha=b36626d8a4e5d97006611661ee60b76ef998d54e -->
 # worklog.md
 
 > One-line-per-line decision log. Append after every meaningful change.
@@ -861,3 +861,6 @@ Detailed iteration history is below for reference.
 
 ## 2026-09-07 — auto-synced from git log
 - chore(ci): sync roadmap metadata [skip ci] (`16d9b30`)
+
+## 2026-09-08 — auto-synced from git log
+- chore(ci): sync roadmap metadata [skip ci] (`b36626d`)
